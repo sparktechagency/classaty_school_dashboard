@@ -70,6 +70,7 @@ const FAQSection = () => {
     useState<boolean>(false);
   const [isFaqDeleteModalOpen, setIsFaqDeleteModalOpen] =
     useState<boolean>(false);
+  console.log(isFaqDeleteModalOpen);
   const [currentRecord, setCurrentRecord] = useState<FAQ | null>(null);
 
   // Open Add FAQ modal
@@ -96,10 +97,6 @@ const FAQSection = () => {
   };
 
   // Close Delete FAQ modal
-  const handleCancelFaqDeleteModal = () => {
-    setIsFaqDeleteModalOpen(false);
-    setCurrentRecord(null);
-  };
 
   return (
     <div className="min-h-[88vh] bg-primary-color py-4 px-4 rounded-lg">
@@ -148,13 +145,6 @@ const FAQSection = () => {
         />
       )}
       {/* Uncomment when Delete FAQ modal is available */}
-      {/* {isFaqDeleteModalOpen && (
-        <DeleteFAQModal
-          isFaqDeleteModalOpen={isFaqDeleteModalOpen}
-          handleCancelFaqDeleteModal={handleCancelFaqDeleteModal}
-          currentRecord={currentRecord}
-        />
-      )} */}
     </div>
   );
 };

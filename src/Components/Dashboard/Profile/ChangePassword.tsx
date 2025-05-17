@@ -62,7 +62,7 @@ const ChangePassword = () => {
   };
   return (
     <div className="lg:w-[70%] mt-20">
-      <ReusableForm onSubmit={onFinish}>
+      <ReusableForm handleFinish={onFinish}>
         {inputStructure.map((input, index) => (
           <ReuseInput
             key={index}

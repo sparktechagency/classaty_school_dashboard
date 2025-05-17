@@ -49,7 +49,7 @@ const SignIn = () => {
               </div>
             </div>
             {/* -------- Form Start ------------ */}
-            <ReusableForm onSubmit={onFinish}>
+            <ReusableForm handleFinish={onFinish}>
               {inputStructure.map((input, index) => (
                 <ReuseInput
                   key={index}

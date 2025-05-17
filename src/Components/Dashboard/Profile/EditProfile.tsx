@@ -45,6 +45,7 @@ const inputStructure = [
 ];
 
 const EditProfile = () => {
+  const [form] = Form.useForm();
   const profileData = {
     userName: "James Mitchell",
     email: "emily@gmail.com",
@@ -78,7 +79,8 @@ const EditProfile = () => {
     <div className=" mt-10  rounded-xl">
       <div className=" flex justify-start items-center">
         <ReusableForm
-          onSubmit={onFinish}
+          form={form}
+          handleFinish={onFinish}
           className="p-10 w-full lg:w-[70%]"
           defaultValues={profileData}
         >

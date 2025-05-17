@@ -1,9 +1,14 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button, Modal } from "antd";
 
 const DeleteSubscriptionModal = ({
   isDeleteModalOpen,
   handleCancelDeleteModal,
   currentRecord,
+}: {
+  isDeleteModalOpen: boolean;
+  handleCancelDeleteModal: () => void;
+  currentRecord: any;
 }) => {
   //   const [deleteSubscription] = useDeleteSubscriptionMutation();
   const handleDelete = async () => {

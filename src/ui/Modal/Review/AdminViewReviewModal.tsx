@@ -1,11 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Modal, Rate } from "antd";
 import { AllImages } from "../../../../public/images/AllImages";
-import { ReviewType } from "../../../types/ReviewType";
 
 interface AdminViewReviewModalProps {
   isViewModalVisible: boolean;
   handleCancel: () => void;
-  currentRecord: ReviewType | null;
+  currentRecord: any | null;
 }
 
 const AdminViewReviewModal: React.FC<AdminViewReviewModalProps> = ({
@@ -30,7 +30,7 @@ const AdminViewReviewModal: React.FC<AdminViewReviewModalProps> = ({
           <div className="mt-3">
             <div className="text-lg  ">
               <img
-                src={AllImages.ads}
+                src={AllImages.cover}
                 alt="quote"
                 className="w-full h-auto mx-auto"
               />
