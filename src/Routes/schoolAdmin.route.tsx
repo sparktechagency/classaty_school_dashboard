@@ -1,0 +1,140 @@
+//* ------------------ICONS------------------
+import dashboardLogo from "../../public/images/dashboard-logo/dashboard.svg";
+import settingLogo from "../../public/images/dashboard-logo/setting.svg";
+import classLogo from "../../public/images/dashboard-logo/class.svg";
+import scheduleLogo from "../../public/images/dashboard-logo/schedule.svg";
+import subjectLogo from "../../public/images/dashboard-logo/subject.svg";
+import schoolLogo from "../../public/images/dashboard-logo/school.svg";
+import teacherLogo from "../../public/images/dashboard-logo/teacher.svg";
+import messageLogo from "../../public/images/dashboard-logo/message.svg";
+import assignmentLogo from "../../public/images/dashboard-logo/assignment.svg";
+import examLogo from "../../public/images/dashboard-logo/exam.svg";
+import resultLogo from "../../public/images/dashboard-logo/result.svg";
+import atendenceLogo from "../../public/images/dashboard-logo/atendence.svg";
+import anounceLogo from "../../public/images/dashboard-logo/anounce.svg";
+import alarmsLogo from "../../public/images/dashboard-logo/alarms.svg";
+
+//* ------------------IMPORT COMPONENTS------------------
+import Notifications from "../pages/Common/Notifications";
+import AdminMessage from "../pages/Admin/AdminMessage";
+import SchoolAdmin from "../pages/SchoolAdmin/SchoolAdmin";
+import AlarmsPage from "../pages/SchoolAdmin/Alarms";
+import AnouncementPage from "../pages/SchoolAdmin/Anouncement";
+import AttendencePage from "../pages/SchoolAdmin/AttendancePage";
+import ResultPage from "../pages/SchoolAdmin/ResultPage";
+import AssignmentPage from "../pages/SchoolAdmin/AssignmentPage";
+import SchoolAdminTeachers from "../pages/SchoolAdmin/SchoolAdminTeachers";
+import SchoolAdminStudent from "../pages/SchoolAdmin/SchoolAdminStudent";
+import SubjectPage from "../pages/SchoolAdmin/Subject";
+import ClassSchedulePage from "../pages/SchoolAdmin/ClassSchedulePage";
+import ClassPage from "../pages/SchoolAdmin/Class";
+import SchoolAdminOVerview from "../pages/SchoolAdmin/SchoolAdminOVerview";
+import ExamPage from "../pages/SchoolAdmin/Exam";
+
+export const schoolAdminPaths = [
+  {
+    path: "overview",
+    element: <SchoolAdminOVerview />,
+    key: "overview",
+    name: "Overview",
+    icon: dashboardLogo,
+  },
+  {
+    path: "notifications",
+    element: <Notifications />,
+    key: "notifications",
+  },
+  {
+    path: "class",
+    element: <ClassPage />,
+    key: "class",
+    name: "Class",
+    icon: classLogo,
+  },
+  {
+    path: "class-schedule",
+    element: <ClassSchedulePage />,
+    key: "class-schedule",
+    name: "Schedule",
+    icon: scheduleLogo,
+  },
+  {
+    path: "subject",
+    element: <SubjectPage />,
+    key: "subject",
+    name: "Subjects",
+    icon: subjectLogo,
+  },
+  {
+    path: "student",
+    element: <SchoolAdminStudent />,
+    key: "student",
+    name: "Students",
+    icon: schoolLogo,
+  },
+  {
+    path: "teacher",
+    element: <SchoolAdminTeachers />,
+    key: "teacher",
+    name: "Teachers",
+    icon: teacherLogo,
+  },
+  {
+    path: "message",
+    element: <AdminMessage />,
+    key: "message",
+    name: "Messages",
+    icon: messageLogo,
+  },
+  {
+    path: "assignment",
+    element: <AssignmentPage />,
+    key: "assignment",
+    name: "Assignment",
+    icon: assignmentLogo,
+  },
+  {
+    path: "exam",
+    element: <ExamPage />,
+    key: "exam",
+    name: "Exam",
+    icon: examLogo,
+  },
+  {
+    path: "result",
+    element: <ResultPage />,
+    key: "result",
+    name: "Result",
+    icon: resultLogo,
+  },
+  {
+    path: "attendence",
+    element: <AttendencePage />,
+    key: "attendence",
+    name: "Attendence",
+    icon: atendenceLogo,
+  },
+  {
+    path: "anouncement",
+    element: <AnouncementPage />,
+    key: "anouncement",
+    name: "Anouncement",
+    icon: anounceLogo,
+  },
+
+  {
+    path: "alarms",
+    element: <AlarmsPage />,
+    key: "alarms",
+    name: "Alarms",
+    icon: alarmsLogo,
+  },
+
+  {
+    path: "settings",
+    element: <SchoolAdmin />,
+    key: "settings",
+    name: "Settings",
+    icon: settingLogo,
+  },
+];
