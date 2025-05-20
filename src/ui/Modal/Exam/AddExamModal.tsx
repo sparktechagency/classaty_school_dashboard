@@ -71,6 +71,20 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
                 rules={[{ required: true, message: "Class is required" }]}
               />
 
+              <ReuseInput
+                inputType="normal"
+                rows={4}
+                Typolevel={5}
+                label="Required Pass Grade"
+                name="requiredPassGrader"
+                placeholder="Enter Required Pass Grader"
+                rules={[
+                  {
+                    required: true,
+                    message: "Required Pass Grader is required",
+                  },
+                ]}
+              />
               <Typography.Title level={5} className="mb-1">
                 Date
               </Typography.Title>

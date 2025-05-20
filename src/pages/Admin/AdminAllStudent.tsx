@@ -11,6 +11,7 @@ import { IStudentData } from "../../types";
 import ViewStudentModal from "../../ui/Modal/Student/ViewStudentModal";
 import StudentTable from "../../ui/Tables/StudentTable";
 import AddStudent from "../../ui/Modal/Student/AddStudent";
+import { MdDownload, MdFileUpload } from "react-icons/md";
 
 const AdminAllStudent = () => {
   const data: IStudentData[] = StudentsData;
@@ -83,7 +84,13 @@ const AdminAllStudent = () => {
         <p className="text-xl sm:text-2xl lg:text-3xl text-secondary-color font-bold">
           Student List
         </p>
-        <div className="h-fit">
+        <div className="h-fit flex items-center gap-2">
+          <ReuseButton variant="primary" className="!py-4.5">
+            <MdFileUpload className="!text-bas" /> Upload From Excel/CSV
+          </ReuseButton>
+          <ReuseButton variant="secondary" className="!py-4.5">
+            <MdDownload className="!text-bas" /> Download Format
+          </ReuseButton>
           <ReuseButton
             variant="secondary"
             className="!py-4.5"
@@ -132,21 +139,21 @@ const AdminAllStudent = () => {
         handleCancel={handleCancel}
         currentRecord={currentRecord}
         handleBlock={handleBlock}
-        description=" Are You Sure You want to Block This School ?"
+        description=" Are You Sure You want to Block This Student ?"
       />
       <UnblockModal
         isUnblockModalVisible={isUnblockModalVisible}
         handleCancel={handleCancel}
         currentRecord={currentRecord}
         handleUnblock={handleUnblock}
-        description=" Are You Sure You want to Unblock This School ?"
+        description=" Are You Sure You want to Unblock This Student ?"
       />
       <DeleteModal
         isDeleteModalVisible={isDeleteModalVisible}
         handleCancel={handleDeleteCancel}
         currentRecord={currentRecord}
         handleDelete={handleDelete}
-        description=" Are You Sure You want to Delete This School ?"
+        description=" Are You Sure You want to Delete This Student ?"
       />
     </div>
   );

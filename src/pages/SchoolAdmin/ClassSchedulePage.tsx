@@ -7,6 +7,7 @@ import ReuseButton from "../../ui/Button/ReuseButton";
 import { FiPlus } from "react-icons/fi";
 import ClassScheduleTable from "../../ui/Tables/ClassScheduleTable";
 import AddClassSchedule from "../../ui/Modal/ClassSchedule/AddClassSchedule";
+import { MdDownload, MdFileUpload } from "react-icons/md";
 
 const ClassSchedulePage = () => {
   const data: any[] = ScheduleData;
@@ -46,7 +47,13 @@ const ClassSchedulePage = () => {
           Class Schedule
         </p>
         <div className="h-fit">
-          <div className="h-fit">
+          <div className="h-fit flex items-center gap-3">
+            <ReuseButton variant="primary" className="!py-4.5">
+              <MdFileUpload className="!text-bas" /> Upload From Excel/CSV
+            </ReuseButton>
+            <ReuseButton variant="secondary" className="!py-4.5">
+              <MdDownload className="!text-bas" /> Download Format
+            </ReuseButton>
             <ReuseButton
               variant="secondary"
               className="!py-4.5"

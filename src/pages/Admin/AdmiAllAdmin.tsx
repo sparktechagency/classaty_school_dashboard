@@ -4,28 +4,25 @@ import BlockModal from "../../ui/Modal/BlockModal";
 import UnblockModal from "../../ui/Modal/UnblockModal";
 import ReuseSearchInput from "../../ui/Form/ReuseSearchInput";
 
-import SchoolAdminStudentData from "../../../public/data/SchoolAdminStudent";
+import AdminData from "../../../public/data/AdminData";
 import DeleteModal from "../../ui/Modal/DeleteModal";
 import ReuseButton from "../../ui/Button/ReuseButton";
 import { FiPlus } from "react-icons/fi";
-import SchoolAdminStudentTable from "../../ui/Tables/SchoolAdminStudentTable";
-import AddSchoolAdminStudent from "../../ui/Modal/SchoolAdminStudent/AddSchoolAdminStudent";
-import ViewSchoolAdminStudent from "../../ui/Modal/SchoolAdminStudent/ViewSchoolAdminStudent";
-import { MdDownload, MdFileUpload } from "react-icons/md";
-import SendNotification from "../../ui/Modal/SchoolAdminStudent/SendNotification";
-import EditSchoolAdminStudent from "../../ui/Modal/SchoolAdminStudent/EditSchoolAdminStudent";
+import AdminAllAdminTable from "../../ui/Tables/AdminAllAdminTable";
+import EditAdminModal from "../../ui/Modal/AdminAllAdmin/EditAdminAllAdmin";
+import AddAdminModal from "../../ui/Modal/AdminAllAdmin/AddAdminModal";
+import ViewAdminModal from "../../ui/Modal/AdminAllAdmin/ViewAdminModal";
 
-const SchoolAdminStudent = () => {
-  const data: any[] = SchoolAdminStudentData;
+const AdminAllAdmin = () => {
+  const data: any[] = AdminData;
   const [page, setPage] = useState(1);
   const [searchText, setSearchText] = useState("");
   console.log(searchText);
 
   const limit = 12;
 
-  const [isSendModalVisible, setIsSendModalVisible] = useState(false);
-  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
   const [isBlockModalVisible, setIsBlockModalVisible] = useState(false);
   const [isUnblockModalVisible, setIsUnblockModalVisible] = useState(false);
@@ -61,7 +58,6 @@ const SchoolAdminStudent = () => {
   };
 
   const handleCancel = () => {
-    setIsSendModalVisible(false);
     setIsAddModalVisible(false);
     setIsEditModalVisible(false);
     setIsViewModalVisible(false);
@@ -93,39 +89,33 @@ const SchoolAdminStudent = () => {
     <div className=" bg-primary-color rounded-xl p-4 min-h-[90vh]">
       <div className="flex justify-between items-center mb-5">
         <p className="text-xl sm:text-2xl lg:text-3xl text-secondary-color font-bold">
-          Student
+          Admin List
         </p>
-        <div className="h-fit flex items-center gap-2">
-          <ReuseButton variant="primary" className="!py-4.5">
-            <MdFileUpload className="!text-bas" /> Upload From Excel/CSV
-          </ReuseButton>
-          <ReuseButton variant="secondary" className="!py-4.5">
-            <MdDownload className="!text-bas" /> Download Format
-          </ReuseButton>
+        <div className="h-fit">
           <ReuseButton
             variant="secondary"
             className="!py-4.5"
             onClick={showAddModal}
           >
-            <FiPlus className="!text-bas" /> Add New Student
+            <FiPlus className="!text-bas" /> Add New Admin
           </ReuseButton>
         </div>
       </div>
       <div className="flex justify-end items-center mb-5">
         <div className="h-fit">
           <ReuseSearchInput
-            placeholder="Search Student.."
+            placeholder="Search Admin..."
             setSearch={setSearchText}
             setPage={setPage}
           />
         </div>
       </div>
       <div className="border-2 border-[#e1e1e1] rounded-xl rounded-tr-xl">
-        <SchoolAdminStudentTable
+        <AdminAllAdminTable
           data={data}
           loading={false}
-          showEditModal={showEditModal}
           showViewModal={showViewUserModal}
+          showEditModal={showEditModal}
           showBlockModal={showBlockModal}
           showUnblockModal={showUnblockModal}
           setPage={setPage}
@@ -135,49 +125,44 @@ const SchoolAdminStudent = () => {
         />
       </div>
 
-      <AddSchoolAdminStudent
-        isAddModalVisible={isAddModalVisible}
-        handleCancel={handleCancel}
-      />
-      <EditSchoolAdminStudent
+      <EditAdminModal
         isEditModalVisible={isEditModalVisible}
         handleCancel={handleCancel}
       />
-      <SendNotification
-        isSendModalVisible={isSendModalVisible}
+      <AddAdminModal
+        isAddModalVisible={isAddModalVisible}
         handleCancel={handleCancel}
       />
 
-      <ViewSchoolAdminStudent
+      <ViewAdminModal
         isViewModalVisible={isViewModalVisible}
         handleCancel={handleCancel}
         currentRecord={currentRecord}
         showDeleteModal={showDeleteModal}
-        setIsSendModalVisible={setIsSendModalVisible}
       />
       <BlockModal
         isBlockModalVisible={isBlockModalVisible}
         handleCancel={handleCancel}
         currentRecord={currentRecord}
         handleBlock={handleBlock}
-        description=" Are You Sure You want to Block This ?"
+        description=" Are You Sure You want to Block This Admin ?"
       />
       <UnblockModal
         isUnblockModalVisible={isUnblockModalVisible}
         handleCancel={handleCancel}
         currentRecord={currentRecord}
         handleUnblock={handleUnblock}
-        description=" Are You Sure You want to Unblock This ?"
+        description=" Are You Sure You want to Unblock This Admin ?"
       />
       <DeleteModal
         isDeleteModalVisible={isDeleteModalVisible}
         handleCancel={handleDeleteCancel}
         currentRecord={currentRecord}
         handleDelete={handleDelete}
-        description=" Are You Sure You want to Delete This ?"
+        description=" Are You Sure You want to Delete This Admin ?"
       />
     </div>
   );
 };
 
-export default SchoolAdminStudent;
+export default AdminAllAdmin;

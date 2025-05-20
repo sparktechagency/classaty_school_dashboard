@@ -44,7 +44,7 @@ const SubjectTable: React.FC<SubjectTableProps> = ({
 
           {/* Block User Tooltip */}
 
-          <Tooltip placement="left" title="Block">
+          <Tooltip placement="left" title="Delete">
             <button
               className="!p-0 !bg-transparent !border-none !text-error-color cursor-pointer"
               onClick={() => showDeleteModal(record)}

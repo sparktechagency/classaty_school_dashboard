@@ -7,12 +7,12 @@ import { MdBlock, MdModeEditOutline } from "react-icons/md";
 import ReuseTable from "../../utils/ReuseTable";
 
 // Define the type for the props
-interface SchoolAdminStudentTableProps {
+interface AdminAllAdminTableProps {
   data: any[]; // Replace `unknown` with the actual type of your data array
   loading: boolean;
+  showEditModal: (record: any) => void;
   showViewModal: (record: any) => void; // Function to handle viewing a user
   showBlockModal: (record: any) => void; // Function to handle blocking a user
-  showEditModal: (record: any) => void;
   showUnblockModal: (record: any) => void; // Function to handle unblocking a user
   setPage?: (page: number) => void; // Function to handle pagination
   page?: number;
@@ -20,12 +20,12 @@ interface SchoolAdminStudentTableProps {
   limit?: number;
 }
 
-const SchoolAdminStudentTable: React.FC<SchoolAdminStudentTableProps> = ({
+const AdminAllAdminTable: React.FC<AdminAllAdminTableProps> = ({
   data,
   loading,
+  showEditModal,
   showViewModal,
   showBlockModal,
-  showEditModal,
   showUnblockModal,
   setPage,
   page,
@@ -34,51 +34,57 @@ const SchoolAdminStudentTable: React.FC<SchoolAdminStudentTableProps> = ({
 }) => {
   const columns = [
     {
-      title: "ID",
-      dataIndex: "ID",
-      key: "ID",
+      title: "#UID",
+      render: (_: unknown, __: unknown, index: number) => index + 1,
+      key: "_id",
     },
     {
-      title: "Student Name",
-      dataIndex: "StudentName",
-      key: "StudentName",
+      title: " Name",
+      dataIndex: "fullName", // Data key for fullName
+      key: "fullName",
     },
     {
-      title: "Student Contact No",
-      dataIndex: "StudentContactNo",
-      key: "StudentContactNo",
+      title: "Email",
+      dataIndex: "email", // Data key for email
+      key: "email",
     },
     {
-      title: "Father Contact No",
-      dataIndex: "FatherContactNo",
-      key: "FatherContactNo",
+      title: "Phone Number",
+      dataIndex: "phoneNumber", // Data key for phoneNumber
+      key: "phoneNumber",
     },
     {
-      title: "Mother Contact No",
-      dataIndex: "MotherContactNo",
-      key: "MotherContactNo",
+      title: "Role",
+      dataIndex: "role", // Data key for role
+      key: "role",
     },
     {
-      title: "Class",
-      dataIndex: "Class",
-      key: "Class",
+      title: "Status",
+      dataIndex: "Status",
+      key: "Status",
+      filters: [
+        { text: "Active", value: "Active" },
+        { text: "Inactive", value: "Inactive" },
+      ],
+      onFilter: (value: string, record: any) => record.Status === value,
+      render: (status: string) => (
+        <span style={{ color: status === "Active" ? "green" : "red" }}>
+          {status}
+        </span>
+      ),
     },
     {
-      title: "Attendance Rate",
-      dataIndex: "AttendanceRate",
-      key: "AttendanceRate",
-    },
-    {
-      title: "Result",
-      dataIndex: "Result",
-      key: "Result",
+      title: "Address",
+      dataIndex: "address", // Data key for address
+      key: "address",
     },
     {
       title: "Action",
       key: "action",
       render: (_: unknown, record: any) => (
         <Space size="middle">
-          <Tooltip placement="right" title="Edit">
+          {/* View Details Tooltip */}
+          <Tooltip placement="right" title="View Details">
             <button
               className="!p-0 !bg-transparent !border-none !text-secondary-color cursor-pointer"
               onClick={() => showEditModal(record)}
@@ -86,7 +92,6 @@ const SchoolAdminStudentTable: React.FC<SchoolAdminStudentTableProps> = ({
               <MdModeEditOutline style={{ fontSize: "24px" }} />
             </button>
           </Tooltip>
-          {/* View Details Tooltip */}
           <Tooltip placement="right" title="View Details">
             <button
               className="!p-0 !bg-transparent !border-none !text-secondary-color cursor-pointer"
@@ -135,4 +140,4 @@ const SchoolAdminStudentTable: React.FC<SchoolAdminStudentTableProps> = ({
   );
 };
 
-export default SchoolAdminStudentTable;
+export default AdminAllAdminTable;

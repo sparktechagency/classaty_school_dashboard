@@ -77,6 +77,7 @@ const EditProfile = () => {
 
   return (
     <div className=" mt-10  rounded-xl">
+      <h1 className="text-3xl font-bold text-secondary-color">Edit Profile</h1>
       <div className=" flex justify-start items-center">
         <ReusableForm
           form={form}

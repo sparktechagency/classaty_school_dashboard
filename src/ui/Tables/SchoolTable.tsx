@@ -1,18 +1,19 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import { Space, Tooltip } from "antd";
 import { GoEye } from "react-icons/go";
 import { CgUnblock } from "react-icons/cg";
-import { MdBlock } from "react-icons/md";
+import { MdBlock, MdModeEditOutline } from "react-icons/md";
 import ReuseTable from "../../utils/ReuseTable";
-import { ISchool } from "../../types";
 
 // Define the type for the props
 interface AllSchoolTableProps {
-  data: ISchool[]; // Replace `unknown` with the actual type of your data array
+  data: any[]; // Replace `unknown` with the actual type of your data array
   loading: boolean;
-  showViewModal: (record: ISchool) => void; // Function to handle viewing a user
-  showBlockModal: (record: ISchool) => void; // Function to handle blocking a user
-  showUnblockModal: (record: ISchool) => void; // Function to handle unblocking a user
+  showEditModal: (record: any) => void;
+  showViewModal: (record: any) => void; // Function to handle viewing a user
+  showBlockModal: (record: any) => void; // Function to handle blocking a user
+  showUnblockModal: (record: any) => void; // Function to handle unblocking a user
   setPage?: (page: number) => void; // Function to handle pagination
   page?: number;
   total?: number;
@@ -23,6 +24,7 @@ interface AllSchoolTableProps {
 const AllSchoolTable: React.FC<AllSchoolTableProps> = ({
   data,
   loading,
+  showEditModal,
   showViewModal,
   showBlockModal,
   showUnblockModal,
@@ -64,9 +66,17 @@ const AllSchoolTable: React.FC<AllSchoolTableProps> = ({
     {
       title: "Action",
       key: "action",
-      render: (_: unknown, record: ISchool) => (
+      render: (_: unknown, record: any) => (
         <Space size="middle">
           {/* View Details Tooltip */}
+          <Tooltip placement="right" title="Edit">
+            <button
+              className="!p-0 !bg-transparent !border-none !text-secondary-color cursor-pointer"
+              onClick={() => showEditModal(record)}
+            >
+              <MdModeEditOutline style={{ fontSize: "24px" }} />
+            </button>
+          </Tooltip>
           <Tooltip placement="right" title="View Details">
             <button
               className="!p-0 !bg-transparent !border-none !text-secondary-color cursor-pointer"

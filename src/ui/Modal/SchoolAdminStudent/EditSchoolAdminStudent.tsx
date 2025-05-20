@@ -9,8 +9,8 @@ import ReuseSelect from "../../Form/ReuseSelect";
 import { useState } from "react";
 import { IoSearch } from "react-icons/io5";
 
-interface AddSchoolAdminStudentProps {
-  isAddModalVisible: boolean;
+interface EditSchoolAdminStudentProps {
+  isEditModalVisible: boolean;
   handleCancel: () => void;
 }
 
@@ -37,8 +37,8 @@ const inputStructure = [
   },
 ];
 
-const AddSchoolAdminStudent: React.FC<AddSchoolAdminStudentProps> = ({
-  isAddModalVisible,
+const EditSchoolAdminStudent: React.FC<EditSchoolAdminStudentProps> = ({
+  isEditModalVisible,
   handleCancel,
 }) => {
   const [form] = Form.useForm();
@@ -48,7 +48,7 @@ const AddSchoolAdminStudent: React.FC<AddSchoolAdminStudentProps> = ({
   };
   return (
     <Modal
-      open={isAddModalVisible}
+      open={isEditModalVisible}
       onCancel={handleCancel}
       footer={null}
       centered
@@ -57,7 +57,7 @@ const AddSchoolAdminStudent: React.FC<AddSchoolAdminStudentProps> = ({
       <div className="py-5">
         <div className="text-base-color">
           <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-secondary-color text-center">
-            Add Student
+            Edit Student
           </h3>
 
           <div className="mt-5">
@@ -176,7 +176,7 @@ const AddSchoolAdminStudent: React.FC<AddSchoolAdminStudentProps> = ({
                 variant="secondary"
                 className="w-full mt-4"
               >
-                Add Student
+                Edit Student
               </ReuseButton>
             </ReusableForm>
           </div>
@@ -186,4 +186,4 @@ const AddSchoolAdminStudent: React.FC<AddSchoolAdminStudentProps> = ({
   );
 };
 
-export default AddSchoolAdminStudent;
+export default EditSchoolAdminStudent;

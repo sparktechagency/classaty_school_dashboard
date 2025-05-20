@@ -28,13 +28,13 @@ const MyPanelHeader: React.FC<{
       {title}
     </h2>
     <Space size="middle">
-      <Tooltip title="Edit Section">
+      <Tooltip title="Edit">
         <EditOutlined
           onClick={showEditModal}
           style={{ fontSize: "16px", cursor: "pointer" }}
         />
       </Tooltip>
-      <Tooltip title="Delete Section">
+      <Tooltip title="Delete">
         <RiDeleteBin6Line
           onClick={() => showDeleteModal(title)}
           style={{ fontSize: "16px", color: "red", cursor: "pointer" }}

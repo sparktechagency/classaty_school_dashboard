@@ -11,6 +11,7 @@ import ReuseButton from "../../ui/Button/ReuseButton";
 import { FiPlus } from "react-icons/fi";
 import AddSchoolModal from "../../ui/Modal/User/AddSchoolModal";
 import { ISchool } from "../../types";
+import EditSchoolModal from "../../ui/Modal/User/EditSchoolModal";
 
 const AdminAllSchools = () => {
   const data: ISchool[] = SchoolsData;
@@ -21,6 +22,7 @@ const AdminAllSchools = () => {
   const limit = 12;
 
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
   const [isBlockModalVisible, setIsBlockModalVisible] = useState(false);
   const [isUnblockModalVisible, setIsUnblockModalVisible] = useState(false);
@@ -29,6 +31,11 @@ const AdminAllSchools = () => {
 
   const showAddModal = () => {
     setIsAddModalVisible(true);
+  };
+
+  const showEditModal = (record: ISchool) => {
+    setCurrentRecord(record);
+    setIsEditModalVisible(true);
   };
 
   const showViewUserModal = (record: ISchool) => {
@@ -52,6 +59,7 @@ const AdminAllSchools = () => {
 
   const handleCancel = () => {
     setIsAddModalVisible(false);
+    setIsEditModalVisible(false);
     setIsViewModalVisible(false);
     setIsBlockModalVisible(false);
     setIsUnblockModalVisible(false);
@@ -107,6 +115,7 @@ const AdminAllSchools = () => {
           data={data}
           loading={false}
           showViewModal={showViewUserModal}
+          showEditModal={showEditModal}
           showBlockModal={showBlockModal}
           showUnblockModal={showUnblockModal}
           setPage={setPage}
@@ -116,6 +125,10 @@ const AdminAllSchools = () => {
         />
       </div>
 
+      <EditSchoolModal
+        isEditModalVisible={isEditModalVisible}
+        handleCancel={handleCancel}
+      />
       <AddSchoolModal
         isAddModalVisible={isAddModalVisible}
         handleCancel={handleCancel}

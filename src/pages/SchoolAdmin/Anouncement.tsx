@@ -100,7 +100,7 @@ const AnouncementPage = () => {
         handleCancel={handleCancel}
         currentRecord={currentRecord}
         handleDelete={handleDelete}
-        description=" Are You Sure You want to Block This Parent ?"
+        description=" Are You Sure You want to Delete This  ?"
       />
     </div>
   );

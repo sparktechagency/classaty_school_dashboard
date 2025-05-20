@@ -12,6 +12,7 @@ import messageLogo from "../../public/images/dashboard-logo/message.svg";
 import subscriptionLogo from "../../public/images/dashboard-logo/subscription.svg";
 import earningLogo from "../../public/images/dashboard-logo/earning.svg";
 import feedbackLogo from "../../public/images/dashboard-logo/feedback.svg";
+import adminLogo from "../../public/images/dashboard-logo/admin.svg";
 
 //* ------------------IMPORT COMPONENTS------------------
 import AdminDashboard from "../pages/Admin/AdminDashboard";
@@ -27,6 +28,7 @@ import Subscription from "../pages/Admin/AdminSubscription";
 import AdminAllTransaction from "../pages/Admin/AdminAllTransaction";
 import AdminFeedback from "../pages/Admin/AdminFeedbcak";
 import AdminAllStudent from "../pages/Admin/AdminAllStudent";
+import AdminAllAdmin from "../pages/Admin/AdmiAllAdmin";
 
 export const adminPaths = [
   {
@@ -96,6 +98,13 @@ export const adminPaths = [
     key: "feedback",
     name: "Feedback",
     icon: feedbackLogo,
+  },
+  {
+    path: "all-admin",
+    element: <AdminAllAdmin />,
+    key: "all-admin",
+    name: "All Admin",
+    icon: adminLogo,
   },
   {
     key: "settings",

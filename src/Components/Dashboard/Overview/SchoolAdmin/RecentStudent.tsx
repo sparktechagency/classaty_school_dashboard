@@ -8,11 +8,14 @@ import ViewSchoolAdminStudent from "../../../../ui/Modal/SchoolAdminStudent/View
 import BlockModal from "../../../../ui/Modal/BlockModal";
 import UnblockModal from "../../../../ui/Modal/UnblockModal";
 import DeleteModal from "../../../../ui/Modal/DeleteModal";
+import EditSchoolAdminStudent from "../../../../ui/Modal/SchoolAdminStudent/EditSchoolAdminStudent";
 
 const RecentStudent = () => {
   const data: any[] = SchoolAdminStudentData?.slice(0, 6);
 
   const [isSendModalVisible, setIsSendModalVisible] = useState(false);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
   const [isBlockModalVisible, setIsBlockModalVisible] = useState(false);
   const [isUnblockModalVisible, setIsUnblockModalVisible] = useState(false);
@@ -22,6 +25,11 @@ const RecentStudent = () => {
   const showViewUserModal = (record: any) => {
     setCurrentRecord(record);
     setIsViewModalVisible(true);
+  };
+
+  const showEditModal = (record: any) => {
+    setCurrentRecord(record);
+    setIsEditModalVisible(true);
   };
 
   const showBlockModal = (record: any) => {
@@ -77,6 +85,7 @@ const RecentStudent = () => {
           data={data}
           loading={false}
           showViewModal={showViewUserModal}
+          showEditModal={showEditModal}
           showBlockModal={showBlockModal}
           showUnblockModal={showUnblockModal}
         />
@@ -84,6 +93,10 @@ const RecentStudent = () => {
 
       <SendNotification
         isSendModalVisible={isSendModalVisible}
+        handleCancel={handleCancel}
+      />
+      <EditSchoolAdminStudent
+        isEditModalVisible={isEditModalVisible}
         handleCancel={handleCancel}
       />
 

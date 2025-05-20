@@ -52,9 +52,9 @@ export const schoolAdminPaths = [
     icon: classLogo,
   },
   {
-    path: "class-schedule",
+    path: "schedule",
     element: <ClassSchedulePage />,
-    key: "class-schedule",
+    key: "schedule",
     name: "Schedule",
     icon: scheduleLogo,
   },

@@ -137,7 +137,7 @@ const ExamPage = () => {
     <div className="bg-primary-color rounded-xl p-4 min-h-[90vh]">
       <div className="flex justify-between items-center mb-5">
         <p className="text-xl sm:text-2xl lg:text-3xl text-secondary-color font-bold">
-          Class
+          Exam
         </p>
         <div className="h-fit">
           <div className="h-fit">

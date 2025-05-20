@@ -1,37 +1,45 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import BlockModal from "../../../../ui/Modal/BlockModal";
 import UnblockModal from "../../../../ui/Modal/UnblockModal";
 import UserModal from "../../../../ui/Modal/User/SchoolModal";
 import SchoolsData from "../../../../../public/data/SchoolData";
-import AllSchoolTable from "../../../../ui/Tables/SchoolTable";
 import DeleteModal from "../../../../ui/Modal/DeleteModal";
-import { ISchool } from "../../../../types";
+import AllSchoolTable from "../../../../ui/Tables/SchoolTable";
+import EditSchoolModal from "../../../../ui/Modal/User/EditSchoolModal";
 
 const RecentSchool = () => {
-  const recentUserData: ISchool[] = SchoolsData.slice(0, 6);
+  const recentUserData: any[] = SchoolsData.slice(0, 6);
 
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+
   const [isBlockModalVisible, setIsBlockModalVisible] = useState(false);
   const [isUnblockModalVisible, setIsUnblockModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
 
-  const [currentRecord, setCurrentRecord] = useState<ISchool | null>(null);
+  const [currentRecord, setCurrentRecord] = useState<any | null>(null);
 
-  const showViewUserModal = (record: ISchool) => {
+  const showViewUserModal = (record: any) => {
     setCurrentRecord(record);
     setIsViewModalVisible(true);
   };
 
-  const showBlockModal = (record: ISchool) => {
+  const showEditModal = (record: any) => {
+    setCurrentRecord(record);
+    setIsEditModalVisible(true);
+  };
+
+  const showBlockModal = (record: any) => {
     setCurrentRecord(record);
     setIsBlockModalVisible(true);
   };
-  const showUnblockModal = (record: ISchool) => {
+  const showUnblockModal = (record: any) => {
     setCurrentRecord(record);
     setIsUnblockModalVisible(true);
   };
 
-  const showDeleteModal = (record: ISchool) => {
+  const showDeleteModal = (record: any) => {
     setCurrentRecord(record);
     setIsDeleteModalVisible(true);
   };
@@ -49,14 +57,14 @@ const RecentSchool = () => {
     // setCurrentRecord(null);
   };
 
-  const handleBlock = (data: ISchool) => {
+  const handleBlock = (data: any) => {
     console.log("block", data);
   };
-  const handleUnblock = (data: ISchool) => {
+  const handleUnblock = (data: any) => {
     console.log("unblock", data);
   };
 
-  const handleDelete = (record: ISchool) => {
+  const handleDelete = (record: any) => {
     handleCancel();
     console.log(record);
   };
@@ -73,10 +81,15 @@ const RecentSchool = () => {
           loading={false}
           showViewModal={showViewUserModal}
           showBlockModal={showBlockModal}
+          showEditModal={showEditModal}
           showUnblockModal={showUnblockModal}
           showFilter={false}
         />
       </div>
+      <EditSchoolModal
+        isEditModalVisible={isEditModalVisible}
+        handleCancel={handleCancel}
+      />
       <UserModal
         isViewModalVisible={isViewModalVisible}
         handleCancel={handleCancel}
@@ -88,14 +101,14 @@ const RecentSchool = () => {
         handleCancel={handleCancel}
         currentRecord={currentRecord}
         handleBlock={handleBlock}
-        description=" Are You Sure You want to Block This User?"
+        description=" Are You Sure You want to Block This School?"
       />
       <UnblockModal
         isUnblockModalVisible={isUnblockModalVisible}
         handleCancel={handleCancel}
         currentRecord={currentRecord}
         handleUnblock={handleUnblock}
-        description=" Are You Sure You want to Unblock This User?"
+        description=" Are You Sure You want to Unblock This School?"
       />
       <DeleteModal
         isDeleteModalVisible={isDeleteModalVisible}
