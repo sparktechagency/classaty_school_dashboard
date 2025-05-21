@@ -13,6 +13,8 @@ import resultLogo from "../../public/images/dashboard-logo/result.svg";
 import atendenceLogo from "../../public/images/dashboard-logo/atendence.svg";
 import anounceLogo from "../../public/images/dashboard-logo/anounce.svg";
 import alarmsLogo from "../../public/images/dashboard-logo/alarms.svg";
+import managerLogo from "../../public/images/dashboard-logo/manager.svg";
+import profileLogo from "../../public/images/dashboard-logo/profile.svg";
 
 //* ------------------IMPORT COMPONENTS------------------
 import Notifications from "../pages/Common/Notifications";
@@ -136,7 +138,7 @@ export const schoolAdminPaths = [
     element: <SchoolAdminAllManager />,
     key: "all-manager",
     name: "All Manager",
-    icon: alarmsLogo,
+    icon: managerLogo,
   },
   {
     key: "settings",
@@ -147,14 +149,14 @@ export const schoolAdminPaths = [
         key: "school-profile",
         path: "settings/school-profile",
         name: "School Profile",
-        icon: settingLogo,
+        icon: schoolLogo,
         element: <SchoolAdmin />,
       },
       {
         key: "manager-profile",
         path: "settings/manager-profile",
         name: "Manager Profile",
-        icon: settingLogo,
+        icon: profileLogo,
         element: <Profile />,
       },
     ],
