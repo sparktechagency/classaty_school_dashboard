@@ -30,6 +30,8 @@ import ClassSchedulePage from "../pages/SchoolAdmin/ClassSchedulePage";
 import ClassPage from "../pages/SchoolAdmin/Class";
 import SchoolAdminOVerview from "../pages/SchoolAdmin/SchoolAdminOVerview";
 import ExamPage from "../pages/SchoolAdmin/Exam";
+import Profile from "../pages/Common/settings/Profile";
+import SchoolAdminAllManager from "../pages/SchoolAdmin/SchoolAdminAllManager";
 
 export const schoolAdminPaths = [
   {
@@ -129,12 +131,32 @@ export const schoolAdminPaths = [
     name: "Alarms",
     icon: alarmsLogo,
   },
-
   {
-    path: "settings",
-    element: <SchoolAdmin />,
+    path: "all-manager",
+    element: <SchoolAdminAllManager />,
+    key: "all-manager",
+    name: "All Manager",
+    icon: alarmsLogo,
+  },
+  {
     key: "settings",
     name: "Settings",
     icon: settingLogo,
+    children: [
+      {
+        key: "school-profile",
+        path: "settings/school-profile",
+        name: "School Profile",
+        icon: settingLogo,
+        element: <SchoolAdmin />,
+      },
+      {
+        key: "manager-profile",
+        path: "settings/manager-profile",
+        name: "Manager Profile",
+        icon: settingLogo,
+        element: <Profile />,
+      },
+    ],
   },
 ];
