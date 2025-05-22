@@ -55,27 +55,9 @@ const ClassScheduleTable: React.FC<ClassScheduleTableProps> = ({
       title: "Active Student",
       dataIndex: "ActiveStudent",
       key: "ActiveStudent",
+      align: "center",
     },
-    {
-      title: "Status",
-      dataIndex: "Status",
-      key: "Status",
-      filters: [
-        { text: "Complete", value: "Complete" },
-        { text: "Pending", value: "Pending" },
-        { text: "Cancelled", value: "Cancelled" },
-      ],
-      onFilter: (value: string, record: any) => record.Status === value,
-      render: (status: string) => {
-        const color =
-          status === "Complete"
-            ? "green"
-            : status === "Pending"
-            ? "orange"
-            : "red";
-        return <span style={{ color }}>{status}</span>;
-      },
-    },
+
     {
       title: "Action",
       key: "action",

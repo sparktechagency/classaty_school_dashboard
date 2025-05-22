@@ -99,6 +99,29 @@ const EditSchoolAdminStudent: React.FC<EditSchoolAdminStudentProps> = ({
                   },
                 ]}
               />
+              <ReuseSelect
+                Typolevel={5}
+                label="Section"
+                name="section"
+                placeholder="Select Section"
+                labelClassName="!font-bold"
+                rules={[{ required: true, message: "Section is required" }]}
+                // prefix={<RiSectionFill SectionName="mr-1 text-secondary-color" />}
+                options={[
+                  {
+                    value: "A",
+                    label: "A",
+                  },
+                  {
+                    value: "B",
+                    label: "B",
+                  },
+                  {
+                    value: "C",
+                    label: "C",
+                  },
+                ]}
+              />
               <Typography.Title level={5}>
                 Did the Parent has existing ID?
               </Typography.Title>
