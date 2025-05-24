@@ -30,6 +30,7 @@ const SendNotification: React.FC<SendNotificationProps> = ({
   const [form] = Form.useForm();
   const handleFinish = (values: any) => {
     console.log(values);
+    handleCancel();
   };
   return (
     <Modal

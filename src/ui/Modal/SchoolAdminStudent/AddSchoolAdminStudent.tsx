@@ -1,13 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Form, Modal, Radio, Space, Typography } from "antd";
+import { Form, Modal } from "antd";
 import ReusableForm from "../../Form/ReuseForm";
 import ReuseInput from "../../Form/ReuseInput";
 import { RiSchoolFill } from "react-icons/ri";
-import { FaPhone } from "react-icons/fa6";
+import { FaAddressCard, FaPhone } from "react-icons/fa6";
 import ReuseButton from "../../Button/ReuseButton";
 import ReuseSelect from "../../Form/ReuseSelect";
-import { useState } from "react";
-import { IoSearch } from "react-icons/io5";
 
 interface AddSchoolAdminStudentProps {
   isAddModalVisible: boolean;
@@ -42,7 +40,6 @@ const AddSchoolAdminStudent: React.FC<AddSchoolAdminStudentProps> = ({
   handleCancel,
 }) => {
   const [form] = Form.useForm();
-  const [existingId, setExistingId] = useState(null);
   const handleFinish = (values: any) => {
     console.log(values);
   };
@@ -62,6 +59,15 @@ const AddSchoolAdminStudent: React.FC<AddSchoolAdminStudentProps> = ({
 
           <div className="mt-5">
             <ReusableForm form={form} handleFinish={handleFinish}>
+              <ReuseInput
+                name="civilId"
+                type="text"
+                Typolevel={5}
+                label="Civil ID"
+                placeholder="Enter Civil ID"
+                labelClassName="!font-bold"
+                prefix={<FaAddressCard className="mr-1 text-secondary-color" />}
+              />
               {inputStructure.map((input, index) => (
                 <ReuseInput
                   key={index}
@@ -122,78 +128,27 @@ const AddSchoolAdminStudent: React.FC<AddSchoolAdminStudentProps> = ({
                   },
                 ]}
               />
-              <Typography.Title level={5}>
-                Did the Parent has existing ID?
-              </Typography.Title>
-              <Form.Item
-                name="existingId"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please select Yes or No",
-                  },
-                ]}
-              >
-                <Radio.Group
-                  onChange={(e) => {
-                    setExistingId(e.target.value);
-                  }}
-                >
-                  <Space size="large">
-                    <Radio value="yes" style={{ fontSize: "16px" }}>
-                      Yes
-                    </Radio>
-                    <Radio value="no" style={{ fontSize: "16px" }}>
-                      No
-                    </Radio>
-                  </Space>
-                </Radio.Group>
-              </Form.Item>
-              {existingId === "yes" ? (
-                <div>
-                  <ReuseInput
-                    name="fatherNumber"
-                    type="text"
-                    Typolevel={5}
-                    label="Father Contact No"
-                    placeholder="Enter Father Contact No"
-                    labelClassName="!font-bold"
-                    prefix={<IoSearch className="mr-1 text-secondary-color" />}
-                  />
-                  <ReuseInput
-                    name="motherNumber"
-                    type="text"
-                    Typolevel={5}
-                    label="Mother Contact No"
-                    placeholder="Enter Mother Contact No"
-                    labelClassName="!font-bold"
-                    prefix={<IoSearch className="mr-1 text-secondary-color" />}
-                  />
-                </div>
-              ) : (
-                existingId === "no" && (
-                  <div>
-                    <ReuseInput
-                      name="fatherNumber"
-                      type="text"
-                      Typolevel={5}
-                      label="Father Contact No"
-                      placeholder="Enter Father Contact No"
-                      labelClassName="!font-bold"
-                      prefix={<FaPhone className="mr-1 text-secondary-color" />}
-                    />
-                    <ReuseInput
-                      name="motherNumber"
-                      type="text"
-                      Typolevel={5}
-                      label="Mother Contact No"
-                      placeholder="Enter Mother Contact No"
-                      labelClassName="!font-bold"
-                      prefix={<FaPhone className="mr-1 text-secondary-color" />}
-                    />
-                  </div>
-                )
-              )}
+
+              <div>
+                <ReuseInput
+                  name="fatherNumber"
+                  type="text"
+                  Typolevel={5}
+                  label="Father Contact No"
+                  placeholder="Enter Father Contact No"
+                  labelClassName="!font-bold"
+                  prefix={<FaPhone className="mr-1 text-secondary-color" />}
+                />
+                <ReuseInput
+                  name="motherNumber"
+                  type="text"
+                  Typolevel={5}
+                  label="Mother Contact No"
+                  placeholder="Enter Mother Contact No"
+                  labelClassName="!font-bold"
+                  prefix={<FaPhone className="mr-1 text-secondary-color" />}
+                />
+              </div>
               <ReuseButton
                 htmlType="submit"
                 variant="secondary"

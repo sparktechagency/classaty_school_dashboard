@@ -36,6 +36,11 @@ const SchoolAdminStudent = () => {
     setIsAddModalVisible(true);
   };
 
+  const showSendModal = (record: any) => {
+    setCurrentRecord(record);
+    setIsSendModalVisible(true);
+  };
+
   const showEditModal = (record: any) => {
     setCurrentRecord(record);
     setIsEditModalVisible(true);
@@ -126,6 +131,7 @@ const SchoolAdminStudent = () => {
           loading={false}
           showEditModal={showEditModal}
           showViewModal={showViewUserModal}
+          showSendModal={showSendModal}
           showBlockModal={showBlockModal}
           showUnblockModal={showUnblockModal}
           setPage={setPage}

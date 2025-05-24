@@ -5,6 +5,8 @@ import { GoEye } from "react-icons/go";
 import { CgUnblock } from "react-icons/cg";
 import { MdBlock, MdModeEditOutline } from "react-icons/md";
 import ReuseTable from "../../utils/ReuseTable";
+import { BsFillSendFill } from "react-icons/bs";
+import ReuseButton from "../Button/ReuseButton";
 
 // Define the type for the props
 interface SchoolAdminStudentTableProps {
@@ -12,6 +14,7 @@ interface SchoolAdminStudentTableProps {
   loading: boolean;
   showViewModal: (record: any) => void; // Function to handle viewing a user
   showBlockModal: (record: any) => void; // Function to handle blocking a user
+  showSendModal: (record: any) => void;
   showEditModal: (record: any) => void;
   showUnblockModal: (record: any) => void; // Function to handle unblocking a user
   setPage?: (page: number) => void; // Function to handle pagination
@@ -25,6 +28,7 @@ const SchoolAdminStudentTable: React.FC<SchoolAdminStudentTableProps> = ({
   loading,
   showViewModal,
   showBlockModal,
+  showSendModal,
   showEditModal,
   showUnblockModal,
   setPage,
@@ -72,6 +76,21 @@ const SchoolAdminStudentTable: React.FC<SchoolAdminStudentTableProps> = ({
       title: "Result",
       dataIndex: "Result",
       key: "Result",
+    },
+    {
+      title: "Send Notification",
+      dataIndex: "send-notification",
+      key: "send-notification",
+      render: (_: unknown, record: any) => (
+        <ReuseButton
+          onClick={() => showSendModal(record)}
+          className="!text-lg !px-3 !py-1.5"
+          variant="secondary"
+        >
+          {" "}
+          <BsFillSendFill style={{ fontSize: "18px" }} /> Send Notification
+        </ReuseButton>
+      ),
     },
     {
       title: "Action",

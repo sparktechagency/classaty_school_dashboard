@@ -27,6 +27,11 @@ const RecentStudent = () => {
     setIsViewModalVisible(true);
   };
 
+  const showSendModal = (record: any) => {
+    setCurrentRecord(record);
+    setIsSendModalVisible(true);
+  };
+
   const showEditModal = (record: any) => {
     setCurrentRecord(record);
     setIsEditModalVisible(true);
@@ -84,6 +89,7 @@ const RecentStudent = () => {
         <SchoolAdminStudentTable
           data={data}
           loading={false}
+          showSendModal={showSendModal}
           showViewModal={showViewUserModal}
           showEditModal={showEditModal}
           showBlockModal={showBlockModal}
