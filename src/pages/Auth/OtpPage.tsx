@@ -6,22 +6,62 @@ import { MdVerifiedUser } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import Container from "../../ui/Container";
 import ReuseButton from "../../ui/Button/ReuseButton";
+import Cookies from "js-cookie";
+import tryCatchWrapper from "../../utils/tryCatchWrapper";
+import {
+  useOtpVerifyMutation,
+  useResendOTPMutation,
+} from "../../redux/features/auth/authApi";
+import { toast } from "sonner";
 
 const OTPVerify = () => {
   const router = useNavigate();
   const [otp, setOtp] = useState("");
+  const phoneNumber = Cookies.get("classaty_phoneNumber");
 
-  const handleOTPSubmit = () => {
+  const [otpMatch] = useOtpVerifyMutation();
+  const [resendOtp] = useResendOTPMutation();
+
+  const handleOTPSubmit = async () => {
     if (otp.length === 6) {
-      console.log("OTP:", otp);
-      if (window?.location?.pathname === "/sign-up/otp-verify") {
-        router("/");
-      } else {
-        router("/update-password");
+      const res = await tryCatchWrapper(
+        otpMatch,
+        {
+          body: {
+            otp: Number(otp),
+          },
+        },
+        "Verifying..."
+      );
+
+      const allowedRoles = ["supperAdmin", "school"];
+      const userRole = res?.data?.user?.role;
+
+      if (res?.statusCode === 200 && allowedRoles.includes(userRole)) {
+        Cookies.set("classaty_accessToken", res?.data?.accessToken, {
+          path: "/",
+          expires: 365,
+          secure: false,
+        });
+
+        Cookies.remove("classaty_signInToken");
+        Cookies.remove("classaty_phoneNumber");
+
+        setOtp("");
+        router("/", { replace: true });
+      } else if (res?.statusCode === 200 && !allowedRoles.includes(userRole)) {
+        setOtp("");
+        toast.error("Access Denied", {
+          duration: 2000,
+        });
       }
     }
   };
 
+  const handleResendOtp = async () => {
+    console.log("Resending OTP...");
+    await tryCatchWrapper(resendOtp, {}, "Resending OTP...");
+  };
   return (
     <div className="text-base-color">
       <Container>
@@ -30,11 +70,9 @@ const OTPVerify = () => {
             <div className="mb-8">
               <MdVerifiedUser className="size-10 mb-4 text-base-color mx-auto" />
               <h1 className="text-2xl sm:text-3xl font-semibold text-base-color mb-2">
-                Code has been sent to
+                Enter code sent to your number Ending in{" "}
+                {phoneNumber?.slice(-4)}
               </h1>
-              <p className="text-lg sm:text-xl lg:text-2xl font-semibold mb-2 text-base-color">
-                user@example.com
-              </p>
             </div>
 
             <Form layout="vertical" className="bg-transparent w-full">
@@ -62,7 +100,10 @@ const OTPVerify = () => {
             </Form>
             <div className="flex justify-center gap-2 py-1 mt-5">
               <p>Didn’t receive code?</p>
-              <p className="!text-base-color !underline font-semibold cursor-pointer">
+              <p
+                className="!text-base-color !underline font-semibold cursor-pointer"
+                onClick={handleResendOtp}
+              >
                 Click to resend
               </p>
             </div>

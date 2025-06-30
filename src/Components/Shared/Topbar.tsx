@@ -2,6 +2,7 @@ import { BarsOutlined } from "@ant-design/icons";
 import { Dropdown } from "antd";
 import { Link } from "react-router-dom";
 import { AllIcons, AllImages } from "../../../public/images/AllImages";
+import useUserData from "../../hooks/useUserData";
 
 // Define the type for a notification
 interface Notification {
@@ -46,7 +47,7 @@ const notifications: Notification[] = [
 
 const Topbar: React.FC<TopbarProps> = ({ collapsed, setCollapsed }) => {
   // Type the user object from localStorage
-  const user = JSON.parse(localStorage.getItem("user_info") || "null");
+  const user = useUserData();
 
   console.log("user", user);
 

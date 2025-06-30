@@ -6,12 +6,14 @@ import ReusableForm from "../../ui/Form/ReuseForm";
 import ReuseInput from "../../ui/Form/ReuseInput";
 import ReuseButton from "../../ui/Button/ReuseButton";
 import { FaPhone } from "react-icons/fa6";
-import ReuseSelect from "../../ui/Form/ReuseSelect";
+import tryCatchWrapper from "../../utils/tryCatchWrapper";
+import { useLoginMutation } from "../../redux/features/auth/authApi";
+import { Form } from "antd";
+import Cookies from "js-cookie";
 
 const inputStructure = [
   {
     name: "phoneNumber",
-    type: "number",
     inputType: "email",
     label: "Phone Number",
     placeholder: "Enter your phone number",
@@ -23,14 +25,30 @@ const inputStructure = [
 ];
 
 const SignIn = () => {
+  const [form] = Form.useForm();
   const router = useNavigate();
-  const onFinish = (values: any) => {
-    const data = {
-      ...values,
-    };
-    console.log(data);
-    localStorage.setItem("user_info", JSON.stringify(data));
-    router("/");
+  const [login] = useLoginMutation();
+
+  const onFinish = async (values: any) => {
+    const res = await tryCatchWrapper(login, { body: values }, "Signing In...");
+
+    console.log("res", res);
+
+    if (res?.data?.signInToken) {
+      Cookies.set("classaty_signInToken", res?.data?.signInToken, {
+        path: "/",
+        expires: 1,
+        secure: false,
+      });
+      Cookies.set("classaty_phoneNumber", values.phoneNumber, {
+        path: "/",
+        expires: 1,
+        secure: false,
+      });
+
+      form.resetFields();
+      router("/sign-in/verify-otp", { replace: true });
+    }
   };
   return (
     <div className="!bg-primary-color">
@@ -51,7 +69,7 @@ const SignIn = () => {
               </div>
             </div>
             {/* -------- Form Start ------------ */}
-            <ReusableForm handleFinish={onFinish}>
+            <ReusableForm form={form} handleFinish={onFinish}>
               {inputStructure.map((input, index) => (
                 <ReuseInput
                   key={index}
@@ -59,25 +77,12 @@ const SignIn = () => {
                   Typolevel={4}
                   prefix={input.prefix}
                   inputType={input.inputType}
-                  type={input.type}
                   label={input.label}
                   placeholder={input.placeholder}
                   labelClassName={input.labelClassName}
                   rules={input.rules}
                 />
               ))}
-              <ReuseSelect
-                Typolevel={4}
-                name="role"
-                label="Role"
-                labelClassName="!font-bold"
-                placeholder="Select your role"
-                options={[
-                  { value: "admin", label: "Admin" },
-                  { value: "school_admin", label: "School Admin" },
-                ]}
-                rules={[{ required: true, message: "Role is required" }]}
-              />
 
               <ReuseButton
                 variant="secondary"

@@ -5,6 +5,7 @@ import { PersistGate } from "redux-persist/lib/integration/react";
 import router from "../../Routes/Routes";
 import { RouterProvider } from "react-router-dom";
 import { mainTheme } from "../../theme";
+import { Toaster } from "sonner";
 
 const Main = () => {
   return (
@@ -13,6 +14,7 @@ const Main = () => {
         <Provider store={store}>
           <PersistGate loading={null} persistor={persistor}>
             <RouterProvider router={router} />
+            <Toaster position="top-center" richColors />
           </PersistGate>
         </Provider>
       </ConfigProvider>

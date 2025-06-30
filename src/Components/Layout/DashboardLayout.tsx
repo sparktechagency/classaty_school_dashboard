@@ -16,9 +16,14 @@ import Sider from "antd/es/layout/Sider";
 import Topbar from "../Shared/Topbar";
 import { AllImages } from "../../../public/images/AllImages";
 import { schoolAdminPaths } from "../../Routes/schoolAdmin.route";
+import useUserData from "../../hooks/useUserData";
+import { useAppDispatch } from "../../redux/hooks";
+import { clearAuth } from "../../redux/features/auth/authSlice";
+import Cookies from "js-cookie";
 
 const DashboardLayout = () => {
-  const userRole = JSON.parse(localStorage.getItem("user_info") || "null");
+  const dispatch = useAppDispatch();
+  const userRole = useUserData();
   const location = useLocation();
 
   const [openKeys, setOpenKeys] = useState<string[]>([]);
@@ -28,6 +33,13 @@ const DashboardLayout = () => {
     "customer-feedBack",
     "settings",
   ];
+
+  const handleLogout = () => {
+    dispatch(clearAuth());
+    Cookies.remove("teeru_accessToken");
+    window.location.href = "/sign-in";
+    window.location.reload();
+  };
 
   const onOpenChange = (keys: string[]) => {
     const latestOpenKey = keys.find(
@@ -65,10 +77,10 @@ const DashboardLayout = () => {
 
   const activeKeys = getActiveKeys(normalizedPath);
   const menuItems =
-    userRole?.role === "admin"
+    userRole?.role === "supperAdmin"
       ? //   ? sidebarItemsGenerator(adminPaths, "admin")
-        sidebarItemsGenerator(adminPaths, userRole?.role)
-      : sidebarItemsGenerator(schoolAdminPaths, userRole?.role);
+        sidebarItemsGenerator(adminPaths, "admin")
+      : sidebarItemsGenerator(schoolAdminPaths, userRole?.role as string);
   // : sidebarItemsGenerator(resturantOwnerPaths, userRole?.role);
 
   menuItems.push({
@@ -83,8 +95,8 @@ const DashboardLayout = () => {
       />
     ),
     label: (
-      <div onClick={() => localStorage.removeItem("user_info")}>
-        <NavLink to="/signin">Logout</NavLink>
+      <div onClick={handleLogout}>
+        <NavLink to="/sign-in">Logout</NavLink>
       </div>
     ),
   });

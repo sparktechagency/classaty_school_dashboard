@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { AllIcons } from "../../../../../public/images/AllImages";
+import useUserData from "../../../../hooks/useUserData";
 
 const activities = [
   {
@@ -81,7 +82,7 @@ const activities = [
 ];
 
 const RecentNotification = () => {
-  const user = JSON.parse(localStorage.getItem("user_info") || "null");
+  const user = useUserData();
   return (
     <div className="w-full max-h-[300px] xl:max-h-[500px] overflow-y-auto  rounded-xl relative border-2 border-[#e1e1e1]">
       <div className="flex justify-between items-center bg-primary-color border-b-2 border-secondary-color sticky top-0 p-5 z-10">

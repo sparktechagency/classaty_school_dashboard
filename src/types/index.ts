@@ -1,3 +1,4 @@
+export * from "./User.Type.ts";
 export * from "./SchoolType.ts";
 export * from "./StudentType.ts";
 export * from "./ParentsType.ts";

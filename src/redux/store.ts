@@ -36,7 +36,7 @@ const storage =
 
 // Configuration for persisting only the auth state (accessToken)
 const persistConfig = {
-  key: "pianofesta",
+  key: "classaty",
   storage,
   whitelist: ["auth"], // Persist only the `auth` slice (for accessToken)
   blacklist: ["baseApi"], // Do not persist the `baseApi` slice
