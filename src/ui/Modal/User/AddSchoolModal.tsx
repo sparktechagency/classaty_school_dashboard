@@ -5,6 +5,8 @@ import ReuseInput from "../../Form/ReuseInput";
 import { RiShieldUserFill, RiSchoolFill } from "react-icons/ri";
 import { FaPhone } from "react-icons/fa6";
 import ReuseButton from "../../Button/ReuseButton";
+import { useAddSchoolMutation } from "../../../redux/features/school/schoolApi";
+import tryCatchWrapper from "../../../utils/tryCatchWrapper";
 
 interface AddSchoolModalProps {
   isAddModalVisible: boolean;
@@ -23,7 +25,17 @@ const inputStructure = [
     rules: [{ required: true, message: "School Name is required" }],
   },
   {
-    name: "schoolPhoneNumber",
+    name: "schoolAddress",
+    type: "text",
+    inputType: "normal",
+    label: "School Address",
+    placeholder: "Enter School Address",
+    labelClassName: "!font-bold",
+    prefix: <RiSchoolFill className="mr-1 text-secondary-color" />,
+    rules: [{ required: true, message: "School Address is required" }],
+  },
+  {
+    name: "phoneNumber",
     type: "text",
     inputType: "normal",
     label: "Phone Number",
@@ -49,8 +61,19 @@ const AddSchoolModal: React.FC<AddSchoolModalProps> = ({
   handleCancel,
 }) => {
   const [form] = Form.useForm();
-  const handleFinish = (values: any) => {
-    console.log(values);
+  const [addSchool] = useAddSchoolMutation();
+
+  const handleSubmit = async (values: any) => {
+    const res = await tryCatchWrapper(
+      addSchool,
+      { body: { ...values } },
+      "Adding School..."
+    );
+
+    if (res?.statusCode === 201) {
+      form.resetFields();
+      handleCancel();
+    }
   };
   return (
     <Modal
@@ -67,7 +90,7 @@ const AddSchoolModal: React.FC<AddSchoolModalProps> = ({
           </h3>
 
           <div className="mt-5">
-            <ReusableForm form={form} handleFinish={handleFinish}>
+            <ReusableForm form={form} handleFinish={handleSubmit}>
               {inputStructure.map((input, index) => (
                 <ReuseInput
                   key={index}

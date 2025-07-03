@@ -1,6 +1,7 @@
 export const tagTypes = {
   auth: "Auth",
+  school: "School",
   user: "User",
 };
 
-export const tagTypesList = [tagTypes.auth, tagTypes.user];
+export const tagTypesList = [tagTypes.auth, tagTypes.school, tagTypes.user];

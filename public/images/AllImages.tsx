@@ -9,6 +9,7 @@ import updatePass from "./authImages/updatePass.png";
 
 import profile from "./dummyProfile.jpg";
 import cover from "./cover.png";
+import defaultCoverPhoto from "./defaultCoverPhoto.png";
 import schoolProfile from "./school.png";
 import loginLogo from "./loginLogo.png";
 // Icons
@@ -27,6 +28,7 @@ export const AllImages = {
   cover,
   schoolProfile,
   loginLogo,
+  defaultCoverPhoto,
 };
 
 export const AuthImages = {

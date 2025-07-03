@@ -5,10 +5,15 @@ import ReuseInput from "../../Form/ReuseInput";
 import { RiShieldUserFill, RiSchoolFill } from "react-icons/ri";
 import { FaPhone } from "react-icons/fa6";
 import ReuseButton from "../../Button/ReuseButton";
+import tryCatchWrapper from "../../../utils/tryCatchWrapper";
+import { useUpdateSchoolMutation } from "../../../redux/features/school/schoolApi";
+import { ISchoolDetails } from "../../../types";
+import { useEffect } from "react";
 
 interface EditSchoolModalProps {
   isEditModalVisible: boolean;
   handleCancel: () => void;
+  currentRecord: ISchoolDetails | null;
 }
 
 const inputStructure = [
@@ -23,7 +28,17 @@ const inputStructure = [
     rules: [{ required: true, message: "School Name is required" }],
   },
   {
-    name: "schoolPhoneNumber",
+    name: "schoolAddress",
+    type: "text",
+    inputType: "normal",
+    label: "School Address",
+    placeholder: "Enter School Address",
+    labelClassName: "!font-bold",
+    prefix: <RiSchoolFill className="mr-1 text-secondary-color" />,
+    rules: [{ required: true, message: "School Address is required" }],
+  },
+  {
+    name: "phoneNumber",
     type: "text",
     inputType: "normal",
     label: "Phone Number",
@@ -47,11 +62,39 @@ const inputStructure = [
 const EditSchoolModal: React.FC<EditSchoolModalProps> = ({
   isEditModalVisible,
   handleCancel,
+  currentRecord,
 }) => {
   const [form] = Form.useForm();
-  const handleFinish = (values: any) => {
-    console.log(values);
+  const [updateSchool] = useUpdateSchoolMutation();
+
+  useEffect(() => {
+    if (currentRecord) {
+      form.setFieldsValue({
+        schoolName: currentRecord?.school?.schoolName,
+        schoolAddress: currentRecord?.school?.schoolAddress,
+        phoneNumber: currentRecord?.phoneNumber,
+        adminName: currentRecord?.school?.adminName,
+      });
+    }
+  }, [currentRecord, form]);
+
+  const handleSubmit = async (values: any) => {
+    const res = await tryCatchWrapper(
+      updateSchool,
+      {
+        body: {
+          ...values,
+        },
+        params: currentRecord?.school?._id,
+      },
+      "Updating School..."
+    );
+    if (res?.statusCode === 200) {
+      form.resetFields();
+      handleCancel();
+    }
   };
+
   return (
     <Modal
       open={isEditModalVisible}
@@ -63,11 +106,11 @@ const EditSchoolModal: React.FC<EditSchoolModalProps> = ({
       <div className="py-5">
         <div className="text-base-color">
           <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-secondary-color text-center">
-            Edit School
+            Update School
           </h3>
 
           <div className="mt-5">
-            <ReusableForm form={form} handleFinish={handleFinish}>
+            <ReusableForm form={form} handleFinish={handleSubmit}>
               {inputStructure.map((input, index) => (
                 <ReuseInput
                   key={index}
@@ -87,7 +130,7 @@ const EditSchoolModal: React.FC<EditSchoolModalProps> = ({
                 variant="secondary"
                 className="w-full mt-4"
               >
-                Add School
+                Update School
               </ReuseButton>
             </ReusableForm>
           </div>

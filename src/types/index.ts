@@ -1,5 +1,5 @@
 export * from "./User.Type.ts";
-export * from "./SchoolType.ts";
+export * from "./School.Type.ts";
 export * from "./StudentType.ts";
 export * from "./ParentsType.ts";
 export * from "./TeacherType.ts";

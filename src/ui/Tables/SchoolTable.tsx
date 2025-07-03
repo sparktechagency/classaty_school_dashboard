@@ -2,8 +2,7 @@
 import React from "react";
 import { Space, Tooltip } from "antd";
 import { GoEye } from "react-icons/go";
-import { CgUnblock } from "react-icons/cg";
-import { MdBlock, MdModeEditOutline } from "react-icons/md";
+import { MdModeEditOutline } from "react-icons/md";
 import ReuseTable from "../../utils/ReuseTable";
 
 // Define the type for the props
@@ -12,13 +11,10 @@ interface AllSchoolTableProps {
   loading: boolean;
   showEditModal: (record: any) => void;
   showViewModal: (record: any) => void; // Function to handle viewing a user
-  showBlockModal: (record: any) => void; // Function to handle blocking a user
-  showUnblockModal: (record: any) => void; // Function to handle unblocking a user
   setPage?: (page: number) => void; // Function to handle pagination
-  page?: number;
-  total?: number;
-  limit?: number;
-  showFilter?: boolean;
+  page: number;
+  total: number;
+  limit: number;
 }
 
 const AllSchoolTable: React.FC<AllSchoolTableProps> = ({
@@ -26,42 +22,41 @@ const AllSchoolTable: React.FC<AllSchoolTableProps> = ({
   loading,
   showEditModal,
   showViewModal,
-  showBlockModal,
-  showUnblockModal,
   setPage,
   page,
   total,
   limit,
-  showFilter = true,
 }) => {
   const columns = [
     {
       title: "#UID",
-      render: (_: unknown, __: unknown, index: number) => index + 1,
+      dataIndex: "_id",
+      render: (_: unknown, __: unknown, index: number) =>
+        page * limit - limit + index + 1,
       key: "_id",
     },
     {
       title: "School Name",
-      dataIndex: "SchoolName", // Data key for SchoolName
+      dataIndex: ["school", "schoolName"], // Data key for SchoolName
       key: "SchoolName",
     },
     {
       title: "Total Student",
-      dataIndex: "TotalStudent", // Data key for TotalStudent
-      key: "TotalStudent",
-      sorter: showFilter ? true : null,
+      dataIndex: "students", // Data key for students
+      key: "students",
+      // sorter: true,
     },
     {
       title: "Parents",
-      dataIndex: "Parents", // Data key for Parents
-      key: "Parents",
-      sorter: showFilter ? true : null,
+      dataIndex: "parents", // Data key for Parents
+      key: "parents",
+      // sorter: true,
     },
     {
       title: "TotalTeacher",
-      dataIndex: "TotalTeacher", // Data key for TotalTeacher
-      key: "TotalTeacher",
-      sorter: showFilter ? true : null,
+      dataIndex: "teachers", // Data key for teachers
+      key: "teachers",
+      // sorter: true,
     },
     {
       title: "Action",
@@ -83,26 +78,6 @@ const AllSchoolTable: React.FC<AllSchoolTableProps> = ({
               onClick={() => showViewModal(record)}
             >
               <GoEye style={{ fontSize: "24px" }} />
-            </button>
-          </Tooltip>
-
-          {/* Block User Tooltip */}
-
-          <Tooltip placement="left" title="Unblock">
-            <button
-              className="!p-0 !bg-transparent !border-none !text-base-color cursor-pointer hidden"
-              onClick={() => showUnblockModal(record)}
-            >
-              <CgUnblock style={{ fontSize: "24px" }} />
-            </button>
-          </Tooltip>
-
-          <Tooltip placement="left" title="Block">
-            <button
-              className="!p-0 !bg-transparent !border-none !text-error-color cursor-pointer"
-              onClick={() => showBlockModal(record)}
-            >
-              <MdBlock style={{ fontSize: "24px" }} />
             </button>
           </Tooltip>
         </Space>
