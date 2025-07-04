@@ -96,7 +96,6 @@ const AddTeacher: React.FC<AddTeacherProps> = ({
       subjectName: selectedSubject?.subjectName || "",
     };
 
-    console.log(finalPayload);
     const res = await tryCatchWrapper(
       addTeacher,
       { body: finalPayload },
@@ -166,7 +165,6 @@ const AddTeacher: React.FC<AddTeacherProps> = ({
                 label="School"
                 placeholder="Select School"
                 labelClassName="!font-bold"
-                onChange={(schoolId) => console.log(schoolId)}
                 rules={[{ required: true, message: "School is required" }]}
                 options={allSchool?.map((school) => ({
                   value: school?.school?._id,

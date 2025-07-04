@@ -32,12 +32,20 @@ const parentsApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: req?.body,
       }),
-      invalidatesTags: [tagTypes.parent, tagTypes.user, tagTypes.teacher],
+      invalidatesTags: [
+        tagTypes.parent,
+        tagTypes.user,
+        tagTypes.teacher,
+        tagTypes.student,
+      ],
     }),
   }),
 });
 
-export const { useGetParentsQuery, useGetParantDetailsQuery, useBlockUserMutation } =
-  parentsApi;
+export const {
+  useGetParentsQuery,
+  useGetParantDetailsQuery,
+  useBlockUserMutation,
+} = parentsApi;
 
 export default parentsApi;

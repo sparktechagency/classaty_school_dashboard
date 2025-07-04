@@ -14,9 +14,9 @@ interface StudentTableProps {
   showBlockModal: (record: IStudentData) => void; // Function to handle blocking a user
   showUnblockModal: (record: IStudentData) => void; // Function to handle unblocking a user
   setPage?: (page: number) => void; // Function to handle pagination
-  page?: number;
-  total?: number;
-  limit?: number;
+  page: number;
+  total: number;
+  limit: number;
 }
 
 const StudentTable: React.FC<StudentTableProps> = ({
@@ -32,38 +32,48 @@ const StudentTable: React.FC<StudentTableProps> = ({
 }) => {
   const columns = [
     {
-      title: "ID",
-      dataIndex: "ID",
-      key: "ID",
+      title: "#UID",
+      dataIndex: "_id",
+      render: (_: unknown, __: unknown, index: number) =>
+        page * limit - limit + index + 1,
+      key: "_id",
     },
     {
       title: "Student Name",
-      dataIndex: "StudentName",
-      key: "StudentName",
+      dataIndex: "name",
+      key: "name",
     },
     {
       title: "Student Contact No",
-      dataIndex: "StudentContactNo",
-      key: "StudentContactNo",
+      dataIndex: "phoneNumber",
+      key: "phoneNumber",
+      render: (phoneNumber: string) => (
+        <div>{phoneNumber ? phoneNumber : "-"}</div>
+      ),
     },
     {
       title: "Father Contact No",
-      dataIndex: "FatherContactNo",
-      key: "FatherContactNo",
+      dataIndex: ["student", "fatherPhoneNumber"],
+      key: "fatherPhoneNumber",
     },
     {
       title: "Mother Contact No",
-      dataIndex: "MotherContactNo",
-      key: "MotherContactNo",
+      dataIndex: ["student", "motherPhoneNumber"],
+      key: "motherPhoneNumber",
     },
     {
       title: "Class",
-      dataIndex: "Class",
+      dataIndex: ["student", "className"],
       key: "Class",
     },
     {
+      title: "Section",
+      dataIndex: ["student", "section"],
+      key: "Section",
+    },
+    {
       title: "School Name",
-      dataIndex: "SchoolName",
+      dataIndex: ["student", "school", "schoolName"],
       key: "SchoolName",
     },
     {
@@ -83,23 +93,25 @@ const StudentTable: React.FC<StudentTableProps> = ({
 
           {/* Block User Tooltip */}
 
-          <Tooltip placement="left" title="Unblock">
-            <button
-              className="!p-0 !bg-transparent !border-none !text-base-color cursor-pointer hidden"
-              onClick={() => showUnblockModal(record)}
-            >
-              <CgUnblock style={{ fontSize: "24px" }} />
-            </button>
-          </Tooltip>
-
-          <Tooltip placement="left" title="Block">
-            <button
-              className="!p-0 !bg-transparent !border-none !text-error-color cursor-pointer"
-              onClick={() => showBlockModal(record)}
-            >
-              <MdBlock style={{ fontSize: "24px" }} />
-            </button>
-          </Tooltip>
+          {record?.status !== "blocked" ? (
+            <Tooltip placement="left" title="Block">
+              <button
+                className="!p-0 !bg-transparent !border-none !text-error-color cursor-pointer"
+                onClick={() => showBlockModal(record)}
+              >
+                <MdBlock style={{ fontSize: "24px" }} />
+              </button>
+            </Tooltip>
+          ) : (
+            <Tooltip placement="left" title="Unblock">
+              <button
+                className="!p-0 !bg-transparent !border-none !text-base-color cursor-pointer"
+                onClick={() => showUnblockModal(record)}
+              >
+                <CgUnblock style={{ fontSize: "24px" }} />
+              </button>
+            </Tooltip>
+          )}
         </Space>
       ),
       align: "center",
@@ -115,7 +127,7 @@ const StudentTable: React.FC<StudentTableProps> = ({
       total={total}
       limit={limit}
       page={page}
-      keyValue={"email"}
+      keyValue={"_id"}
     />
   );
 };

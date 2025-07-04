@@ -3,9 +3,18 @@ import { Form, Modal } from "antd";
 import ReusableForm from "../../Form/ReuseForm";
 import ReuseInput from "../../Form/ReuseInput";
 import { RiSchoolFill } from "react-icons/ri";
-import { FaAddressCard, FaPhone } from "react-icons/fa6";
+import { FaDoorClosed, FaPhone } from "react-icons/fa6";
 import ReuseButton from "../../Button/ReuseButton";
 import ReuseSelect from "../../Form/ReuseSelect";
+import { useGetSchoolQuery } from "../../../redux/features/school/schoolApi";
+import { useState } from "react";
+import { IClass, ISchoolDetails } from "../../../types";
+import { useGetClassBySchoolIdQuery } from "../../../redux/features/class/classAPi";
+import { IoMaleFemale } from "react-icons/io5";
+import { MdOutlineClass } from "react-icons/md";
+import { useGetSectionByClassIdQuery } from "../../../redux/features/section/sectionApi";
+import tryCatchWrapper from "../../../utils/tryCatchWrapper";
+import { useAddStudentMutation } from "../../../redux/features/student/studentAPi";
 interface AddStudentProps {
   isAddModalVisible: boolean;
   handleCancel: () => void;
@@ -23,14 +32,34 @@ const inputStructure = [
     rules: [{ required: true, message: "Student Name is required" }],
   },
   {
-    name: "studentPhoneNumber",
+    name: "phoneNumber",
     type: "text",
     inputType: "normal",
-    label: "Student Contact No",
+    label: "Student Contact No (Optional)",
     placeholder: "Enter Student Contact No",
     labelClassName: "!font-bold",
     prefix: <FaPhone className="mr-1 text-secondary-color" />,
-    rules: [{ required: true, message: "Phone Number is required" }],
+    rules: [{ required: false }],
+  },
+  {
+    name: "fatherPhoneNumber",
+    type: "text",
+    inputType: "normal",
+    label: "Father Contact No ",
+    placeholder: "Enter Father Contact No",
+    labelClassName: "!font-bold",
+    prefix: <FaPhone className="mr-1 text-secondary-color" />,
+    rules: [{ required: true }],
+  },
+  {
+    name: "motherPhoneNumber",
+    type: "text",
+    inputType: "normal",
+    label: "Mother Contact No ",
+    placeholder: "Enter Mother Contact No",
+    labelClassName: "!font-bold",
+    prefix: <FaPhone className="mr-1 text-secondary-color" />,
+    rules: [{ required: true }],
   },
 ];
 
@@ -39,9 +68,96 @@ const AddStudent: React.FC<AddStudentProps> = ({
   handleCancel,
 }) => {
   const [form] = Form.useForm();
-  const handleFinish = (values: any) => {
-    console.log(values);
+  const [schoolId, setSchoolId] = useState<string | undefined>(undefined);
+  const [classId, setClassId] = useState<string | undefined>(undefined);
+
+  const [addStudent] = useAddStudentMutation();
+
+  const { data, isFetching } = useGetSchoolQuery(
+    {
+      page: 1,
+      limit: 999999,
+    },
+    {
+      refetchOnMountOrArgChange: true,
+      skip: !isAddModalVisible,
+    }
+  );
+  const { data: classData, isFetching: isClassFetching } =
+    useGetClassBySchoolIdQuery(
+      {
+        page: 1,
+        limit: 999999,
+        schoolId: schoolId,
+      },
+      {
+        refetchOnMountOrArgChange: true,
+        skip: !isAddModalVisible || !schoolId,
+      }
+    );
+  const { data: sectionData, isFetching: isSectionFetching } =
+    useGetSectionByClassIdQuery(
+      {
+        page: 1,
+        limit: 999999,
+        classId: classId,
+      },
+      {
+        refetchOnMountOrArgChange: true,
+        skip: !isAddModalVisible || !schoolId || !classId,
+      }
+    );
+
+  const allSchool: ISchoolDetails[] = data?.data?.result || [];
+  const allClass: IClass[] = classData?.data || [];
+  const allSection: string[] = sectionData?.data || [];
+
+  const handleValuesChange = (changedValues: any) => {
+    if (changedValues?.school) {
+      const selectedSchool = changedValues.school;
+      setSchoolId(selectedSchool);
+      form.setFieldsValue({ class: undefined }); // reset subject field
+      form.setFieldsValue({ section: undefined });
+    }
+
+    if (changedValues?.class) {
+      const selectedClass = changedValues.class;
+      setClassId(selectedClass);
+      form.setFieldsValue({ section: undefined }); // reset subject field
+    }
   };
+
+  const handleFinish = async (values: any) => {
+    const selectedSchool = allSchool.find(
+      (school) => school?.school?._id === values.school
+    );
+
+    const selectedClass = allClass.find((cls) => cls?._id === values.class);
+
+    const payload = {
+      schoolId: schoolId,
+      classId: classId,
+      section: values.section,
+      name: values.studentName,
+      phoneNumber: values.phoneNumber,
+      fatherPhoneNumber: values.fatherPhoneNumber,
+      motherPhoneNumber: values.motherPhoneNumber,
+      schoolName: selectedSchool?.school?.schoolName,
+      className: selectedClass?.className,
+    };
+
+    const res = await tryCatchWrapper(
+      addStudent,
+      { body: payload },
+      "Adding Student..."
+    );
+
+    if (res?.statusCode === 201) {
+      form.resetFields();
+      handleCancel();
+    }
+  };
+
   return (
     <Modal
       open={isAddModalVisible}
@@ -57,16 +173,11 @@ const AddStudent: React.FC<AddStudentProps> = ({
           </h3>
 
           <div className="mt-5">
-            <ReusableForm form={form} handleFinish={handleFinish}>
-              <ReuseInput
-                name="civilId"
-                type="text"
-                Typolevel={5}
-                label="Civil ID"
-                placeholder="Enter Civil ID"
-                labelClassName="!font-bold"
-                prefix={<FaAddressCard className="mr-1 text-secondary-color" />}
-              />
+            <ReusableForm
+              form={form}
+              handleFinish={handleFinish}
+              onValuesChange={handleValuesChange}
+            >
               {inputStructure.map((input, index) => (
                 <ReuseInput
                   key={index}
@@ -82,49 +193,84 @@ const AddStudent: React.FC<AddStudentProps> = ({
                 />
               ))}
               <ReuseSelect
+                name="gender"
+                Typolevel={5}
+                label="Gender"
+                placeholder="Select Gender"
+                labelClassName="!font-bold"
+                prefix={<IoMaleFemale className="mr-1 text-secondary-color" />}
+                options={[
+                  { value: "male", label: "Male" },
+                  { value: "female", label: "Female" },
+                  { value: "other", label: "Other" },
+                ]}
+              />
+              <ReuseSelect
+                showSearch={true}
+                filterOption={(input, option) =>
+                  (option?.children ?? "")
+                    .toLowerCase()
+                    .includes(input.toLowerCase())
+                }
+                optionFilterProp="children"
+                prefix={<RiSchoolFill className="mr-1 text-secondary-color" />}
+                name="school"
+                loading={isFetching}
                 Typolevel={5}
                 label="School"
-                name="school"
                 placeholder="Select School"
                 labelClassName="!font-bold"
                 rules={[{ required: true, message: "School is required" }]}
-                prefix={<RiSchoolFill className="mr-1 text-secondary-color" />}
-                options={[
-                  {
-                    value: "school1",
-                    label: "School 1",
-                  },
-                  {
-                    value: "school2",
-                    label: "School 2",
-                  },
-                  {
-                    value: "school3",
-                    label: "School 3",
-                  },
-                ]}
+                options={allSchool?.map((school) => ({
+                  value: school?.school?._id,
+                  label: school.school?.schoolName,
+                }))}
               />
-
-              <div>
-                <ReuseInput
-                  name="fatherNumber"
-                  type="text"
-                  Typolevel={5}
-                  label="Father Contact No"
-                  placeholder="Enter Father Contact No"
-                  labelClassName="!font-bold"
-                  prefix={<FaPhone className="mr-1 text-secondary-color" />}
-                />
-                <ReuseInput
-                  name="motherNumber"
-                  type="text"
-                  Typolevel={5}
-                  label="Mother Contact No"
-                  placeholder="Enter Mother Contact No"
-                  labelClassName="!font-bold"
-                  prefix={<FaPhone className="mr-1 text-secondary-color" />}
-                />
-              </div>
+              <ReuseSelect
+                showSearch={true}
+                filterOption={(input, option) =>
+                  (option?.children ?? "")
+                    .toLowerCase()
+                    .includes(input.toLowerCase())
+                }
+                optionFilterProp="children"
+                prefix={
+                  <MdOutlineClass className="mr-1 text-secondary-color" />
+                }
+                name="class"
+                loading={isClassFetching}
+                Typolevel={5}
+                label="Class"
+                placeholder="Select Class"
+                labelClassName="!font-bold"
+                rules={[{ required: true, message: "School is required" }]}
+                options={allClass?.map((cls) => ({
+                  value: cls?._id,
+                  label: cls?.className,
+                }))}
+                disabled={!schoolId}
+              />
+              <ReuseSelect
+                showSearch={true}
+                filterOption={(input, option) =>
+                  (option?.children ?? "")
+                    .toLowerCase()
+                    .includes(input.toLowerCase())
+                }
+                optionFilterProp="children"
+                prefix={<FaDoorClosed className="mr-1 text-secondary-color" />}
+                name="section"
+                loading={isSectionFetching}
+                Typolevel={5}
+                label="Section"
+                labelClassName="!font-bold"
+                rules={[{ required: true, message: "School is required" }]}
+                options={allSection?.map((sec) => ({
+                  value: sec,
+                  label: sec,
+                }))}
+                disabled={!classId}
+              />
 
               <ReuseButton
                 htmlType="submit"

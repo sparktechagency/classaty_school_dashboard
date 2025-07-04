@@ -2,24 +2,38 @@ import { useState } from "react";
 import BlockModal from "../../ui/Modal/BlockModal";
 import UnblockModal from "../../ui/Modal/UnblockModal";
 import ReuseSearchInput from "../../ui/Form/ReuseSearchInput";
-
-import StudentsData from "../../../public/data/StudentData";
 import DeleteModal from "../../ui/Modal/DeleteModal";
 import ReuseButton from "../../ui/Button/ReuseButton";
 import { FiPlus } from "react-icons/fi";
-import { IStudentData } from "../../types";
 import ViewStudentModal from "../../ui/Modal/Student/ViewStudentModal";
 import StudentTable from "../../ui/Tables/StudentTable";
 import AddStudent from "../../ui/Modal/Student/AddStudent";
 import { MdDownload, MdFileUpload } from "react-icons/md";
+import { IStudentData } from "../../types";
+import {
+  useDeleteStudentMutation,
+  useGetStudentQuery,
+} from "../../redux/features/student/studentAPi";
+import tryCatchWrapper from "../../utils/tryCatchWrapper";
+import { useBlockUserMutation } from "../../redux/features/parents/parentsApi";
 
 const AdminAllStudent = () => {
-  const data: IStudentData[] = StudentsData;
   const [page, setPage] = useState(1);
   const [searchText, setSearchText] = useState("");
   console.log(searchText);
 
   const limit = 12;
+
+  const { data, isFetching } = useGetStudentQuery({
+    page,
+    limit,
+    searchTerm: searchText,
+  });
+  const [deleteStudent] = useDeleteStudentMutation();
+  const [userAction] = useBlockUserMutation();
+
+  const schoolData: IStudentData[] = data?.data?.result;
+  const schoolPagination = data?.data?.meta;
 
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
@@ -65,18 +79,46 @@ const AdminAllStudent = () => {
     // setCurrentRecord(null);
   };
 
-  const handleBlock = (record: IStudentData) => {
-    handleCancel();
-    console.log(record);
+  const handleBlock = async (data: IStudentData) => {
+    const res = await tryCatchWrapper(
+      userAction,
+      {
+        body: {
+          userId: data?._id,
+          action: "blocked",
+        },
+      },
+      "Blocking..."
+    );
+    if (res.statusCode === 200) {
+      handleCancel();
+    }
   };
-  const handleUnblock = (record: IStudentData) => {
-    handleCancel();
-    console.log(record);
+  const handleUnblock = async (data: IStudentData) => {
+    const res = await tryCatchWrapper(
+      userAction,
+      {
+        body: {
+          userId: data?._id,
+          action: "active",
+        },
+      },
+      "Unblocking..."
+    );
+    if (res.statusCode === 200) {
+      handleCancel();
+    }
   };
 
-  const handleDelete = (record: IStudentData) => {
-    handleCancel();
-    console.log(record);
+  const handleDelete = async (record: IStudentData) => {
+    const res = await tryCatchWrapper(
+      deleteStudent,
+      { params: record?.student?._id },
+      "Deleting..."
+    );
+    if (res.statusCode === 200) {
+      handleCancel();
+    }
   };
   return (
     <div className=" bg-primary-color rounded-xl p-4 min-h-[90vh]">
@@ -111,14 +153,14 @@ const AdminAllStudent = () => {
       </div>
       <div className="border-2 border-[#e1e1e1] rounded-xl rounded-tr-xl">
         <StudentTable
-          data={data}
-          loading={false}
+          data={schoolData}
+          loading={isFetching}
           showViewModal={showViewUserModal}
           showBlockModal={showBlockModal}
           showUnblockModal={showUnblockModal}
           setPage={setPage}
           page={page}
-          total={data.length}
+          total={schoolPagination?.total}
           limit={limit}
         />
       </div>
