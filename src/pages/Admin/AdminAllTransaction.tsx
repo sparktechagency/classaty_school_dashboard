@@ -1,24 +1,28 @@
 import { useState } from "react";
-import { TransactionsData } from "../../../public/data/TransactionsData";
 import ReuseSearchInput from "../../ui/Form/ReuseSearchInput";
-import { ITransactionType } from "../../types/TransactionType";
 import TransactionTable from "../../ui/Tables/TransactionTable";
 import TransactionViewModal from "../../ui/Modal/Transactions/TransactionViewModal";
+import { useGetEarningQuery } from "../../redux/features/earning/earningApi";
+import { IEarning } from "../../types";
 
 const AdminAllTransaction = () => {
-  const data: ITransactionType[] = TransactionsData;
   const [page, setPage] = useState(1);
   const [searchText, setSearchText] = useState("");
-  console.log(searchText);
 
   const limit = 12;
 
-  const [isViewModalVisible, setIsViewModalVisible] = useState(false);
-  const [currentRecord, setCurrentRecord] = useState<ITransactionType | null>(
-    null
-  );
+  const { data, isFetching } = useGetEarningQuery({
+    page,
+    limit,
+    searchTerm: searchText,
+  });
+  const EarningData: IEarning[] = data?.data?.result;
+  const EarningPagination = data?.data?.meta;
 
-  const showViewUserModal = (record: ITransactionType) => {
+  const [isViewModalVisible, setIsViewModalVisible] = useState(false);
+  const [currentRecord, setCurrentRecord] = useState<IEarning | null>(null);
+
+  const showViewUserModal = (record: IEarning) => {
     setCurrentRecord(record);
     setIsViewModalVisible(true);
   };
@@ -47,12 +51,12 @@ const AdminAllTransaction = () => {
       </div>
 
       <TransactionTable
-        data={data}
-        loading={false}
+        data={EarningData}
+        loading={isFetching}
         showViewModal={showViewUserModal}
         setPage={setPage}
         page={page}
-        total={data.length}
+        total={EarningPagination?.total}
         limit={limit}
       />
       <TransactionViewModal

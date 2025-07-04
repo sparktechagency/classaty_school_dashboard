@@ -1,20 +1,31 @@
 import { useState } from "react";
-import ParentsData from "../../../public/data/ParentsData";
-import { IParents } from "../../types/ParentsType";
+import { IParents } from "../../types/Parents.Type";
 import ReuseSearchInput from "../../ui/Form/ReuseSearchInput";
 
 import AllParentsTable from "../../ui/Tables/ParentsTable";
 import ParentsViewModal from "../../ui/Modal/Parents/ParentsViewModal";
 import BlockModal from "../../ui/Modal/BlockModal";
 import UnblockModal from "../../ui/Modal/UnblockModal";
+import {
+  useBlockUserMutation,
+  useGetParentsQuery,
+} from "../../redux/features/parents/parentsApi";
+import tryCatchWrapper from "../../utils/tryCatchWrapper";
 
 const AdminAllParents = () => {
-  const data: IParents[] = ParentsData;
   const [page, setPage] = useState(1);
   const [searchText, setSearchText] = useState("");
-  console.log(searchText);
 
   const limit = 12;
+
+  const { data, isFetching } = useGetParentsQuery({
+    page,
+    limit,
+    searchTerm: searchText,
+  });
+  const [blockParent] = useBlockUserMutation();
+  const parentsData: IParents[] = data?.data?.result;
+  const parentsPagination = data?.data?.meta;
 
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
   const [isBlockModalVisible, setIsBlockModalVisible] = useState(false);
@@ -42,13 +53,35 @@ const AdminAllParents = () => {
     setCurrentRecord(null);
   };
 
-  const handleBlock = (record: IParents) => {
-    handleCancel();
-    console.log(record);
+  const handleBlock = async (data: IParents) => {
+    const res = await tryCatchWrapper(
+      blockParent,
+      {
+        body: {
+          userId: data?._id,
+          action: "blocked",
+        },
+      },
+      "Blocking..."
+    );
+    if (res.statusCode === 200) {
+      handleCancel();
+    }
   };
-  const handleUnblock = (record: IParents) => {
-    handleCancel();
-    console.log(record);
+  const handleUnblock = async (data: IParents) => {
+    const res = await tryCatchWrapper(
+      blockParent,
+      {
+        body: {
+          userId: data?._id,
+          action: "active",
+        },
+      },
+      "Unblocking..."
+    );
+    if (res.statusCode === 200) {
+      handleCancel();
+    }
   };
 
   return (
@@ -69,14 +102,14 @@ const AdminAllParents = () => {
       </div>
       <div className="border-2 border-[#e1e1e1] rounded-xl rounded-tr-xl">
         <AllParentsTable
-          data={data}
-          loading={false}
+          data={parentsData}
+          loading={isFetching}
           showViewModal={showViewUserModal}
           showBlockModal={showBlockModal}
           showUnblockModal={showUnblockModal}
           setPage={setPage}
           page={page}
-          total={data.length}
+          total={parentsPagination?.total}
           limit={limit}
         />
       </div>

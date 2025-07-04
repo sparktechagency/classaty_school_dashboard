@@ -4,7 +4,7 @@ import { GoEye } from "react-icons/go";
 import { CgUnblock } from "react-icons/cg";
 import { MdBlock } from "react-icons/md";
 import ReuseTable from "../../utils/ReuseTable";
-import { IParents } from "../../types/ParentsType";
+import { IParents } from "../../types/Parents.Type";
 
 // Define the type for the props
 interface AllParentsTableProps {
@@ -14,9 +14,9 @@ interface AllParentsTableProps {
   showBlockModal: (record: IParents) => void; // Function to handle blocking a user
   showUnblockModal: (record: IParents) => void; // Function to handle unblocking a user
   setPage?: (page: number) => void; // Function to handle pagination
-  page?: number;
-  total?: number;
-  limit?: number;
+  page: number;
+  total: number;
+  limit: number;
 }
 
 const AllParentsTable: React.FC<AllParentsTableProps> = ({
@@ -32,47 +32,42 @@ const AllParentsTable: React.FC<AllParentsTableProps> = ({
 }) => {
   const columns = [
     {
-      title: "ID",
-      dataIndex: "ID",
-      key: "ID",
+      title: "#UID",
+      dataIndex: "_id",
+      render: (_: unknown, __: unknown, index: number) =>
+        page * limit - limit + index + 1,
+      key: "_id",
     },
     {
       title: "Parents Name",
-      dataIndex: "ParentsName",
-      key: "ParentsName",
+      dataIndex: "name",
+      key: "name",
     },
     {
       title: "Contact No",
-      dataIndex: "ContactNo",
-      key: "ContactNo",
+      dataIndex: "phoneNumber",
+      key: "phoneNumber",
     },
     {
       title: "Children Name",
-      dataIndex: "ChildrenName",
-      key: "ChildrenName",
+      dataIndex: ["parents", "studentUser", "name"],
+      key: "name",
     },
     {
       title: "Children School",
-      dataIndex: "ChildrenSchool",
-      key: "ChildrenSchool",
+      dataIndex: ["parents", "student", "schoolName"],
+      key: "schoolName",
     },
     {
       title: "Class",
-      dataIndex: "Class",
-      key: "Class",
+      dataIndex: ["parents", "student", "className"],
+      key: "className",
     },
     {
       title: "Subscription",
-      dataIndex: "SubscriptionPlan",
+      dataIndex: ["subscriptionDetails", "planName"],
       key: "SubscriptionPlan",
-      filters: [
-        { text: "Basic", value: "Basic" },
-        { text: "Plus", value: "Plus" },
-        { text: "Premium", value: "Premium" },
-      ],
-      onFilter: (value: string, record: IParents) =>
-        record.SubscriptionPlan === value,
-      filterMultiple: false,
+      render: (text: string) => <div className="capitalize">{text}</div>,
       align: "center",
     },
     {
@@ -90,25 +85,25 @@ const AllParentsTable: React.FC<AllParentsTableProps> = ({
             </button>
           </Tooltip>
 
-          {/* Block User Tooltip */}
-
-          <Tooltip placement="left" title="Unblock">
-            <button
-              className="!p-0 !bg-transparent !border-none !text-base-color cursor-pointer hidden"
-              onClick={() => showUnblockModal(record)}
-            >
-              <CgUnblock style={{ fontSize: "24px" }} />
-            </button>
-          </Tooltip>
-
-          <Tooltip placement="left" title="Block">
-            <button
-              className="!p-0 !bg-transparent !border-none !text-error-color cursor-pointer"
-              onClick={() => showBlockModal(record)}
-            >
-              <MdBlock style={{ fontSize: "24px" }} />
-            </button>
-          </Tooltip>
+          {record?.status !== "blocked" ? (
+            <Tooltip placement="left" title="Block">
+              <button
+                className="!p-0 !bg-transparent !border-none !text-error-color cursor-pointer"
+                onClick={() => showBlockModal(record)}
+              >
+                <MdBlock style={{ fontSize: "24px" }} />
+              </button>
+            </Tooltip>
+          ) : (
+            <Tooltip placement="left" title="Unblock">
+              <button
+                className="!p-0 !bg-transparent !border-none !text-base-color cursor-pointer"
+                onClick={() => showUnblockModal(record)}
+              >
+                <CgUnblock style={{ fontSize: "24px" }} />
+              </button>
+            </Tooltip>
+          )}
         </Space>
       ),
       align: "center",
@@ -124,7 +119,7 @@ const AllParentsTable: React.FC<AllParentsTableProps> = ({
       total={total}
       limit={limit}
       page={page}
-      keyValue={"email"}
+      keyValue={"_id"}
     />
   );
 };

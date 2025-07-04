@@ -5,6 +5,7 @@ import { CgUnblock } from "react-icons/cg";
 import { MdBlock } from "react-icons/md";
 import ReuseTable from "../../utils/ReuseTable";
 import { ITeacherData } from "../../types";
+import { formetDateAndTime } from "../../utils/dateFormet";
 
 // Define the type for the props
 interface AllTeacherTableProps {
@@ -14,9 +15,9 @@ interface AllTeacherTableProps {
   showBlockModal: (record: ITeacherData) => void; // Function to handle blocking a user
   showUnblockModal: (record: ITeacherData) => void; // Function to handle unblocking a user
   setPage?: (page: number) => void; // Function to handle pagination
-  page?: number;
-  total?: number;
-  limit?: number;
+  page: number;
+  total: number;
+  limit: number;
 }
 
 const AllTeacherTable: React.FC<AllTeacherTableProps> = ({
@@ -32,29 +33,37 @@ const AllTeacherTable: React.FC<AllTeacherTableProps> = ({
 }) => {
   const columns = [
     {
-      title: "ID",
-      dataIndex: "ID",
-      key: "ID",
+      title: "#UID",
+      dataIndex: "_id",
+      render: (_: unknown, __: unknown, index: number) =>
+        page * limit - limit + index + 1,
+      key: "_id",
     },
     {
       title: "Teacher Name",
-      dataIndex: "TeacherName",
-      key: "TeacherName",
+      dataIndex: "name",
+      key: "name",
     },
     {
       title: "School Name",
-      dataIndex: "SchoolName",
-      key: "SchoolName",
+      dataIndex: "schoolName",
+      key: "schoolName",
+    },
+    {
+      title: "School Address",
+      dataIndex: "schoolAddress",
+      key: "schoolAddress",
     },
     {
       title: "Contact No",
-      dataIndex: "ContactNo",
-      key: "ContactNo",
+      dataIndex: "phoneNumber",
+      key: "phoneNumber",
     },
     {
       title: "Join Date",
-      dataIndex: "JoinDate",
-      key: "JoinDate",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (text: string) => formetDateAndTime(text),
     },
     {
       title: "Action",
@@ -71,25 +80,25 @@ const AllTeacherTable: React.FC<AllTeacherTableProps> = ({
             </button>
           </Tooltip>
 
-          {/* Block User Tooltip */}
-
-          <Tooltip placement="left" title="Unblock">
-            <button
-              className="!p-0 !bg-transparent !border-none !text-base-color cursor-pointer hidden"
-              onClick={() => showUnblockModal(record)}
-            >
-              <CgUnblock style={{ fontSize: "24px" }} />
-            </button>
-          </Tooltip>
-
-          <Tooltip placement="left" title="Block">
-            <button
-              className="!p-0 !bg-transparent !border-none !text-error-color cursor-pointer"
-              onClick={() => showBlockModal(record)}
-            >
-              <MdBlock style={{ fontSize: "24px" }} />
-            </button>
-          </Tooltip>
+          {record?.status !== "blocked" ? (
+            <Tooltip placement="left" title="Block">
+              <button
+                className="!p-0 !bg-transparent !border-none !text-error-color cursor-pointer"
+                onClick={() => showBlockModal(record)}
+              >
+                <MdBlock style={{ fontSize: "24px" }} />
+              </button>
+            </Tooltip>
+          ) : (
+            <Tooltip placement="left" title="Unblock">
+              <button
+                className="!p-0 !bg-transparent !border-none !text-base-color cursor-pointer"
+                onClick={() => showUnblockModal(record)}
+              >
+                <CgUnblock style={{ fontSize: "24px" }} />
+              </button>
+            </Tooltip>
+          )}
         </Space>
       ),
       align: "center",
@@ -105,7 +114,7 @@ const AllTeacherTable: React.FC<AllTeacherTableProps> = ({
       total={total}
       limit={limit}
       page={page}
-      keyValue={"email"}
+      keyValue={"_id"}
     />
   );
 };

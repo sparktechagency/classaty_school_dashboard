@@ -95,7 +95,7 @@ const AllSchoolTable: React.FC<AllSchoolTableProps> = ({
       total={total}
       limit={limit}
       page={page}
-      keyValue={"email"}
+      keyValue={"_id"}
     />
   );
 };

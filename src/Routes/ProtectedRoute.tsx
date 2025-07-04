@@ -9,8 +9,6 @@ interface ProtectedRouteProps {
 function ProtectedRoute({ children, role }: ProtectedRouteProps) {
   const user = useUserData();
 
-  console.log("Protected ===> user", user);
-
   const modifyRole = role === "admin" ? "supperAdmin" : role;
 
   if (!user || user.role !== modifyRole) {

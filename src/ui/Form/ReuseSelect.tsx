@@ -7,6 +7,7 @@ import { cn } from "../../lib/utils";
 const { Option } = Select;
 
 type TSelectProps = {
+  showSearch?: boolean;
   Typolevel?: 1 | 2 | 3 | 4 | 5;
   label?: React.ReactNode;
   name: string;
@@ -15,7 +16,9 @@ type TSelectProps = {
   disabled?: boolean;
   options: any[];
   value?: any;
+  loading?: boolean;
   onChange?: (value: any) => void;
+  filterOption?: (inputValue: string, option: any) => boolean;
   allowClear?: boolean;
   mode?: "multiple" | undefined;
   wrapperClassName?: string;
@@ -23,9 +26,11 @@ type TSelectProps = {
   selectClassName?: string;
   defaultValue?: any;
   prefix?: React.ReactNode | null;
+  optionFilterProp?: string;
 };
 
 const ReuseSelect = ({
+  showSearch = false,
   Typolevel = 5,
   label,
   name,
@@ -34,7 +39,9 @@ const ReuseSelect = ({
   disabled,
   options,
   value,
+  loading = false,
   onChange,
+  filterOption,
   allowClear = false,
   mode,
   wrapperClassName,
@@ -42,6 +49,7 @@ const ReuseSelect = ({
   selectClassName,
   defaultValue = "",
   prefix,
+  optionFilterProp,
 }: TSelectProps) => {
   return (
     <div className={cn(wrapperClassName)}>
@@ -55,6 +63,10 @@ const ReuseSelect = ({
       )}
       <Form.Item name={name} rules={rules}>
         <Select
+          showSearch={showSearch}
+          filterOption={filterOption}
+          optionFilterProp={optionFilterProp}
+          loading={loading}
           mode={mode}
           className={cn(
             "!h-12 !text-secondary-color !bg-[#EFEFEF] !ring-0 rounded-md ",
@@ -68,7 +80,7 @@ const ReuseSelect = ({
           defaultValue={defaultValue}
           prefix={prefix}
         >
-          {options.map((option) => (
+          {options?.map((option) => (
             <Option key={option.value} value={option.value}>
               {option.label}
             </Option>

@@ -2,17 +2,18 @@ import React from "react";
 import { Space, Tooltip } from "antd";
 import { GoEye } from "react-icons/go";
 import ReuseTable from "../../utils/ReuseTable";
-import { ITransactionType } from "../../types/TransactionType";
+import { IEarning } from "../../types";
+import { formetDateAndTime } from "../../utils/dateFormet";
 
 // Define the type for the props
 interface TransactionTableProps {
-  data: ITransactionType[]; // Replace `unknown` with the actual type of your data array
+  data: IEarning[]; // Replace `unknown` with the actual type of your data array
   loading: boolean;
-  showViewModal: (record: ITransactionType) => void; // Function to handle viewing a user
+  showViewModal: (record: IEarning) => void; // Function to handle viewing a user
   setPage?: (page: number) => void; // Function to handle pagination
-  page?: number;
-  total?: number;
-  limit?: number;
+  page: number;
+  total: number;
+  limit: number;
 }
 
 const TransactionTable: React.FC<TransactionTableProps> = ({
@@ -27,28 +28,30 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
   const columns = [
     {
       title: "#UID",
-      render: (_: unknown, __: unknown, index: number) => index + 1,
+      dataIndex: "_id",
+      render: (_: unknown, __: unknown, index: number) =>
+        page * limit - limit + index + 1,
       key: "_id",
     },
     {
       title: "Name",
-      dataIndex: "name", // Data key for name
+      dataIndex: ["user", "name"], // Data key for name
       key: "name",
     },
     {
       title: "Phone Number",
-      dataIndex: "email", // Data key for email
-      key: "email",
-      render: () => <p>1234567890</p>,
+      dataIndex: ["user", "phoneNumber"], // Data key for email
+      key: "phoneNumber",
     },
     {
       title: "Date",
-      dataIndex: "date", // Data key for date
-      key: "date",
+      dataIndex: "createdAt", // Data key for date
+      key: "createdAt",
+      render: (createdAt: string) => formetDateAndTime(createdAt),
     },
     {
       title: "Plan",
-      dataIndex: "plan", // Data key for plan
+      dataIndex: ["subscription", "planName"], // Data key for plan
       key: "plan",
     },
     {
@@ -59,7 +62,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
     {
       title: "Action",
       key: "action",
-      render: (_: unknown, record: ITransactionType) => (
+      render: (_: unknown, record: IEarning) => (
         <Space size="middle">
           {/* View Details Tooltip */}
           <Tooltip placement="right" title="View Details">
@@ -85,7 +88,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
       total={total}
       limit={limit}
       page={page}
-      keyValue={"email"}
+      keyValue={"_id"}
     />
   );
 };

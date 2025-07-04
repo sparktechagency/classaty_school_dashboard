@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import React, { useState } from "react";
 import { Form, Modal } from "antd";
 import ReusableForm from "../../Form/ReuseForm";
 import ReuseInput from "../../Form/ReuseInput";
@@ -6,6 +7,12 @@ import { RiSchoolFill } from "react-icons/ri";
 import { FaPhone } from "react-icons/fa6";
 import ReuseButton from "../../Button/ReuseButton";
 import { MdSchool } from "react-icons/md";
+import ReuseSelect from "../../Form/ReuseSelect";
+import { useGetSchoolQuery } from "../../../redux/features/school/schoolApi";
+import { ISchoolDetails, ISubject } from "../../../types";
+import { useGetSubjectBySchoolIdQuery } from "../../../redux/features/subject/subjectApi";
+import tryCatchWrapper from "../../../utils/tryCatchWrapper";
+import { useAddTeacherMutation } from "../../../redux/features/teacher/teacherApi";
 
 interface AddTeacherProps {
   isAddModalVisible: boolean;
@@ -14,7 +21,7 @@ interface AddTeacherProps {
 
 const inputStructure = [
   {
-    name: "teacherlName",
+    name: "name",
     type: "text",
     inputType: "normal",
     label: "Teacher Name",
@@ -24,24 +31,14 @@ const inputStructure = [
     rules: [{ required: true, message: "Teacher Name is required" }],
   },
   {
-    name: "schoolPhoneNumber",
-    type: "text",
-    inputType: "normal",
-    label: "School Phone Number",
-    placeholder: "Enter School Phone Number",
-    labelClassName: "!font-bold",
-    prefix: <RiSchoolFill className="mr-1 text-secondary-color" />,
-    rules: [{ required: true, message: "Phone Number is required" }],
-  },
-  {
-    name: "adminPhoneNumber",
-    type: "text",
-    inputType: "normal",
-    label: "Admin Phone Number",
-    placeholder: "Enter Admin Phone Number",
+    name: "phoneNumber",
+    type: "number",
+    inputType: "number",
+    label: "Phone Number",
+    placeholder: "Enter Phone Number",
     labelClassName: "!font-bold",
     prefix: <FaPhone className="mr-1 text-secondary-color" />,
-    rules: [{ required: true, message: "Admin Phone Number is required" }],
+    rules: [{ required: true, message: "Phone Number is required" }],
   },
 ];
 
@@ -50,9 +47,76 @@ const AddTeacher: React.FC<AddTeacherProps> = ({
   handleCancel,
 }) => {
   const [form] = Form.useForm();
-  const handleFinish = (values: any) => {
-    console.log(values);
+  const [schoolId, setSchoolId] = useState<string | undefined>(undefined);
+
+  const [addTeacher] = useAddTeacherMutation();
+
+  const { data, isFetching } = useGetSchoolQuery(
+    {
+      page: 1,
+      limit: 999999,
+    },
+    {
+      refetchOnMountOrArgChange: true,
+      skip: !isAddModalVisible,
+    }
+  );
+
+  const { data: subjectData, isFetching: isSubjectFetching } =
+    useGetSubjectBySchoolIdQuery(
+      {
+        page: 1,
+        limit: 999999,
+        schoolId: schoolId || "", // fallback to empty string to avoid undefined
+      },
+      {
+        skip: !isAddModalVisible || !schoolId,
+        refetchOnMountOrArgChange: true,
+      }
+    );
+
+  const allSchool: ISchoolDetails[] = data?.data?.result || [];
+  const allSubject: ISubject[] = subjectData?.data?.result || [];
+
+  const handleFinish = async (values: any) => {
+    const selectedSchool = allSchool.find(
+      (school) => school.school?._id === values.school
+    );
+
+    const selectedSubject = allSubject.find(
+      (subject) => subject._id === values.subject
+    );
+
+    const finalPayload = {
+      name: values.name,
+      phoneNumber: values.phoneNumber,
+      schoolId: selectedSchool?.school?._id || "",
+      schoolName: selectedSchool?.school?.schoolName || "",
+      subjectId: selectedSubject?._id || "",
+      subjectName: selectedSubject?.subjectName || "",
+    };
+
+    console.log(finalPayload);
+    const res = await tryCatchWrapper(
+      addTeacher,
+      { body: finalPayload },
+      "Adding School..."
+    );
+
+    if (res?.statusCode === 201) {
+      form.resetFields();
+      handleCancel();
+    }
   };
+
+  const handleValuesChange = (changedValues: any) => {
+    if (changedValues?.school) {
+      const selectedSchool = changedValues.school;
+      setSchoolId(selectedSchool);
+      form.setFieldsValue({ subject: undefined }); // reset subject field
+    }
+  };
+
   return (
     <Modal
       open={isAddModalVisible}
@@ -68,8 +132,12 @@ const AddTeacher: React.FC<AddTeacherProps> = ({
           </h3>
 
           <div className="mt-5">
-            <ReusableForm form={form} handleFinish={handleFinish}>
-              {inputStructure.map((input, index) => (
+            <ReusableForm
+              form={form}
+              handleFinish={handleFinish}
+              onValuesChange={handleValuesChange}
+            >
+              {inputStructure?.map((input, index) => (
                 <ReuseInput
                   key={index}
                   name={input.name}
@@ -83,6 +151,50 @@ const AddTeacher: React.FC<AddTeacherProps> = ({
                   rules={input.rules}
                 />
               ))}
+              <ReuseSelect
+                showSearch={true}
+                filterOption={(input, option) =>
+                  (option?.children ?? "")
+                    .toLowerCase()
+                    .includes(input.toLowerCase())
+                }
+                optionFilterProp="children"
+                prefix={<RiSchoolFill className="mr-1 text-secondary-color" />}
+                name="school"
+                loading={isFetching}
+                Typolevel={5}
+                label="School"
+                placeholder="Select School"
+                labelClassName="!font-bold"
+                onChange={(schoolId) => console.log(schoolId)}
+                rules={[{ required: true, message: "School is required" }]}
+                options={allSchool?.map((school) => ({
+                  value: school?.school?._id,
+                  label: school.school?.schoolName,
+                }))}
+              />
+              <ReuseSelect
+                prefix={<RiSchoolFill className="mr-1 text-secondary-color" />}
+                showSearch={true}
+                filterOption={(input, option) =>
+                  (option?.children ?? "")
+                    .toLowerCase()
+                    .includes(input.toLowerCase())
+                }
+                optionFilterProp="children"
+                name="subject"
+                loading={isSubjectFetching}
+                Typolevel={5}
+                disabled={!schoolId}
+                label="Subject"
+                placeholder="Select Subject"
+                labelClassName="!font-bold"
+                rules={[{ required: true, message: "Subject is required" }]}
+                options={allSubject.map((subject) => ({
+                  value: subject._id,
+                  label: subject.subjectName || subject._id,
+                }))}
+              />
               <ReuseButton
                 htmlType="submit"
                 variant="secondary"

@@ -10,6 +10,7 @@ type ReusableFormProps = {
   defaultValues?: any;
   className?: string;
   handleFinish: (values: Record<string, any>) => void;
+  onValuesChange?: (changedValues: any, allValues: any) => void;
 };
 
 const ReusableForm = ({
@@ -18,6 +19,7 @@ const ReusableForm = ({
   defaultValues,
   className,
   handleFinish,
+  onValuesChange,
 }: ReusableFormProps) => {
   return (
     <Form
@@ -26,6 +28,7 @@ const ReusableForm = ({
       initialValues={defaultValues}
       onFinish={handleFinish}
       className={cn("space-y-1", className)}
+      onValuesChange={onValuesChange}
     >
       {children}
     </Form>

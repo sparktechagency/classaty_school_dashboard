@@ -49,8 +49,6 @@ const Topbar: React.FC<TopbarProps> = ({ collapsed, setCollapsed }) => {
   // Type the user object from localStorage
   const user = useUserData();
 
-  console.log("user", user);
-
   const handleMenuClick = () => {
     setCollapsed(false);
   };

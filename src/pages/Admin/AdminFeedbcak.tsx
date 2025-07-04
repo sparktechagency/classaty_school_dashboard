@@ -1,19 +1,24 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
-import FeedbackData from "../../../public/data/FeedbackData";
 import FeedbackTable from "../../ui/Tables/FeedbackTable";
 import FeedbackViewModal from "../../ui/Modal/Feedback/FeedbackViewModal";
+import { useGetFeedbackQuery } from "../../redux/features/feedback/feedbackApi";
 
 // Define the type for a report row (customize fields as needed)
 
 const limit = 12;
 
 const AdminFeedback: React.FC = () => {
-  const data: any[] = FeedbackData;
   const [page, setPage] = useState<number>(1);
 
   const [isViewModalVisible, setIsViewModalVisible] = useState<boolean>(false);
   const [currentRecord, setCurrentRecord] = useState<any | null>(null);
+
+  const { data, isFetching } = useGetFeedbackQuery({ page, limit });
+
+  const FeedbackData: any[] = data?.data?.result;
+
+  const FeedbackPagination = data?.data?.meta;
 
   const showViewUserModal = (record: any) => {
     setCurrentRecord(record);
@@ -36,12 +41,12 @@ const AdminFeedback: React.FC = () => {
           </div>
         </div>
         <FeedbackTable
-          data={data}
-          loading={false}
+          data={FeedbackData}
+          loading={isFetching}
           showViewModal={showViewUserModal}
           setPage={setPage}
           page={page}
-          total={data.length}
+          total={FeedbackPagination?.total}
           limit={limit}
         />
         <FeedbackViewModal

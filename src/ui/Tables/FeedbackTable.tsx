@@ -3,6 +3,7 @@ import { Rate, Space, Tooltip } from "antd";
 import { GoEye } from "react-icons/go";
 import { FC } from "react";
 import ReuseTable from "../../utils/ReuseTable";
+import { formetDateAndTime } from "../../utils/dateFormet";
 
 // Define the row type for feedback/report
 export interface ReportRow {
@@ -39,32 +40,40 @@ const FeedbackTable: FC<FeedbackTableProps> = ({
   const columns = [
     {
       title: "#UID",
-      render: (_: any, __: any, index: number) => index + 1,
+      dataIndex: "_id",
+      render: (_: unknown, __: unknown, index: number) =>
+        page * limit - limit + index + 1,
       key: "_id",
     },
     {
       title: "Name",
-      dataIndex: "reportedBy",
-      key: "reportedBy",
+      dataIndex: ["user", "name"],
+      key: "name",
     },
     {
       title: "Feedback",
-      dataIndex: "feedback",
-      key: "feedback",
+      dataIndex: "review",
+      key: "review",
       render: (feedback: string) => (
         <div className="max-w-[200px] truncate">{feedback}</div>
       ),
     },
     {
       title: "Rating",
-      dataIndex: "rating",
-      key: "rating",
-      render: (rating: number) => <Rate disabled defaultValue={rating} />,
+      dataIndex: "ratings",
+      key: "ratings",
+      render: (ratings: number) => (
+        <div className="flex items-center">
+          <Rate allowHalf disabled defaultValue={ratings} />
+          <span className="ml-2">{ratings}</span>
+        </div>
+      ),
     },
     {
       title: "Date",
-      dataIndex: "date",
-      key: "date",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (createdAt: string) => formetDateAndTime(createdAt),
     },
     {
       title: "Action",
@@ -73,7 +82,7 @@ const FeedbackTable: FC<FeedbackTableProps> = ({
         <Space size="middle">
           <Tooltip placement="right" title="View Details">
             <button
-              className="!p-0 !bg-transparent !border-none !text-secondary-color"
+              className="!p-0 !bg-transparent !border-none !text-secondary-color cursor-pointer"
               onClick={() => showViewModal(record)}
               type="button"
             >
@@ -95,7 +104,7 @@ const FeedbackTable: FC<FeedbackTableProps> = ({
       total={total}
       limit={limit}
       page={page}
-      keyValue={"email"}
+      keyValue={"_id"}
     />
   );
 };

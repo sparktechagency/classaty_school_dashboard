@@ -29,17 +29,17 @@ const ViewTeachersModal: React.FC<ViewTeachersModalProps> = ({
             Teacher Information
           </h3>
           <p className="text-sm sm:text-base lg:text-lg text-center mt-2 text-[#989898]">
-            See all details about {currentRecord?.TeacherName}
+            See all details about {currentRecord?.name}
           </p>
           <div className="flex flex-col justify-center items-center gap-2 mt-5">
             {/* Avatar */}
             <img
-              src={AllImages.profile}
-              alt={currentRecord?.TeacherName}
+              src={currentRecord?.image || AllImages.profile}
+              alt={currentRecord?.name}
               className="w-40 h-40 object-cover rounded"
             />
             <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-secondary-color mt-5">
-              {currentRecord?.SchoolName}
+              {currentRecord?.name}
             </h2>
           </div>
 

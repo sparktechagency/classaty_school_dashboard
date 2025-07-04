@@ -34,7 +34,6 @@ const tryCatchWrapper = async (
 
     // Return the actual data
   } catch (error: any) {
-    console.log(error);
     toast.error(
       error?.data?.message ||
         error?.error ||
