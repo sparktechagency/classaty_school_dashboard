@@ -4,10 +4,14 @@ import ReusableForm from "../../Form/ReuseForm";
 import ReuseInput from "../../Form/ReuseInput";
 import ReuseButton from "../../Button/ReuseButton";
 import { GiClassicalKnowledge } from "react-icons/gi";
+import { useEffect } from "react";
+import tryCatchWrapper from "../../../utils/tryCatchWrapper";
+import { useUpdateLevelMutation } from "../../../redux/features/level/levelApi";
 
 interface EditClassLevelModalProps {
   isEditModalVisible: boolean;
   handleCancel: () => void;
+  currentRecord: any;
 }
 
 const inputStructure = [
@@ -26,10 +30,31 @@ const inputStructure = [
 const EditClassLevelModal: React.FC<EditClassLevelModalProps> = ({
   isEditModalVisible,
   handleCancel,
+  currentRecord,
 }) => {
   const [form] = Form.useForm();
-  const handleFinish = (values: any) => {
-    console.log(values);
+
+  const [updateLevel] = useUpdateLevelMutation();
+
+  useEffect(() => {
+    if (currentRecord) {
+      form.setFieldsValue({
+        levelName: currentRecord?.levelName,
+      });
+    }
+  }, [currentRecord, form]);
+
+  const handleFinish = async (values: any) => {
+    const res = await tryCatchWrapper(
+      updateLevel,
+      { body: values, params: currentRecord?._id },
+      "Updating Level..."
+    );
+
+    if (res?.statusCode === 200) {
+      form.resetFields();
+      handleCancel();
+    }
   };
   return (
     <Modal

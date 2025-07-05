@@ -5,11 +5,14 @@ import ReuseInput from "../../Form/ReuseInput";
 import { RiSchoolFill } from "react-icons/ri";
 import ReuseButton from "../../Button/ReuseButton";
 import tryCatchWrapper from "../../../utils/tryCatchWrapper";
-import { useAddSubjectMutation } from "../../../redux/features/subject/subjectApi";
+import { useUpdateSubjectMutation } from "../../../redux/features/subject/subjectApi";
+import { ISubject } from "../../../types";
+import { useEffect } from "react";
 
-interface AddSubjectProps {
-  isAddModalVisible: boolean;
+interface EditSubjectProps {
+  isUpdateModalVisible: boolean;
   handleCancel: () => void;
+  currentRecord: ISubject | null;
 }
 
 const inputStructure = [
@@ -25,27 +28,37 @@ const inputStructure = [
   },
 ];
 
-const AddSubject: React.FC<AddSubjectProps> = ({
-  isAddModalVisible,
+const EditSubject: React.FC<EditSubjectProps> = ({
+  isUpdateModalVisible,
   handleCancel,
+  currentRecord,
 }) => {
-  const [addSubject] = useAddSubjectMutation();
+  const [updateSubject] = useUpdateSubjectMutation();
   const [form] = Form.useForm();
+
+  useEffect(() => {
+    if (currentRecord) {
+      form.setFieldsValue({
+        subjectName: currentRecord?.subjectName,
+      });
+    }
+  }, [currentRecord, form]);
+
   const handleFinish = async (values: any) => {
     const res = await tryCatchWrapper(
-      addSubject,
-      { body: values },
-      "Adding School..."
+      updateSubject,
+      { body: { ...values, subjectId: currentRecord?._id } },
+      "Updating School..."
     );
 
-    if (res?.statusCode === 201) {
+    if (res?.statusCode === 200) {
       form.resetFields();
       handleCancel();
     }
   };
   return (
     <Modal
-      open={isAddModalVisible}
+      open={isUpdateModalVisible}
       onCancel={handleCancel}
       footer={null}
       centered
@@ -54,7 +67,7 @@ const AddSubject: React.FC<AddSubjectProps> = ({
       <div className="py-5">
         <div className="text-base-color">
           <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-secondary-color text-center">
-            Add Subject
+            Update Subject
           </h3>
 
           <div className="mt-5">
@@ -79,7 +92,7 @@ const AddSubject: React.FC<AddSubjectProps> = ({
                 variant="secondary"
                 className="w-full mt-4"
               >
-                Add Subject
+                Update Subject
               </ReuseButton>
             </ReusableForm>
           </div>
@@ -89,4 +102,4 @@ const AddSubject: React.FC<AddSubjectProps> = ({
   );
 };
 
-export default AddSubject;
+export default EditSubject;

@@ -4,6 +4,8 @@ import ReusableForm from "../../Form/ReuseForm";
 import ReuseInput from "../../Form/ReuseInput";
 import ReuseButton from "../../Button/ReuseButton";
 import { GiClassicalKnowledge } from "react-icons/gi";
+import { useAddLevelMutation } from "../../../redux/features/level/levelApi";
+import tryCatchWrapper from "../../../utils/tryCatchWrapper";
 
 interface AddClassLevelModalProps {
   isAddModalVisible: boolean;
@@ -27,9 +29,19 @@ const AddClassLevelModal: React.FC<AddClassLevelModalProps> = ({
   isAddModalVisible,
   handleCancel,
 }) => {
+  const [addClassLevel] = useAddLevelMutation();
   const [form] = Form.useForm();
-  const handleFinish = (values: any) => {
-    console.log(values);
+  const handleFinish = async (values: any) => {
+    const res = await tryCatchWrapper(
+      addClassLevel,
+      { body: values },
+      "Adding Level..."
+    );
+
+    if (res?.statusCode === 201) {
+      form.resetFields();
+      handleCancel();
+    }
   };
   return (
     <Modal

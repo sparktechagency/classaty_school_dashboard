@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { PlusOutlined } from "@ant-design/icons";
 import {
@@ -13,63 +12,90 @@ import {
 import { MdDelete } from "react-icons/md";
 import ReuseButton from "../../Button/ReuseButton";
 import { toast } from "sonner";
+import { useEffect, useState } from "react";
+import { useUpdateClassMutation } from "../../../redux/features/class/classAPi";
 import tryCatchWrapper from "../../../utils/tryCatchWrapper";
-import { useAddClassMutation } from "../../../redux/features/class/classAPi";
-import { useState } from "react";
 
-interface AddClassModalProps {
-  selectedLevel: string;
-  isAddClassModalVisible: boolean;
-  handleCancel: () => void;
+interface ClassData {
+  _id?: string; // optional for edit
+  className: string;
+  section: string[];
+  levelId: string;
 }
 
-const AddClassModal: React.FC<AddClassModalProps> = ({
-  selectedLevel,
-  isAddClassModalVisible,
+interface EditClassModalProps {
+  isEditClassModalVisible: boolean;
+  handleCancel: () => void;
+  currentRecord?: ClassData | null;
+}
+
+const EditClassModal: React.FC<EditClassModalProps> = ({
+  isEditClassModalVisible,
   handleCancel,
+  currentRecord = null,
 }) => {
   const [activeKey, setActiveKey] = useState<string[]>(["0"]);
-
   const [form] = Form.useForm();
-  const [addClass] = useAddClassMutation();
+  const [updateClass] = useUpdateClassMutation();
+
+  useEffect(() => {
+    if (currentRecord) {
+      const splitSections =
+        currentRecord.section?.[0]?.includes("/") &&
+        currentRecord.section.length === 1
+          ? currentRecord.section[0].split("/").map((s) => s.trim())
+          : currentRecord.section;
+
+      form.setFieldsValue({
+        className: currentRecord.className,
+        sections: splitSections?.length ? splitSections : [""],
+      });
+
+      setActiveKey(["0"]);
+    } else {
+      form.resetFields();
+      setActiveKey(["0"]);
+    }
+  }, [currentRecord, form, isEditClassModalVisible]);
+
   const handleSave = async () => {
     try {
       const values = await form.validateFields();
 
       const payload = {
-        levelId: selectedLevel?.[0],
         className: values.className.trim(),
         section: values.sections.map((s: string) => s.trim()),
       };
       const res = await tryCatchWrapper(
-        addClass,
-        { body: payload },
-        "Adding Level..."
+        updateClass,
+        { body: payload, params: currentRecord?._id },
+        "Updating Level..."
       );
 
       if (res?.statusCode === 201) {
         form.resetFields();
         handleCancel();
       }
-    } catch (error: any) {
-      console.log("Validation failed:", error);
 
+      form.resetFields();
+      handleCancel();
+    } catch (error: any) {
+      console.error("Validation failed:", error);
       const firstError =
         error?.errorFields?.[0]?.errors?.[0] || "Validation failed";
-
       toast.error(firstError);
     }
   };
 
   return (
     <Modal
-      open={isAddClassModalVisible}
+      open={isEditClassModalVisible}
       onCancel={handleCancel}
       footer={null}
       centered
+      destroyOnClose
     >
       <Form form={form} layout="vertical" className="p-4">
-        {/* Class Name Input */}
         <Typography.Title level={5} className="mb-2">
           Class Name
         </Typography.Title>
@@ -84,11 +110,9 @@ const AddClassModal: React.FC<AddClassModalProps> = ({
           />
         </Form.Item>
 
-        {/* Sections List */}
         <Typography.Title level={5}>Section</Typography.Title>
         <Form.List
           name="sections"
-          initialValue={[""]}
           rules={[
             {
               validator: async (_, names) => {
@@ -139,6 +163,14 @@ const AddClassModal: React.FC<AddClassModalProps> = ({
                             onClick={(e) => {
                               e.stopPropagation();
                               remove(name);
+                              // Adjust active key if needed after removal
+                              setTimeout(() => {
+                                setActiveKey(
+                                  fields.length > 2
+                                    ? [String(idx === 0 ? 0 : idx - 1)]
+                                    : ["0"]
+                                );
+                              }, 100);
                             }}
                             size={22}
                           />
@@ -171,22 +203,17 @@ const AddClassModal: React.FC<AddClassModalProps> = ({
                 variant="outline"
                 onClick={async () => {
                   try {
-                    // Validate existing section fields before adding
+                    // Validate all existing sections before adding a new one
                     const values = await form.validateFields(["sections"]);
                     const lastIndex = fields.length;
 
-                    // Add new section
                     add("");
-
-                    // Set form value explicitly (optional in most cases)
                     form.setFieldsValue({
                       sections: [...values.sections, ""],
                     });
 
-                    // Set newly added panel as active
                     setActiveKey([String(lastIndex)]);
 
-                    // Optional: scroll into view
                     setTimeout(() => {
                       document
                         .querySelector(`[data-node-key="${lastIndex}"]`)
@@ -195,7 +222,7 @@ const AddClassModal: React.FC<AddClassModalProps> = ({
                           block: "start",
                         });
                     }, 100);
-                  } catch (err) {
+                  } catch {
                     toast.error("Please fill out all existing sections first.");
                   }
                 }}
@@ -207,7 +234,6 @@ const AddClassModal: React.FC<AddClassModalProps> = ({
           )}
         </Form.List>
 
-        {/* Submit */}
         <div className="mt-5">
           <Form.Item className="mt-6">
             <Button
@@ -217,7 +243,7 @@ const AddClassModal: React.FC<AddClassModalProps> = ({
               onClick={handleSave}
               className="!bg-[#28314E] border-[#28314E]"
             >
-              Add Class
+              {currentRecord ? "Update Class" : "Add Class"}
             </Button>
           </Form.Item>
         </div>
@@ -226,4 +252,4 @@ const AddClassModal: React.FC<AddClassModalProps> = ({
   );
 };
 
-export default AddClassModal;
+export default EditClassModal;

@@ -1,29 +1,50 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
-import SubjectData from "../../../public/data/SubjectData";
 import ReuseSearchInput from "../../ui/Form/ReuseSearchInput";
 import DeleteModal from "../../ui/Modal/DeleteModal";
 import ReuseButton from "../../ui/Button/ReuseButton";
 import { FiPlus } from "react-icons/fi";
 import AddSubject from "../../ui/Modal/Subject/AddSubject";
 import SubjectTable from "../../ui/Tables/SubjectTable";
+import {
+  useDeleteSubjectMutation,
+  useGetSubjectBySchoolIdQuery,
+} from "../../redux/features/subject/subjectApi";
+import { ISubject } from "../../types";
+import EditSubject from "../../ui/Modal/Subject/EditSubject";
+import tryCatchWrapper from "../../utils/tryCatchWrapper";
 
 const SubjectPage = () => {
-  const data: any[] = SubjectData;
   const [page, setPage] = useState(1);
   const [searchText, setSearchText] = useState("");
-  console.log(searchText);
 
   const limit = 12;
+
+  const [deleteSubject] = useDeleteSubjectMutation();
+  const { data, isFetching } = useGetSubjectBySchoolIdQuery({
+    page,
+    limit,
+    searchTerm: searchText,
+  });
+
+  const subjectData: ISubject[] = data?.data?.result;
+
+  const subjectPagination = data?.data?.meta;
+
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
-  const [currentRecord, setCurrentRecord] = useState<any | null>(null);
+  const [currentRecord, setCurrentRecord] = useState<ISubject | null>(null);
 
   const showAddModal = () => {
     setIsAddModalVisible(true);
   };
 
-  const showDeleteModal = (record: any) => {
+  const showUpdateModal = (record: ISubject) => {
+    setCurrentRecord(record);
+    setIsUpdateModalVisible(true);
+  };
+
+  const showDeleteModal = (record: ISubject) => {
     setCurrentRecord(record);
     setIsDeleteModalVisible(true);
   };
@@ -31,12 +52,19 @@ const SubjectPage = () => {
   const handleCancel = () => {
     setIsAddModalVisible(false);
     setIsDeleteModalVisible(false);
+    setIsUpdateModalVisible(false);
     setCurrentRecord(null);
   };
 
-  const handleDelete = (record: any) => {
-    handleCancel();
-    console.log(record);
+  const handleDelete = async (record: ISubject) => {
+    const res = await tryCatchWrapper(
+      deleteSubject,
+      { params: record?._id },
+      "Deleting..."
+    );
+    if (res.statusCode === 200) {
+      handleCancel();
+    }
   };
 
   return (
@@ -70,14 +98,15 @@ const SubjectPage = () => {
         isAddModalVisible={isAddModalVisible}
         handleCancel={handleCancel}
       />
-      <div className="border-2 border-[#e1e1e1] rounded-xl rounded-tr-xl">
+      <div className="border-2 border-[#e1e1e1] rounded-xl rounded-tr-xl mt-5">
         <SubjectTable
-          data={data}
-          loading={false}
+          data={subjectData}
+          loading={isFetching}
           showDeleteModal={showDeleteModal}
+          showUpdateModal={showUpdateModal}
           setPage={setPage}
           page={page}
-          total={data.length}
+          total={subjectPagination?.total}
           limit={limit}
         />
       </div>
@@ -88,6 +117,11 @@ const SubjectPage = () => {
         currentRecord={currentRecord}
         handleDelete={handleDelete}
         description=" Are You Sure You want to Delete This ?"
+      />
+      <EditSubject
+        isUpdateModalVisible={isUpdateModalVisible}
+        handleCancel={handleCancel}
+        currentRecord={currentRecord}
       />
     </div>
   );

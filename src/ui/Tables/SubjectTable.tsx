@@ -1,24 +1,27 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import { Space, Tooltip } from "antd";
-import { MdDelete } from "react-icons/md";
+import { MdDelete, MdModeEditOutline } from "react-icons/md";
 import ReuseTable from "../../utils/ReuseTable";
+import { ISubject } from "../../types";
 
 // Define the type for the props
 interface SubjectTableProps {
-  data: any[]; // Replace `unknown` with the actual type of your data array
+  data: ISubject[]; // Replace `unknown` with the actual type of your data array
   loading: boolean;
-  showDeleteModal: (record: any) => void; // Function to handle blocking a user
+  showDeleteModal: (record: ISubject) => void; // Function to handle blocking a user
+  showUpdateModal: (record: ISubject) => void;
   setPage?: (page: number) => void; // Function to handle pagination
-  page?: number;
-  total?: number;
-  limit?: number;
+  page: number;
+  total: number;
+  limit: number;
 }
 
 const SubjectTable: React.FC<SubjectTableProps> = ({
   data,
   loading,
   showDeleteModal,
+  showUpdateModal,
   setPage,
   page,
   total,
@@ -26,24 +29,30 @@ const SubjectTable: React.FC<SubjectTableProps> = ({
 }) => {
   const columns = [
     {
-      title: "UID",
-      dataIndex: "UID",
-      key: "UID",
+      title: "#UID",
+      dataIndex: "_id",
+      render: (_: unknown, __: unknown, index: number) =>
+        page * limit - limit + index + 1,
+      key: "_id",
     },
     {
       title: "Subject",
-      dataIndex: "Subject",
-      key: "Subject",
+      dataIndex: "subjectName",
+      key: "subjectName",
     },
     {
       title: "Action",
       key: "action",
-      render: (_: unknown, record: any) => (
+      render: (_: unknown, record: ISubject) => (
         <Space size="middle">
-          {/* View Details Tooltip */}
-
-          {/* Block User Tooltip */}
-
+          <Tooltip placement="right" title="Edit">
+            <button
+              className="!p-0 !bg-transparent !border-none !text-secondary-color cursor-pointer"
+              onClick={() => showUpdateModal(record)}
+            >
+              <MdModeEditOutline style={{ fontSize: "24px" }} />
+            </button>
+          </Tooltip>
           <Tooltip placement="left" title="Delete">
             <button
               className="!p-0 !bg-transparent !border-none !text-error-color cursor-pointer"
@@ -67,7 +76,7 @@ const SubjectTable: React.FC<SubjectTableProps> = ({
       total={total}
       limit={limit}
       page={page}
-      keyValue={"email"}
+      keyValue={"_id"}
     />
   );
 };

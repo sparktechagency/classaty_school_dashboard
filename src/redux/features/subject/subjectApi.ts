@@ -5,20 +5,6 @@ const subject_url = "/subject";
 
 const subjectApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
-    getSubject: build.query({
-      query: ({ page, limit, searchTerm }) => {
-        return {
-          url: `${subject_url}`,
-          method: "GET",
-          params: {
-            page,
-            limit,
-            searchTerm,
-          },
-        };
-      },
-      providesTags: [tagTypes.subject],
-    }),
     getSubjectBySchoolId: build.query({
       query: ({ page, limit, searchTerm, schoolId }) => {
         return {
@@ -34,9 +20,37 @@ const subjectApi = baseApi.injectEndpoints({
       },
       providesTags: [tagTypes.subject],
     }),
+    addSubject: build.mutation({
+      query: (req) => ({
+        url: `${subject_url}/create`,
+        method: "POST",
+        body: req.body,
+      }),
+      invalidatesTags: [tagTypes.subject],
+    }),
+    updateSubject: build.mutation({
+      query: (req) => ({
+        url: `${subject_url}/action`,
+        method: "PATCH",
+        body: req.body,
+      }),
+      invalidatesTags: [tagTypes.subject],
+    }),
+    deleteSubject: build.mutation({
+      query: (req) => ({
+        url: `subject/${req?.params}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: [tagTypes.subject],
+    }),
   }),
 });
 
-export const { useGetSubjectQuery, useGetSubjectBySchoolIdQuery } = subjectApi;
+export const {
+  useGetSubjectBySchoolIdQuery,
+  useAddSubjectMutation,
+  useUpdateSubjectMutation,
+  useDeleteSubjectMutation,
+} = subjectApi;
 
 export default subjectApi;

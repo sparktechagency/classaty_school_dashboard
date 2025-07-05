@@ -66,9 +66,9 @@ const router: RouteObject[] = [
     children: routeGenerator(adminPaths), // Generating child routes dynamically
   },
   {
-    path: "school_admin",
+    path: "school",
     element: (
-      <ProtectedRoute role="school_admin">
+      <ProtectedRoute role="school">
         <DashboardLayout />
       </ProtectedRoute>
     ),

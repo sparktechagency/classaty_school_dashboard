@@ -10,6 +10,7 @@ export const tagTypes = {
 
   section: "Section",
   subject: "Subject",
+  level: "Level",
   class: "Class",
 };
 
@@ -24,5 +25,6 @@ export const tagTypesList = [
   tagTypes.feedback,
   tagTypes.subject,
   tagTypes.class,
+  tagTypes.level,
   tagTypes.section,
 ];

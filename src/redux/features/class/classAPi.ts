@@ -34,9 +34,53 @@ const classApi = baseApi.injectEndpoints({
       },
       providesTags: [tagTypes.class],
     }),
+    getClassByLevelId: build.query({
+      query: ({ page, limit, searchTerm, levelId }) => {
+        return {
+          url: `${class_url}/${levelId}`,
+          method: "GET",
+          params: {
+            page,
+            limit,
+            searchTerm,
+          },
+        };
+      },
+      providesTags: [tagTypes.class],
+    }),
+    addClass: build.mutation({
+      query: (req) => ({
+        url: `${class_url}/create`,
+        method: "POST",
+        body: req.body,
+      }),
+      invalidatesTags: [tagTypes.class],
+    }),
+    updateClass: build.mutation({
+      query: (req) => ({
+        url: `${class_url}/${req?.params}`,
+        method: "PATCH",
+        body: req.body,
+      }),
+      invalidatesTags: [tagTypes.class],
+    }),
+    deleteClass: build.mutation({
+      query: (req) => ({
+        url: `${class_url}/${req?.params}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: [tagTypes.class],
+    }),
   }),
 });
 
-export const { useGetClassQuery, useGetClassBySchoolIdQuery } = classApi;
+export const {
+  useGetClassQuery,
+  useGetClassBySchoolIdQuery,
+  useGetClassByLevelIdQuery,
+  useAddClassMutation,
+  useUpdateClassMutation,
+  useDeleteClassMutation,
+} = classApi;
 
 export default classApi;
