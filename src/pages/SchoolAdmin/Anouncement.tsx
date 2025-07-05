@@ -1,5 +1,4 @@
 import { useState } from "react";
-import AnouncementData from "../../../public/data/AnouncementData";
 import ReuseSearchInput from "../../ui/Form/ReuseSearchInput";
 import { IAnounceType } from "../../types";
 import DeleteModal from "../../ui/Modal/DeleteModal";
@@ -8,14 +7,23 @@ import AnouncementViewModal from "../../ui/Modal/Anouncement/AnouncementViewModa
 import ReuseButton from "../../ui/Button/ReuseButton";
 import { FiPlus } from "react-icons/fi";
 import AddAnouncementModal from "../../ui/Modal/Anouncement/AddAnouncementModal";
+import { useGetAnnouncementQuery } from "../../redux/features/announcement/announcementApi";
 
 const AnouncementPage = () => {
-  const data: IAnounceType[] = AnouncementData;
   const [page, setPage] = useState(1);
   const [searchText, setSearchText] = useState("");
-  console.log(searchText);
 
   const limit = 12;
+
+  const { data, isFetching } = useGetAnnouncementQuery({
+    page,
+    limit,
+    searchTerm: searchText,
+  });
+
+  const AnouncementData: IAnounceType[] = data?.data?.result;
+  const AnouncementPagination = data?.data?.meta;
+
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
@@ -80,13 +88,13 @@ const AnouncementPage = () => {
       />
       <div className="border-2 border-[#e1e1e1] rounded-xl rounded-tr-xl">
         <AnouncemantTable
-          data={data}
-          loading={false}
+          data={AnouncementData}
+          loading={isFetching}
           showViewModal={showViewUserModal}
           showDeleteModal={showDeleteModal}
           setPage={setPage}
           page={page}
-          total={data.length}
+          total={AnouncementPagination?.total}
           limit={limit}
         />
       </div>

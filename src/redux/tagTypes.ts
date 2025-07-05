@@ -11,6 +11,8 @@ export const tagTypes = {
   section: "Section",
   subject: "Subject",
   level: "Level",
+  assignment: "Assignment",
+  announcement: "Announcement",
   class: "Class",
 };
 
@@ -27,4 +29,6 @@ export const tagTypesList = [
   tagTypes.class,
   tagTypes.level,
   tagTypes.section,
+  tagTypes.assignment,
+  tagTypes.announcement,
 ];
