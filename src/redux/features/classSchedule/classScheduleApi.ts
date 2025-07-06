@@ -17,11 +17,20 @@ const classScheduleApi = baseApi.injectEndpoints({
                     },
                 };
             },
-            providesTags: [tagTypes.payment],
+            providesTags: [tagTypes.classSchedule],
         }),
+
+        createClassSchedule: build.mutation({
+            query: (req) => ({
+                url: `${class_schedule_api}/create`,
+                method: "POST",
+                body: req.body,
+            }),
+            invalidatesTags: [tagTypes.classSchedule],
+        })
     }),
 });
 
-export const { useGetAllClassScheduleQuery } = classScheduleApi;
+export const { useGetAllClassScheduleQuery, useCreateClassScheduleMutation } = classScheduleApi;
 
 export default classScheduleApi;

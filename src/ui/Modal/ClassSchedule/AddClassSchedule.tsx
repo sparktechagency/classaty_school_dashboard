@@ -1,10 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { DatePicker, Form, Modal, TimePicker, Typography } from "antd";
+import dayjs from "dayjs";
+import { useState } from "react";
+import { useGetClassQuery } from "../../../redux/features/class/classAPi";
+import { useCreateClassScheduleMutation } from "../../../redux/features/classSchedule/classScheduleApi";
+import { useGetSectionByClassIdQuery } from "../../../redux/features/section/sectionApi";
+import { useGetSubjectBySchoolIdQuery } from "../../../redux/features/subject/subjectApi";
+import { useGetTeacherQuery } from "../../../redux/features/teacher/teacherApi";
+import tryCatchWrapper from "../../../utils/tryCatchWrapper";
+import ReuseButton from "../../Button/ReuseButton";
 import ReusableForm from "../../Form/ReuseForm";
 import ReuseInput from "../../Form/ReuseInput";
-import ReuseButton from "../../Button/ReuseButton";
 import ReuseSelect from "../../Form/ReuseSelect";
-import dayjs from "dayjs";
 
 interface AddClassScheduleProps {
   isAddModalVisible: boolean;
@@ -16,9 +23,78 @@ const AddClassSchedule: React.FC<AddClassScheduleProps> = ({
   handleCancel,
 }) => {
   const [form] = Form.useForm();
-  const handleFinish = (values: any) => {
-    console.log(values);
+  const [classId, setClassId] = useState<string>("");
+
+  const { data: classData, isFetching: classFetching } = useGetClassQuery(
+    {},
+    {
+      skip: !isAddModalVisible,
+    }
+  );
+  const allClass = classData?.data;
+  const { data: subjectData, isFetching: subjectFetching } =
+    useGetSubjectBySchoolIdQuery(
+      {
+        page: 1,
+        limit: 1000,
+      },
+      {
+        skip: !isAddModalVisible,
+      }
+    );
+  const { data: teachers, isFetching: teacherFetching } = useGetTeacherQuery(
+    {
+      page: 1,
+      limit: 1000,
+    },
+    {
+      skip: !isAddModalVisible,
+    }
+  );
+  const { data: section } = useGetSectionByClassIdQuery(
+    {
+      classId: classId,
+      page: 1,
+      limit: 1000,
+    },
+    {
+      skip: !classId || !isAddModalVisible,
+    }
+  );
+
+  const [createClassSchedule] = useCreateClassScheduleMutation();
+
+  const handleValuesChange = (changedValues: any) => {
+    if (changedValues?.classId) {
+      const selectedClass = changedValues.classId;
+      console.log(selectedClass, "selectedClass");
+      setClassId(selectedClass);
+    }
+
+    if (changedValues?.classId) {
+      const selectedClass = changedValues.classId;
+      setClassId(selectedClass);
+    }
   };
+
+  const handleFinish = async (values: any) => {
+    const isoDate = dayjs(values.date).toISOString();
+    values.date = isoDate;
+    values.selectTime = dayjs(values.selectTime).format("HH:mm:ss");
+    values.endTime = dayjs(values.endTime).format("HH:mm:ss");
+
+    const res = await tryCatchWrapper(
+      createClassSchedule,
+      { body: values },
+      "Adding Class Schedule..."
+    );
+
+    if (res?.statusCode === 201) {
+      form.resetFields();
+      handleCancel();
+    }
+  };
+
   return (
     <Modal
       open={isAddModalVisible}
@@ -34,29 +110,48 @@ const AddClassSchedule: React.FC<AddClassScheduleProps> = ({
           </h3>
 
           <div className="mt-5">
-            <ReusableForm form={form} handleFinish={handleFinish}>
+            <ReusableForm
+              onValuesChange={handleValuesChange}
+              form={form}
+              handleFinish={handleFinish}
+            >
               <ReuseSelect
                 Typolevel={5}
                 label="Class"
-                name="class"
+                name="classId"
+                labelClassName="!font-bold"
                 placeholder="Select Class"
-                options={[
-                  { value: "Class 1", label: "Class 1" },
-                  { value: "Class 2", label: "Class 2" },
-                  { value: "Class 3", label: "Class 3" },
-                ]}
+                options={allClass?.map((item: any) => ({
+                  value: item._id,
+                  label: item.className,
+                }))}
+                disabled={classFetching}
+                rules={[{ required: true, message: "Class is required" }]}
+              />
+              <ReuseSelect
+                Typolevel={5}
+                label="Section"
+                name="section"
+                labelClassName="!font-bold"
+                placeholder="Select Section"
+                options={section?.data?.map((item: any) => ({
+                  value: item,
+                  label: item,
+                }))}
+                disabled={classId === ""}
                 rules={[{ required: true, message: "Class is required" }]}
               />
               <ReuseSelect
                 Typolevel={5}
                 label="Subject"
-                name="subject"
+                name="subjectId"
+                labelClassName="!font-bold"
                 placeholder="Select Subject"
-                options={[
-                  { value: "Subject 1", label: "Subject 1" },
-                  { value: "Subject 2", label: "Subject 2" },
-                  { value: "Subject 3", label: "Subject 3" },
-                ]}
+                options={subjectData?.data?.result?.map((item: any) => ({
+                  value: item._id,
+                  label: item.subjectName,
+                }))}
+                disabled={subjectFetching}
                 rules={[{ required: true, message: "Subject is required" }]}
               />
               <ReuseInput
@@ -78,19 +173,20 @@ const AddClassSchedule: React.FC<AddClassScheduleProps> = ({
               <ReuseSelect
                 Typolevel={5}
                 label="Teacher"
-                name="teacher"
+                name="teacherId"
+                labelClassName="!font-bold"
                 placeholder="Select Teacher"
-                options={[
-                  { value: "Teacher 1", label: "Teacher 1" },
-                  { value: "Teacher 2", label: "Teacher 2" },
-                  { value: "Teacher 3", label: "Teacher 3" },
-                ]}
+                options={teachers?.data?.result?.map((item: any) => ({
+                  value: item._id,
+                  label: item.name,
+                }))}
+                disabled={teacherFetching}
                 rules={[{ required: true, message: "Teacher is required" }]}
               />
               <Typography.Title level={5} className="mb-1">
                 Start Time
               </Typography.Title>
-              <Form.Item name="startTime" rules={[{ required: true }]}>
+              <Form.Item name="selectTime" rules={[{ required: true }]}>
                 <TimePicker
                   className="w-full !py-2 !px-3 !rounded-lg !text-lg !bg-[#EFEFEF] !border !border-[#EFEFEF] !text-base-color"
                   placeholder="Select Time"
@@ -116,9 +212,29 @@ const AddClassSchedule: React.FC<AddClassScheduleProps> = ({
                   }}
                 />
               </Form.Item>
+
+              <ReuseSelect
+                Typolevel={5}
+                label="Days"
+                name="days"
+                labelClassName="!font-bold"
+                placeholder="Select Days"
+                options={[
+                  { value: "saturday", label: "Saturday" },
+                  { value: "sunday", label: "Sunday" },
+                  { value: "monday", label: "Monday" },
+                  { value: "tuesday", label: "Tuesday" },
+                  { value: "wednesday", label: "Wednesday" },
+                  { value: "thursday", label: "Thursday" },
+                  { value: "friday", label: "Friday" },
+                ]}
+                rules={[{ required: true, message: "Class is required" }]}
+              />
+
               <Typography.Title level={5} className="mb-1">
                 Date
               </Typography.Title>
+
               <Form.Item name="date" rules={[{ required: true }]}>
                 <DatePicker
                   className="w-full !py-2 !px-3 !rounded-lg !text-lg !bg-[#EFEFEF] !border !border-[#EFEFEF] !text-base-color"

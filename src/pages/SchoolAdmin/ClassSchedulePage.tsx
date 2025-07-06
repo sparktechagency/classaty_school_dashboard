@@ -19,7 +19,7 @@ const ClassSchedulePage = () => {
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [currentRecord, setCurrentRecord] = useState<any | null>(null);
 
-  const { data } = useGetAllClassScheduleQuery({
+  const { data, isFetching } = useGetAllClassScheduleQuery({
     page,
     limit,
     searchTerm: searchText,
@@ -46,8 +46,6 @@ const ClassSchedulePage = () => {
     handleCancel();
     console.log(record);
   };
-
-  console.log(classScheduleData);
 
   return (
     <div className=" bg-primary-color rounded-xl p-4 min-h-[90vh]">
@@ -89,7 +87,7 @@ const ClassSchedulePage = () => {
       <div className="border-2 border-[#e1e1e1] rounded-xl rounded-tr-xl">
         <ClassScheduleTable
           data={classScheduleData?.result}
-          loading={false}
+          loading={isFetching}
           showDeleteModal={showDeleteModal}
           ShowAddModal={showAddModal}
           setPage={setPage}
