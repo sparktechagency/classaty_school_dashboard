@@ -1,131 +1,35 @@
+import dayjs from "dayjs";
 import { AllIcons } from "../../../public/images/AllImages";
+import { INotification } from "../../Components/Dashboard/Overview/Admin/RecentNotification";
+import { useGetNotificationQuery } from "../../redux/features/school/schoolApi";
 
-const alarms = [
-  {
-    id: 1,
-    message: "At 2:45 PM, a student enrolled in a newly created course.",
-    time: "Fri, 12:30pm",
-  },
-  {
-    id: 2,
-    message: "At 2:45 PM, a student enrolled in a newly created course.",
-    time: "Fri, 12:30pm",
-  },
-  {
-    id: 3,
-    message: "At 2:45 PM, a student enrolled in a newly created course.",
-    time: "Fri, 12:30pm",
-  },
-  {
-    id: 4,
-    message: "At 2:45 PM, a student enrolled in a newly created course.",
-    time: "Fri, 12:30pm",
-  },
-  {
-    id: 5,
-    message: "At 2:45 PM, a student enrolled in a newly created course.",
-    time: "Fri, 12:30pm",
-  },
-  {
-    id: 6,
-    message: "At 2:45 PM, a student enrolled in a newly created course.",
-    time: "Fri, 12:30pm",
-  },
-  {
-    id: 7,
-    message: "At 2:45 PM, a student enrolled in a newly created course.",
-    time: "Fri, 12:30pm",
-  },
-  {
-    id: 8,
-    message: "At 2:45 PM, a student enrolled in a newly created course.",
-    time: "Fri, 12:30pm",
-  },
-  {
-    id: 9,
-    message: "At 2:45 PM, a student enrolled in a newly created course.",
-    time: "Fri, 12:30pm",
-  },
-  {
-    id: 10,
-    message: "At 2:45 PM, a student enrolled in a newly created course.",
-    time: "Fri, 12:30pm",
-  },
-  {
-    id: 11,
-    message: "At 2:45 PM, a student enrolled in a newly created course.",
-    time: "Fri, 12:30pm",
-  },
-  {
-    id: 12,
-    message: "At 2:45 PM, a student enrolled in a newly created course.",
-    time: "Fri, 12:30pm",
-  },
-  {
-    id: 13,
-    message: "At 2:45 PM, a student enrolled in a newly created course.",
-    time: "Fri, 12:30pm",
-  },
-  {
-    id: 14,
-    message: "At 2:45 PM, a student enrolled in a newly created course.",
-    time: "Fri, 12:30pm",
-  },
-  {
-    id: 15,
-    message: "At 2:45 PM, a student enrolled in a newly created course.",
-    time: "Fri, 12:30pm",
-  },
-  {
-    id: 16,
-    message: "At 2:45 PM, a student enrolled in a newly created course.",
-    time: "Fri, 12:30pm",
-  },
-  {
-    id: 17,
-    message: "At 2:45 PM, a student enrolled in a newly created course.",
-    time: "Fri, 12:30pm",
-  },
-  {
-    id: 18,
-    message: "At 2:45 PM, a student enrolled in a newly created course.",
-    time: "Fri, 12:30pm",
-  },
-  {
-    id: 19,
-    message: "At 2:45 PM, a student enrolled in a newly created course.",
-    time: "Fri, 12:30pm",
-  },
-  {
-    id: 20,
-    message: "At 2:45 PM, a student enrolled in a newly created course.",
-    time: "Fri, 12:30pm",
-  },
-];
 
 const AlarmsPage = () => {
+  const { data: activities } = useGetNotificationQuery({});
+
   return (
     <div className=" bg-primary-color w-full h-full  rounded-xl">
       <div className="flex items-center bg-primary-color gap-1 py-3 px-5 mb-3 rounded-tl-xl rounded-tr-xl">
         <h1 className="text-3xl font-bold text-secondary-color">Alarms</h1>
       </div>
       <div className="px-4 sm:px-6 md:px-8 ">
-        {alarms.map((notification) => (
+        {activities?.data?.result?.map((activity: INotification, i: number) => (
           <div
-            key={notification.id}
-            className="flex items-center space-x-3 p-2 border-b border-gray-300 last:border-none"
+            key={i}
+            className="flex items-center gap-2 border-b border-[#e1e1e1] py-3"
           >
-            {/* Icon */}
-            <div className="bg-secondary-color p-1.5 rounded-full">
-              <img src={AllIcons.bell} className="w-6 h-6" alt="" />
+            <div className=" p-1.5 bg-secondary-color rounded-full w-fit">
+              <img src={AllIcons.bell} alt="bell" className="w-5 h-5 " />
             </div>
+            <div>
+              <p className="text-base-color text-base font-semibold">
+                At {dayjs(activity.createdAt).format("hh:mm A")} {", "}
+                {activity.message}
+              </p>
 
-            {/* Notification text */}
-            <div className="flex flex-col">
-              <span className="text-lg font-semibold text-base-color">
-                {notification.message}
-              </span>
-              <span className="text-sm text-gray-500">{notification.time}</span>
+              <p className="text-sm text-[#8A8D8E] mt-1">
+                {dayjs(activity.createdAt).format("DD-MM-YYYY hh:mm A")}
+              </p>
             </div>
           </div>
         ))}

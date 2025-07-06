@@ -1,16 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
-import ScheduleData from "../../../public/data/ScheduleData";
-import ReuseSearchInput from "../../ui/Form/ReuseSearchInput";
-import DeleteModal from "../../ui/Modal/DeleteModal";
-import ReuseButton from "../../ui/Button/ReuseButton";
 import { FiPlus } from "react-icons/fi";
-import ClassScheduleTable from "../../ui/Tables/ClassScheduleTable";
-import AddClassSchedule from "../../ui/Modal/ClassSchedule/AddClassSchedule";
 import { MdDownload, MdFileUpload } from "react-icons/md";
+import { useGetAllClassScheduleQuery } from "../../redux/features/classSchedule/classScheduleApi";
+import ReuseButton from "../../ui/Button/ReuseButton";
+import ReuseSearchInput from "../../ui/Form/ReuseSearchInput";
+import AddClassSchedule from "../../ui/Modal/ClassSchedule/AddClassSchedule";
+import DeleteModal from "../../ui/Modal/DeleteModal";
+import ClassScheduleTable from "../../ui/Tables/ClassScheduleTable";
 
 const ClassSchedulePage = () => {
-  const data: any[] = ScheduleData;
   const [page, setPage] = useState(1);
   const [searchText, setSearchText] = useState("");
   console.log(searchText);
@@ -19,6 +18,14 @@ const ClassSchedulePage = () => {
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [currentRecord, setCurrentRecord] = useState<any | null>(null);
+
+  const { data } = useGetAllClassScheduleQuery({
+    page,
+    limit,
+    searchTerm: searchText,
+  });
+
+  const classScheduleData = data?.data;
 
   const showAddModal = () => {
     setIsAddModalVisible(true);
@@ -39,6 +46,8 @@ const ClassSchedulePage = () => {
     handleCancel();
     console.log(record);
   };
+
+  console.log(classScheduleData);
 
   return (
     <div className=" bg-primary-color rounded-xl p-4 min-h-[90vh]">
@@ -79,13 +88,13 @@ const ClassSchedulePage = () => {
       />
       <div className="border-2 border-[#e1e1e1] rounded-xl rounded-tr-xl">
         <ClassScheduleTable
-          data={data}
+          data={classScheduleData?.result}
           loading={false}
           showDeleteModal={showDeleteModal}
           ShowAddModal={showAddModal}
           setPage={setPage}
           page={page}
-          total={data.length}
+          total={classScheduleData?.meta?.total}
           limit={limit}
         />
       </div>
