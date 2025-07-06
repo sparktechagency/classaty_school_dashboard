@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from "react";
 import { Space, Tooltip } from "antd";
-import { GoEye } from "react-icons/go";
+import React from "react";
+import { BsFillSendFill } from "react-icons/bs";
 import { CgUnblock } from "react-icons/cg";
+import { GoEye } from "react-icons/go";
 import { MdBlock, MdModeEditOutline } from "react-icons/md";
 import ReuseTable from "../../utils/ReuseTable";
-import { BsFillSendFill } from "react-icons/bs";
 import ReuseButton from "../Button/ReuseButton";
 
 // Define the type for the props
@@ -36,46 +36,63 @@ const SchoolAdminStudentTable: React.FC<SchoolAdminStudentTableProps> = ({
   total,
   limit,
 }) => {
+  console.log(data);
+
   const columns = [
     {
       title: "ID",
-      dataIndex: "ID",
-      key: "ID",
+      dataIndex: "uid",
+      render: (_: unknown, record: any) => {
+        return <p>{record.uid ? record.uid : "-"}</p>;
+      },
+      key: "uid",
     },
     {
       title: "Student Name",
-      dataIndex: "StudentName",
-      key: "StudentName",
+      dataIndex: "studentName",
+      render: (_: unknown, record: any) => {
+        return <p>{record.studentName ? record.studentName : "-"}</p>;
+      },
+      key: "studentName",
     },
     {
       title: "Student Contact No",
-      dataIndex: "StudentContactNo",
-      key: "StudentContactNo",
+      dataIndex: "phoneNumber",
+      render: (_: unknown, record: any) => {
+        return <p>{record.phoneNumber ? record.phoneNumber : "-"}</p>;
+      },
+      key: "phoneNumber",
     },
     {
       title: "Father Contact No",
-      dataIndex: "FatherContactNo",
-      key: "FatherContactNo",
+      dataIndex: "fatherPhoneNumber",
+      key: "fatherPhoneNumber",
     },
     {
       title: "Mother Contact No",
-      dataIndex: "MotherContactNo",
-      key: "MotherContactNo",
+      dataIndex: "motherPhoneNumber",
+      key: "motherPhoneNumber",
     },
     {
       title: "Class",
-      dataIndex: "Class",
-      key: "Class",
+      dataIndex: "className",
+      key: "className",
     },
     {
       title: "Attendance Rate",
-      dataIndex: "AttendanceRate",
-      key: "AttendanceRate",
+      dataIndex: "attendanceRate",
+      render: (_: unknown, record: any) => {
+        return <p>{record.attendanceRate ? record.attendanceRate : "-"}</p>;
+      },
+      key: "attendanceRate",
     },
     {
       title: "Result",
-      dataIndex: "Result",
-      key: "Result",
+      dataIndex: "averageGPA",
+      render: (_: unknown, record: any) => {
+        return <p>{record.averageGPA ? record.averageGPA : "-"}</p>;
+      },
+      key: "averageGPA",
     },
     {
       title: "Send Notification",
@@ -117,23 +134,25 @@ const SchoolAdminStudentTable: React.FC<SchoolAdminStudentTableProps> = ({
 
           {/* Block User Tooltip */}
 
-          <Tooltip placement="left" title="Unblock">
-            <button
-              className="!p-0 !bg-transparent !border-none !text-base-color cursor-pointer hidden"
-              onClick={() => showUnblockModal(record)}
-            >
-              <CgUnblock style={{ fontSize: "24px" }} />
-            </button>
-          </Tooltip>
-
-          <Tooltip placement="left" title="Block">
-            <button
-              className="!p-0 !bg-transparent !border-none !text-error-color cursor-pointer"
-              onClick={() => showBlockModal(record)}
-            >
-              <MdBlock style={{ fontSize: "24px" }} />
-            </button>
-          </Tooltip>
+          {record?.status === "active" ? (
+            <Tooltip placement="left" title="Block">
+              <button
+                className="!p-0 !bg-transparent !border-none !text-error-color cursor-pointer"
+                onClick={() => showBlockModal(record)}
+              >
+                <MdBlock style={{ fontSize: "24px" }} />
+              </button>
+            </Tooltip>
+          ) : (
+            <Tooltip placement="left" title="Unblock">
+              <button
+                className="!p-0 !bg-transparent !border-none !text-base-color cursor-pointer"
+                onClick={() => showUnblockModal(record)}
+              >
+                <CgUnblock style={{ fontSize: "24px" }} />
+              </button>
+            </Tooltip>
+          )}
         </Space>
       ),
       align: "center",
@@ -150,6 +169,7 @@ const SchoolAdminStudentTable: React.FC<SchoolAdminStudentTableProps> = ({
       limit={limit}
       page={page}
       keyValue={"email"}
+      scroll={{ x: "max-content" }}
     />
   );
 };

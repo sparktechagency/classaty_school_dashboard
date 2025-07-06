@@ -13,6 +13,7 @@ const schoolApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [tagTypes.school],
     }),
+
     getSchool: build.query({
       query: ({ page, limit, searchTerm }) => {
         return {
@@ -53,6 +54,21 @@ const schoolApi = baseApi.injectEndpoints({
       providesTags: [tagTypes.school],
     }),
 
+    getAllStudents: build.query({
+      query: ({ page, limit, searchTerm }) => {
+        return {
+          url: `${school_url}/all_students`,
+          method: "GET",
+          params: {
+            page,
+            limit,
+            searchTerm,
+          },
+        };
+      },
+      providesTags: [tagTypes.student],
+    }),
+
     getNotification: build.query({
       query: ({page, limit, searchTerm}) => {
         return {
@@ -76,6 +92,7 @@ const schoolApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [tagTypes.school],
     }),
+
     deleteSchool: build.mutation({
       query: (req) => ({
         url: `${school_url}/delete_school/${req?.params}`,
@@ -92,6 +109,7 @@ export const {
   useGetAttendanceChartDataQuery,
   useUpdateSchoolMutation,
   useGetNotificationQuery,
+  useGetAllStudentsQuery,
   useGetTotalOfOverviewQuery,
   useDeleteSchoolMutation,
 } = schoolApi;

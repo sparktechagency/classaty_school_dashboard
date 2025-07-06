@@ -1,21 +1,21 @@
 import { useState } from "react";
-import BlockModal from "../../ui/Modal/BlockModal";
-import UnblockModal from "../../ui/Modal/UnblockModal";
-import ReuseSearchInput from "../../ui/Form/ReuseSearchInput";
-import DeleteModal from "../../ui/Modal/DeleteModal";
-import ReuseButton from "../../ui/Button/ReuseButton";
 import { FiPlus } from "react-icons/fi";
-import ViewStudentModal from "../../ui/Modal/Student/ViewStudentModal";
-import StudentTable from "../../ui/Tables/StudentTable";
-import AddStudent from "../../ui/Modal/Student/AddStudent";
 import { MdDownload, MdFileUpload } from "react-icons/md";
-import { IStudentData } from "../../types";
+import { useBlockUserMutation } from "../../redux/features/parents/parentsApi";
 import {
   useDeleteStudentMutation,
   useGetStudentQuery,
 } from "../../redux/features/student/studentAPi";
+import { IStudentData } from "../../types";
+import ReuseButton from "../../ui/Button/ReuseButton";
+import ReuseSearchInput from "../../ui/Form/ReuseSearchInput";
+import BlockModal from "../../ui/Modal/BlockModal";
+import DeleteModal from "../../ui/Modal/DeleteModal";
+import AddStudent from "../../ui/Modal/Student/AddStudent";
+import ViewStudentModal from "../../ui/Modal/Student/ViewStudentModal";
+import UnblockModal from "../../ui/Modal/UnblockModal";
+import StudentTable from "../../ui/Tables/StudentTable";
 import tryCatchWrapper from "../../utils/tryCatchWrapper";
-import { useBlockUserMutation } from "../../redux/features/parents/parentsApi";
 
 const AdminAllStudent = () => {
   const [page, setPage] = useState(1);
@@ -120,6 +120,8 @@ const AdminAllStudent = () => {
       handleCancel();
     }
   };
+
+  
   return (
     <div className=" bg-primary-color rounded-xl p-4 min-h-[90vh]">
       <div className="flex justify-between items-center mb-5">

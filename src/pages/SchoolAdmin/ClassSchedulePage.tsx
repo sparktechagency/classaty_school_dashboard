@@ -17,7 +17,6 @@ import EditClassSchedule from "../../ui/Modal/ClassSchedule/EditClassSchedule";
 const ClassSchedulePage = () => {
   const [page, setPage] = useState(1);
   const [searchText, setSearchText] = useState("");
-  console.log(searchText);
 
   const limit = 12;
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
