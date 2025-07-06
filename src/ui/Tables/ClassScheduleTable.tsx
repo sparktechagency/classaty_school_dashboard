@@ -11,6 +11,7 @@ interface ClassScheduleTableProps {
   loading: boolean;
   showDeleteModal: (record: any) => void; // Function to handle blocking a user
   ShowAddModal: () => void;
+  showEditModal: (record: any) => void;
   setPage?: (page: number) => void; // Function to handle pagination
   page?: number;
   total?: number;
@@ -21,7 +22,7 @@ const ClassScheduleTable: React.FC<ClassScheduleTableProps> = ({
   data,
   loading,
   showDeleteModal,
-  ShowAddModal,
+  showEditModal,
   setPage,
   page,
   total,
@@ -74,7 +75,7 @@ const ClassScheduleTable: React.FC<ClassScheduleTableProps> = ({
           <Tooltip placement="left" title="Edit">
             <button
               className="!p-0 !bg-transparent !border-none !text-secondary-color cursor-pointer"
-              onClick={ShowAddModal}
+              onClick={() => showEditModal(record)}
             >
               <MdEdit style={{ fontSize: "24px" }} />
             </button>

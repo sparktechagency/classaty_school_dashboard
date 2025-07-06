@@ -2,12 +2,17 @@
 import { useState } from "react";
 import { FiPlus } from "react-icons/fi";
 import { MdDownload, MdFileUpload } from "react-icons/md";
-import { useGetAllClassScheduleQuery } from "../../redux/features/classSchedule/classScheduleApi";
+import {
+  useDeleteClassScheduleMutation,
+  useGetAllClassScheduleQuery,
+} from "../../redux/features/classSchedule/classScheduleApi";
 import ReuseButton from "../../ui/Button/ReuseButton";
 import ReuseSearchInput from "../../ui/Form/ReuseSearchInput";
 import AddClassSchedule from "../../ui/Modal/ClassSchedule/AddClassSchedule";
 import DeleteModal from "../../ui/Modal/DeleteModal";
 import ClassScheduleTable from "../../ui/Tables/ClassScheduleTable";
+import tryCatchWrapper from "../../utils/tryCatchWrapper";
+import EditClassSchedule from "../../ui/Modal/ClassSchedule/EditClassSchedule";
 
 const ClassSchedulePage = () => {
   const [page, setPage] = useState(1);
@@ -16,8 +21,10 @@ const ClassSchedulePage = () => {
 
   const limit = 12;
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [currentRecord, setCurrentRecord] = useState<any | null>(null);
+  const [deleteClassSchedule] = useDeleteClassScheduleMutation();
 
   const { data, isFetching } = useGetAllClassScheduleQuery({
     page,
@@ -31,6 +38,11 @@ const ClassSchedulePage = () => {
     setIsAddModalVisible(true);
   };
 
+  const showEditModal = (record: any) => {
+    setIsEditModalVisible(true);
+    setCurrentRecord(record);
+  };
+
   const showDeleteModal = (record: any) => {
     setCurrentRecord(record);
     setIsDeleteModalVisible(true);
@@ -38,13 +50,20 @@ const ClassSchedulePage = () => {
 
   const handleCancel = () => {
     setIsAddModalVisible(false);
+    setIsEditModalVisible(false);
     setIsDeleteModalVisible(false);
     setCurrentRecord(null);
   };
 
-  const handleDelete = (record: any) => {
-    handleCancel();
-    console.log(record);
+  const handleDelete = async (record: any) => {
+    const res = await tryCatchWrapper(
+      deleteClassSchedule,
+      { params: record?._id },
+      "Deleting..."
+    );
+    if (res.statusCode === 200) {
+      handleCancel();
+    }
   };
 
   return (
@@ -90,6 +109,7 @@ const ClassSchedulePage = () => {
           loading={isFetching}
           showDeleteModal={showDeleteModal}
           ShowAddModal={showAddModal}
+          showEditModal={showEditModal}
           setPage={setPage}
           page={page}
           total={classScheduleData?.meta?.total}
@@ -97,6 +117,11 @@ const ClassSchedulePage = () => {
         />
       </div>
 
+      <EditClassSchedule
+        isAddModalVisible={isEditModalVisible}
+        handleCancel={handleCancel}
+        currentRecord={currentRecord}
+      />
       <DeleteModal
         isDeleteModalVisible={isDeleteModalVisible}
         handleCancel={handleCancel}

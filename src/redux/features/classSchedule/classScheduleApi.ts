@@ -27,10 +27,27 @@ const classScheduleApi = baseApi.injectEndpoints({
                 body: req.body,
             }),
             invalidatesTags: [tagTypes.classSchedule],
-        })
+        }),
+
+        editClassSchedule: build.mutation({
+            query: (req) => ({
+                url: `${class_schedule_api}/update/${req?.params}`,
+                method: "PATCH",
+                body: req.body,
+            }),
+            invalidatesTags: [tagTypes.classSchedule],
+        }),
+
+        deleteClassSchedule: build.mutation({
+            query: (req) => ({
+                url: `${class_schedule_api}/delete/${req?.params}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: [tagTypes.classSchedule],
+        }),
     }),
 });
 
-export const { useGetAllClassScheduleQuery, useCreateClassScheduleMutation } = classScheduleApi;
+export const { useGetAllClassScheduleQuery, useCreateClassScheduleMutation, useEditClassScheduleMutation, useDeleteClassScheduleMutation } = classScheduleApi;
 
 export default classScheduleApi;
