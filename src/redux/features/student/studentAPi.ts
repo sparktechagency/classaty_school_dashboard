@@ -40,7 +40,7 @@ const studentApi = baseApi.injectEndpoints({
       invalidatesTags: [tagTypes.student],
     }),
 
-    studentAction : build.mutation({
+    userAction : build.mutation({
       query: (req) => {
         return {
           url: `/users/action`,
@@ -48,7 +48,7 @@ const studentApi = baseApi.injectEndpoints({
           body: req?.body,
         }
       },
-      invalidatesTags: [tagTypes.student],
+      invalidatesTags: [tagTypes.student, tagTypes.parent, tagTypes.teacher],
     }),
 
     deleteStudent: build.mutation({
@@ -65,7 +65,7 @@ export const {
   useAddStudentMutation,
   useGetStudentQuery,
   useDeleteStudentMutation,
-  useStudentActionMutation,
+  useUserActionMutation,
   useEditStudentInfoMutation,
 } = studentApi;
 

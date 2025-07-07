@@ -7,6 +7,10 @@ import UnblockModal from "../../ui/Modal/UnblockModal";
 import { FiPlus } from "react-icons/fi";
 import { MdDownload, MdFileUpload } from "react-icons/md";
 import { useGetAllStudentsQuery } from "../../redux/features/school/schoolApi";
+import {
+  useDeleteStudentMutation,
+  useUserActionMutation
+} from "../../redux/features/student/studentAPi";
 import ReuseButton from "../../ui/Button/ReuseButton";
 import DeleteModal from "../../ui/Modal/DeleteModal";
 import AddSchoolAdminStudent from "../../ui/Modal/SchoolAdminStudent/AddSchoolAdminStudent";
@@ -14,10 +18,6 @@ import EditSchoolAdminStudent from "../../ui/Modal/SchoolAdminStudent/EditSchool
 import SendNotification from "../../ui/Modal/SchoolAdminStudent/SendNotification";
 import ViewSchoolAdminStudent from "../../ui/Modal/SchoolAdminStudent/ViewSchoolAdminStudent";
 import SchoolAdminStudentTable from "../../ui/Tables/SchoolAdminStudentTable";
-import {
-  useDeleteStudentMutation,
-  useStudentActionMutation,
-} from "../../redux/features/student/studentAPi";
 import tryCatchWrapper from "../../utils/tryCatchWrapper";
 
 const SchoolAdminStudent = () => {
@@ -27,7 +27,7 @@ const SchoolAdminStudent = () => {
 
   const limit = 12;
 
-  const { data: studentData } = useGetAllStudentsQuery({
+  const { data: studentData, isFetching } = useGetAllStudentsQuery({
     page,
     limit,
     searchTerm: searchText,
@@ -42,7 +42,7 @@ const SchoolAdminStudent = () => {
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [currentRecord, setCurrentRecord] = useState<any | null>(null);
 
-  const [studentAction] = useStudentActionMutation();
+  const [userAction] = useUserActionMutation();
   const [deleteStudent] = useDeleteStudentMutation();
 
   const showAddModal = () => {
@@ -98,7 +98,7 @@ const SchoolAdminStudent = () => {
     handleCancel();
 
     tryCatchWrapper(
-      studentAction,
+      userAction,
       {
         body: {
           userId: record?.userId,
@@ -111,7 +111,7 @@ const SchoolAdminStudent = () => {
 
   const handleUnblock = (record: any) => {
     tryCatchWrapper(
-      studentAction,
+      userAction,
       {
         body: {
           userId: record?.userId,
@@ -132,7 +132,6 @@ const SchoolAdminStudent = () => {
       },
       "Deleting..."
     );
-    
   };
 
   return (
@@ -169,7 +168,7 @@ const SchoolAdminStudent = () => {
       <div className="border-2 border-[#e1e1e1] rounded-xl rounded-tr-xl">
         <SchoolAdminStudentTable
           data={studentData?.data?.result}
-          loading={false}
+          loading={isFetching}
           showEditModal={showEditModal}
           showViewModal={showViewUserModal}
           showSendModal={showSendModal}
