@@ -1,9 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { EditOutlined } from "@ant-design/icons";
 import { Collapse, Space, Table, Tooltip, Typography } from "antd";
+import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { FiPlus } from "react-icons/fi";
 import { RiDeleteBin6Line } from "react-icons/ri";
+import {
+  useDeleteExamMutation,
+  useGetAllExamsQuery,
+} from "../../redux/features/exam/examApi";
 import {
   useDeleteTermMutation,
   useGetAllTermsQuery,
@@ -12,14 +17,9 @@ import ReuseButton from "../../ui/Button/ReuseButton";
 import DeleteModal from "../../ui/Modal/DeleteModal";
 import AddExamModal from "../../ui/Modal/Exam/AddExamModal";
 import AddExamTermModal from "../../ui/Modal/Exam/AddExamTermModal";
+import EditExamModal from "../../ui/Modal/Exam/EditExamModal";
 import EditExamTermModal from "../../ui/Modal/Exam/EditExamTermModal";
 import tryCatchWrapper from "../../utils/tryCatchWrapper";
-import {
-  useDeleteExamMutation,
-  useGetAllExamsQuery,
-} from "../../redux/features/exam/examApi";
-import EditExamModal from "../../ui/Modal/Exam/EditExamModal";
-import dayjs from "dayjs";
 
 const { Panel } = Collapse;
 
@@ -156,8 +156,18 @@ const ExamPage = () => {
   };
 
   const columns = [
-    { title: "Subject Name", dataIndex: "subjectName", key: "subject" },
-    { title: "Exam Details", dataIndex: "details", key: "examDetails" },
+    {
+      title: "Subject Name",
+      dataIndex: "subjectName",
+      key: "subject",
+      fixed: "left",
+    },
+    {
+      title: "Exam Details",
+      dataIndex: "details",
+      width: 400,
+      key: "examDetails",
+    },
     { title: "Class", dataIndex: "className", key: "class" },
     {
       title: "Date",
@@ -169,7 +179,12 @@ const ExamPage = () => {
     { title: "Class Room", dataIndex: "classRoom", key: "classRoom" },
     { title: "Duration", dataIndex: "duration", key: "duration" },
     { title: "Assigned Teacher", dataIndex: "teacherName", key: "teacherName" },
-    { title: "Instruction", dataIndex: "instruction", key: "instruction" },
+    {
+      title: "Instruction",
+      dataIndex: "instruction",
+      width: 400,
+      key: "instruction",
+    },
     {
       title: "Action",
       key: "action",

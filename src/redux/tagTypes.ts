@@ -14,6 +14,7 @@ export const tagTypes = {
   level: "Level",
   class: "Class",
   classSchedule: "ClassSchedule",
+  announcement: "Announcement",
 };
 
 export const tagTypesList = [
@@ -32,4 +33,5 @@ export const tagTypesList = [
   tagTypes.classSchedule,
   tagTypes.terms,
   tagTypes.exam,
+  tagTypes.announcement,
 ];

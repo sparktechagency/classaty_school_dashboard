@@ -8,7 +8,7 @@ const AssignmentPage = () => {
   const [searchText, setSearchText] = useState("");
   const limit = 12;
 
-  const { data: assignmentData } = useGetAllAssignmentQuery({
+  const { data: assignmentData, isFetching } = useGetAllAssignmentQuery({
     page,
     limit,
     searchTerm: searchText,
@@ -34,7 +34,7 @@ const AssignmentPage = () => {
       <div className="border-2 border-[#e1e1e1] rounded-xl rounded-tr-xl">
         <AssignmentTable
           data={assignmentData?.data?.result}
-          loading={false}
+          loading={isFetching}
           setPage={setPage}
           page={page}
           total={assignmentData?.data?.meta.total}

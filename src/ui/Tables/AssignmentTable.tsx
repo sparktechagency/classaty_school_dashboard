@@ -5,6 +5,7 @@ import ReuseTable from "../../utils/ReuseTable";
 import ReuseButton from "../Button/ReuseButton";
 import { IAssignment } from "../../types/AssignmentType";
 import { getImageUrl } from "../../helpers/config/envConfig";
+import dayjs from "dayjs";
 
 // Define the type for the props
 interface AssignmentTableProps {
@@ -65,6 +66,7 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
     {
       title: "Due Date",
       dataIndex: "dueDate",
+      render: (date: string) => dayjs(date).format("D MMMM, YY"),
       key: "dueDate",
     },
     {

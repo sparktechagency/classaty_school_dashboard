@@ -18,14 +18,14 @@ const examApi = baseApi.injectEndpoints({
 
 
         getAllExams: build.query({
-            query: ({ page, limit, searchExam, termsId }) => {
+            query: ({ page, limit, searchTerm, termsId }) => {
                 return {
                     url: `${exam_url}/${termsId}`,
                     method: "GET",
                     params: {
                         page,
                         limit,
-                        searchExam,
+                        searchTerm,
                     },
                 };
             },
