@@ -1,26 +1,26 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { DatePicker, Form, Modal, TimePicker, Typography } from "antd";
+import dayjs from "dayjs";
+import { useGetClassBySchoolIdQuery } from "../../../redux/features/class/classAPi";
+import { useUpdateExamMutation } from "../../../redux/features/exam/examApi";
+import { useGetSubjectBySchoolIdQuery } from "../../../redux/features/subject/subjectApi";
+import { useGetTeacherQuery } from "../../../redux/features/teacher/teacherApi";
+import tryCatchWrapper from "../../../utils/tryCatchWrapper";
+import ReuseButton from "../../Button/ReuseButton";
 import ReusableForm from "../../Form/ReuseForm";
 import ReuseInput from "../../Form/ReuseInput";
-import ReuseButton from "../../Button/ReuseButton";
 import ReuseSelect from "../../Form/ReuseSelect";
-import dayjs from "dayjs";
-import { useGetSubjectBySchoolIdQuery } from "../../../redux/features/subject/subjectApi";
-import { useGetClassBySchoolIdQuery } from "../../../redux/features/class/classAPi";
-import { useGetTeacherQuery } from "../../../redux/features/teacher/teacherApi";
-import { useCreateExamMutation } from "../../../redux/features/exam/examApi";
-import tryCatchWrapper from "../../../utils/tryCatchWrapper";
 
-interface AddExamModalProps {
-  isAddExamModalVisible: boolean;
+interface EditExamModalProps {
+  isEditExamModalVisible: boolean;
   handleCancel: () => void;
-  activeKey: string[];
+  currentRecord: any;
 }
 
-const AddExamModal: React.FC<AddExamModalProps> = ({
-  isAddExamModalVisible,
+const EditExamModal: React.FC<EditExamModalProps> = ({
+  isEditExamModalVisible,
   handleCancel,
-  activeKey,
+  currentRecord,
 }) => {
   const [form] = Form.useForm();
 
@@ -30,7 +30,7 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
       limit: 10000,
     },
     {
-      skip: !isAddExamModalVisible,
+      skip: !isEditExamModalVisible,
     }
   );
 
@@ -40,7 +40,7 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
       limit: 10000,
     },
     {
-      skip: !isAddExamModalVisible,
+      skip: !isEditExamModalVisible,
     }
   );
 
@@ -50,11 +50,11 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
       limit: 10000,
     },
     {
-      skip: !isAddExamModalVisible,
+      skip: !isEditExamModalVisible,
     }
   );
 
-  const [createExam] = useCreateExamMutation();
+  const [updateExam] = useUpdateExamMutation();
 
   const handleFinish = async (values: any) => {
     const subjectName = subject?.data?.result?.find(
@@ -84,26 +84,25 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
       duration: Number(values.duration),
       assignedTeacher: assignedTeacher?.name,
       teacherId: values.teacherId,
-      termsId: activeKey?.[0],
       instruction: values.instruction,
       totalMarks: values.totalMarks,
       subjectName: subjectName?.subjectName,
     };
 
-    const res = await tryCatchWrapper(
-      createExam,
-      { body: finalPayload },
-      "Adding Exam..."
-    ) as any;
+    const res = (await tryCatchWrapper(
+      updateExam,
+      { body: finalPayload, params: currentRecord?._id },
+      "Updating Exam..."
+    )) as any;
 
-    if (res?.statusCode === 201) {
+    if (res?.statusCode === 200) {
       form.resetFields();
       handleCancel();
     }
   };
   return (
     <Modal
-      open={isAddExamModalVisible}
+      open={isEditExamModalVisible}
       onCancel={handleCancel}
       footer={null}
       centered
@@ -112,7 +111,7 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
       <div className="py-5">
         <div className="text-base-color">
           <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-secondary-color text-center">
-            Add Exam
+            Edit Exam
           </h3>
 
           <div className="mt-5">
@@ -127,7 +126,6 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
                   value: subject._id,
                   label: subject.subjectName,
                 }))}
-                rules={[{ required: true, message: "Subject is required" }]}
               />
               <ReuseInput
                 inputType="textarea"
@@ -136,9 +134,6 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
                 label="Exam Details"
                 name="details"
                 placeholder="Enter Exam Details"
-                rules={[
-                  { required: true, message: "Exam Details is required" },
-                ]}
               />
               <ReuseSelect
                 Typolevel={5}
@@ -150,7 +145,6 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
                   value: classData._id,
                   label: classData.className,
                 }))}
-                rules={[{ required: true, message: "Class is required" }]}
               />
 
               <ReuseInput
@@ -161,12 +155,6 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
                 label="Total Mark"
                 name="totalMarks"
                 placeholder="Enter Required Pass Grader"
-                rules={[
-                  {
-                    required: true,
-                    message: "Required Pass Grader is required",
-                  },
-                ]}
               />
 
               <ReuseInput
@@ -177,17 +165,11 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
                 label="Required Pass Grade"
                 name="passGrade"
                 placeholder="Enter Required Pass Grader"
-                rules={[
-                  {
-                    required: true,
-                    message: "Required Pass Grader is required",
-                  },
-                ]}
               />
               <Typography.Title level={5} className="mb-1">
                 Date
               </Typography.Title>
-              <Form.Item name="date" rules={[{ required: true }]}>
+              <Form.Item name="date">
                 <DatePicker
                   className="w-full !py-2 !px-3 !rounded-lg !text-lg !bg-[#EFEFEF] !border !border-[#EFEFEF] !text-base-color"
                   placeholder="Select Date"
@@ -202,7 +184,7 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
               <Typography.Title level={5} className="mb-1">
                 Start Time
               </Typography.Title>
-              <Form.Item name="startTime" rules={[{ required: true }]}>
+              <Form.Item name="startTime">
                 <TimePicker
                   className="w-full !py-2 !px-3 !rounded-lg !text-lg !bg-[#EFEFEF] !border !border-[#EFEFEF] !text-base-color"
                   placeholder="Select Time"
@@ -219,7 +201,6 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
                 label="Class Room"
                 name="classRoom"
                 placeholder="Enter Class Room"
-                rules={[{ required: true, message: "Class Room is required" }]}
               />
               <ReuseInput
                 Typolevel={5}
@@ -227,9 +208,6 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
                 name="duration"
                 type="number"
                 placeholder="Enter Exam Duration"
-                rules={[
-                  { required: true, message: "Exam Duration is required" },
-                ]}
               />
               <ReuseSelect
                 Typolevel={5}
@@ -241,7 +219,6 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
                   value: teacher._id,
                   label: teacher.name,
                 }))}
-                rules={[{ required: true, message: "Teacher is required" }]}
               />
 
               <ReuseInput
@@ -251,7 +228,6 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
                 label="Instruction"
                 name="instruction"
                 placeholder="Enter instruction"
-                rules={[{ required: true, message: "instruction is required" }]}
               />
 
               <ReuseButton
@@ -259,7 +235,7 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
                 variant="secondary"
                 className="w-full mt-4"
               >
-                Add Exam
+                Edit Exam
               </ReuseButton>
             </ReusableForm>
           </div>
@@ -269,4 +245,4 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
   );
 };
 
-export default AddExamModal;
+export default EditExamModal;
