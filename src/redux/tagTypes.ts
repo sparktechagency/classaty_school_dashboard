@@ -7,7 +7,8 @@ export const tagTypes = {
   user: "User",
   payment: "Payment",
   feedback: "Feedback",
-
+  terms: "Terms",
+  exam: "Exam",
   section: "Section",
   subject: "Subject",
   level: "Level",
@@ -29,4 +30,6 @@ export const tagTypesList = [
   tagTypes.level,
   tagTypes.section,
   tagTypes.classSchedule,
+  tagTypes.terms,
+  tagTypes.exam,
 ];

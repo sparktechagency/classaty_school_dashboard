@@ -1,14 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
-import { Collapse, Table, Typography, Space, Tooltip } from "antd";
 import { EditOutlined } from "@ant-design/icons";
-import { RiDeleteBin6Line } from "react-icons/ri";
+import { Collapse, Space, Table, Tooltip, Typography } from "antd";
+import { useState } from "react";
 import { FiPlus } from "react-icons/fi";
+import { RiDeleteBin6Line } from "react-icons/ri";
+import {
+  useDeleteTermMutation,
+  useGetAllTermsQuery,
+} from "../../redux/features/terms/termsApi";
 import ReuseButton from "../../ui/Button/ReuseButton";
 import DeleteModal from "../../ui/Modal/DeleteModal";
+import AddExamModal from "../../ui/Modal/Exam/AddExamModal";
 import AddExamTermModal from "../../ui/Modal/Exam/AddExamTermModal";
 import EditExamTermModal from "../../ui/Modal/Exam/EditExamTermModal";
-import AddExamModal from "../../ui/Modal/Exam/AddExamModal";
+import tryCatchWrapper from "../../utils/tryCatchWrapper";
 
 const { Panel } = Collapse;
 
@@ -68,14 +73,19 @@ const ExamPage = () => {
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [currentRecord, setCurrentRecord] = useState<any | null>(null);
 
+  // terms api
+  const { data: terms } = useGetAllTermsQuery({});
+  const [deleteTerm] = useDeleteTermMutation();
+
   const showAddModal = () => {
     setIsAddModalVisible(true);
   };
   const showAddExamModal = () => {
     setIsAddExamModalVisible(true);
   };
-  const showEditModal = () => {
+  const showEditModal = (record: any) => {
     setIsEditModalVisible(true);
+    setCurrentRecord(record);
   };
 
   const showDeleteModal = (record: any) => {
@@ -91,9 +101,17 @@ const ExamPage = () => {
     setCurrentRecord(null);
   };
 
-  const handleDelete = (record: any) => {
+  const handleDelete = async (record: any) => {
     handleCancel();
-    console.log(record);
+
+    const res = await tryCatchWrapper(
+      deleteTerm,
+      { params: record?._id },
+      "Deleting..."
+    );
+    if (res.statusCode === 200) {
+      handleCancel();
+    }
   };
 
   const columns = [
@@ -159,6 +177,7 @@ const ExamPage = () => {
       <EditExamTermModal
         isEditModalVisible={isEditModalVisible}
         handleCancel={handleCancel}
+        currentRecord={currentRecord}
       />
       <AddExamModal
         isAddExamModalVisible={isAddExamModalVisible}
@@ -171,18 +190,18 @@ const ExamPage = () => {
         expandIconPosition="right"
         style={{ backgroundColor: "#ffffff" }}
       >
-        {["1st Term", "2nd Term", "Mid Term"].map((term) => (
+        {terms?.data?.map((term: any) => (
           <Panel
-            key={term}
+            key={term?._id}
             header={
               <MyPanelHeader
-                title={term}
-                onEdit={showEditModal}
+                title={term?.termsName}
+                onEdit={() => showEditModal(term)}
                 onDelete={() => showDeleteModal(term)}
               />
             }
           >
-            {term === "1st Term" && (
+            {term?.termsName === term?.termsName && (
               <>
                 <Table
                   columns={columns}
@@ -203,7 +222,7 @@ const ExamPage = () => {
                 </ReuseButton>
               </>
             )}
-            {term !== "1st Term" && (
+            {term?.termsName !== term?.termsName && (
               <div className="flex flex-col ">
                 <Typography.Title
                   level={4}
