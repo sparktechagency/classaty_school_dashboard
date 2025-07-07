@@ -1,7 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React from "react";
 import ReuseTable from "../../utils/ReuseTable";
 import ReuseButton from "../Button/ReuseButton";
 import { IAssignment } from "../../types/AssignmentType";
+import { getImageUrl } from "../../helpers/config/envConfig";
 
 // Define the type for the props
 interface AssignmentTableProps {
@@ -21,45 +24,63 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
   total,
   limit,
 }) => {
+  const handleDownload = async (record: any) => {
+    const fileUrl = `${getImageUrl()}/${record.fileUrl}`;
+    const response = await fetch(fileUrl, {
+      method: "GET",
+    });
+
+    console.log(response, "response");
+
+    const blob = await response.blob();
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = record.fileUrl; // or your desired filename
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const columns = [
     {
       title: "Assignment Title",
-      dataIndex: "AssignmentTitle",
-      key: "AssignmentTitle",
+      dataIndex: "title",
+      key: "title",
     },
     {
       title: "Description",
-      dataIndex: "Description",
-      key: "Description",
+      dataIndex: "description",
+      key: "description",
     },
     {
       title: "Class",
-      dataIndex: "Class",
-      key: "Class",
+      dataIndex: "className",
+      key: "className",
     },
     {
       title: "Subject",
-      dataIndex: "Subject",
-      key: "Subject",
+      dataIndex: "subject",
+      key: "subject",
     },
     {
       title: "Due Date",
-      dataIndex: "DueDate",
-      key: "DueDate",
+      dataIndex: "dueDate",
+      key: "dueDate",
     },
     {
       title: "Mark",
-      dataIndex: "Mark",
-      key: "Mark",
+      dataIndex: "marks",
+      key: "marks",
     },
 
     {
       title: "Attachment",
       key: "attachment",
-      render: () => (
+      render: (_: any, record: any) => (
         <ReuseButton
           className="!w-fit !text-base !py-2 !px-3"
           variant="secondary"
+          onClick={() => handleDownload(record)}
         >
           Download
         </ReuseButton>
