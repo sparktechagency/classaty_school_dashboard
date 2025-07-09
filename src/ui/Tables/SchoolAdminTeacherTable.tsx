@@ -36,21 +36,25 @@ const SchoolAdminTeacherTable: React.FC<SchoolAdminTeacherTableProps> = ({
       dataIndex: "uid",
       render: (_: unknown, __: unknown, index: number) =>
         page * limit - limit + index + 1,
+      align: "center",
       key: "uid",
     },
     {
       title: "Name",
       dataIndex: "name",
+      align: "center",
       key: "name",
     },
     {
       title: "Subject",
       dataIndex: "subjectName",
+      align: "center",
       key: "subjectName",
     },
     {
       title: "Contact No",
       dataIndex: "phoneNumber",
+      align: "center",
       key: "phoneNumber",
     },
     {
@@ -61,6 +65,7 @@ const SchoolAdminTeacherTable: React.FC<SchoolAdminTeacherTableProps> = ({
         { text: "Active", value: "Active" },
         { text: "Inactive", value: "Inactive" },
       ],
+      align: "center",
       onFilter: (value: string, record: any) => record.Status === value,
       render: (status: string) => (
         <span

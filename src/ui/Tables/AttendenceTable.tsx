@@ -35,27 +35,32 @@ const AttendenceTable: React.FC<AttendenceTableProps> = ({
           {record?.className} - {record?.section}
         </div>
       ),
+      align: "center",
       key: "className",
     },
     {
       title: "Total Student",
       dataIndex: "totalStudents",
+      align: "center",
       key: "TotalStudent",
     },
     {
       title: "Present",
       dataIndex: "presentStudents",
+      align: "center",
       key: "Present",
     },
     {
       title: "Absent",
       dataIndex: "absentStudents",
+      align: "center",
       key: "Absent",
     },
     {
       title: "Date",
       dataIndex: "date",
       render: (date: string) => dayjs(date).format("D MMMM, YY"),
+      align: "center",
       key: "Date",
     },
     {

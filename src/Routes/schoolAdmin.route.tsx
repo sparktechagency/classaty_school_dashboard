@@ -15,6 +15,7 @@ import anounceLogo from "../../public/images/dashboard-logo/anounce.svg";
 import alarmsLogo from "../../public/images/dashboard-logo/alarms.svg";
 import managerLogo from "../../public/images/dashboard-logo/manager.svg";
 import profileLogo from "../../public/images/dashboard-logo/profile.svg";
+import gradeLogo from "../../public/images/dashboard-logo/grade.svg";
 
 //* ------------------IMPORT COMPONENTS------------------
 import Notifications from "../pages/Common/Notifications";
@@ -34,6 +35,7 @@ import SchoolAdminOVerview from "../pages/SchoolAdmin/SchoolAdminOVerview";
 import ExamPage from "../pages/SchoolAdmin/Exam";
 import Profile from "../pages/Common/settings/Profile";
 import SchoolAdminAllManager from "../pages/SchoolAdmin/SchoolAdminAllManager";
+import GradeSystem from "../pages/SchoolAdmin/GradeSystem";
 
 export const schoolAdminPaths = [
   {
@@ -103,6 +105,13 @@ export const schoolAdminPaths = [
     key: "exam",
     name: "Exam",
     icon: examLogo,
+  },
+  {
+    path: "grade",
+    element: <GradeSystem />,
+    key: "grade",
+    name: "Grade System",
+    icon: gradeLogo,
   },
   {
     path: "result",

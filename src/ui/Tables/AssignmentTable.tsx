@@ -31,8 +31,6 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
       method: "GET",
     });
 
-    console.log(response, "response");
-
     const blob = await response.blob();
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
@@ -51,33 +49,39 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
     {
       title: "Description",
       dataIndex: "description",
+      align: "center",
       key: "description",
     },
     {
       title: "Class",
       dataIndex: "className",
+      align: "center",
       key: "className",
     },
     {
       title: "Subject",
       dataIndex: "subject",
+      align: "center",
       key: "subject",
     },
     {
       title: "Due Date",
       dataIndex: "dueDate",
+      align: "center",
       render: (date: string) => dayjs(date).format("D MMMM, YY"),
       key: "dueDate",
     },
     {
       title: "Mark",
       dataIndex: "marks",
+      align: "center",
       key: "marks",
     },
 
     {
       title: "Attachment",
       key: "attachment",
+      align: "center",
       render: (_: any, record: any) => (
         <ReuseButton
           className="!w-fit !text-base !py-2 !px-3"

@@ -45,11 +45,13 @@ const SchoolAdminStudentTable: React.FC<SchoolAdminStudentTableProps> = ({
       render: (_: unknown, record: any) => {
         return <p>{record.uid ? record.uid : "-"}</p>;
       },
+      align: "center",
       key: "uid",
     },
     {
       title: "Student Name",
       dataIndex: "studentName",
+      align: "center",
       render: (_: unknown, record: any) => {
         return <p>{record.studentName ? record.studentName : "-"}</p>;
       },
@@ -61,26 +63,31 @@ const SchoolAdminStudentTable: React.FC<SchoolAdminStudentTableProps> = ({
       render: (_: unknown, record: any) => {
         return <p>{record.phoneNumber ? record.phoneNumber : "-"}</p>;
       },
+      align: "center",
       key: "phoneNumber",
     },
     {
       title: "Father Contact No",
       dataIndex: "fatherPhoneNumber",
+      align: "center",
       key: "fatherPhoneNumber",
     },
     {
       title: "Mother Contact No",
       dataIndex: "motherPhoneNumber",
+      align: "center",
       key: "motherPhoneNumber",
     },
     {
       title: "Class",
       dataIndex: "className",
+      align: "center",
       key: "className",
     },
     {
       title: "Attendance Rate",
       dataIndex: "attendanceRate",
+      align: "center",
       render: (_: unknown, record: any) => {
         return <p>{record.attendanceRate ? record.attendanceRate : "-"}</p>;
       },
@@ -89,6 +96,7 @@ const SchoolAdminStudentTable: React.FC<SchoolAdminStudentTableProps> = ({
     {
       title: "Result",
       dataIndex: "averageGPA",
+      align: "center",
       render: (_: unknown, record: any) => {
         return <p>{record.averageGPA ? record.averageGPA : "-"}</p>;
       },
@@ -97,6 +105,7 @@ const SchoolAdminStudentTable: React.FC<SchoolAdminStudentTableProps> = ({
     {
       title: "Send Notification",
       dataIndex: "send-notification",
+      align: "center",
       key: "send-notification",
       render: (_: unknown, record: any) => (
         <ReuseButton
