@@ -5,23 +5,23 @@ import ReuseInput from "../../Form/ReuseInput";
 // import { RiShieldUserFill, RiSchoolFill } from "react-icons/ri";
 // import { FaPhone } from "react-icons/fa6";
 import ReuseButton from "../../Button/ReuseButton";
-import ReuseSelect from "../../Form/ReuseSelect";
+import { useUpdateManagerMutation } from "../../../redux/features/manager/managerApi";
+import tryCatchWrapper from "../../../utils/tryCatchWrapper";
 
 interface EditSchoolAdminAllManagerProps {
   isEditModalVisible: boolean;
   handleCancel: () => void;
+  currentRecord: any;
 }
 
 const inputStructure = [
   {
-    name: "fullName",
+    name: "name",
     type: "text",
     inputType: "normal",
     label: "Manager Name",
     placeholder: "Enter Full Name",
     labelClassName: "!font-bold",
-    // prefix: <RiSchoolFill className="mr-1 text-secondary-color" />,
-    rules: [{ required: true, message: "Full Name is required" }],
   },
   {
     name: "phoneNumber",
@@ -30,19 +30,41 @@ const inputStructure = [
     label: "Phone Number",
     placeholder: "Enter Phone Number",
     labelClassName: "!font-bold",
-    // prefix: <RiShieldUserFill className="mr-1 text-secondary-color" />,
-    rules: [{ required: true, message: "Admin Phone Number is required" }],
+  },
+  {
+    name: "managerRole",
+    type: "text",
+    inputType: "normal",
+    label: "Manager Role",
+    placeholder: "Manager Role",
+    labelClassName: "!font-bold",
   },
 ];
 
 const EditSchoolAdminAllManager: React.FC<EditSchoolAdminAllManagerProps> = ({
   isEditModalVisible,
   handleCancel,
+  currentRecord,
 }) => {
   const [form] = Form.useForm();
-  const handleFinish = (values: any) => {
-    console.log(values);
+
+  const [updateManager] = useUpdateManagerMutation();
+
+  const handleFinish = async (values: any) => {
+    const res = await tryCatchWrapper(
+      updateManager,
+      { body: values, params: currentRecord?._id },
+      "Updating Manager..."
+    );
+
+    if (res?.statusCode === 200) {
+      form.resetFields();
+      handleCancel();
+    }
   };
+
+  console.log(currentRecord, "currentRecord in edit manager");
+
   return (
     <Modal
       open={isEditModalVisible}
@@ -64,26 +86,15 @@ const EditSchoolAdminAllManager: React.FC<EditSchoolAdminAllManagerProps> = ({
                   key={index}
                   name={input.name}
                   Typolevel={5}
-                  //   prefix={input.prefix}
+                  // prefix={input.prefix}
                   inputType={input.inputType}
                   type={input.type}
                   label={input.label}
                   placeholder={input.placeholder}
                   labelClassName={input.labelClassName}
-                  rules={input.rules}
                 />
               ))}
-              <ReuseSelect
-                Typolevel={5}
-                name="role"
-                label="Manager Role"
-                placeholder="Select Role"
-                options={[
-                  { label: "Manager", value: "manager" },
-                  { label: "Admin", value: "admin" },
-                ]}
-                rules={[{ required: true, message: "Role is required" }]}
-              />
+
               <ReuseButton
                 htmlType="submit"
                 variant="secondary"

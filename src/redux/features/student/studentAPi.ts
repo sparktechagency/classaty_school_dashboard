@@ -48,7 +48,7 @@ const studentApi = baseApi.injectEndpoints({
           body: req?.body,
         }
       },
-      invalidatesTags: [tagTypes.student, tagTypes.parent, tagTypes.teacher],
+      invalidatesTags: [tagTypes.student, tagTypes.parent, tagTypes.teacher , tagTypes.manager],
     }),
 
     deleteStudent: build.mutation({
