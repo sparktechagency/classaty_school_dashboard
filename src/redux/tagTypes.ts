@@ -15,6 +15,7 @@ export const tagTypes = {
   class: "Class",
   classSchedule: "ClassSchedule",
   announcement: "Announcement",
+  attendance: "Attendance",
 };
 
 export const tagTypesList = [
@@ -34,4 +35,5 @@ export const tagTypesList = [
   tagTypes.terms,
   tagTypes.exam,
   tagTypes.announcement,
+  tagTypes.attendance,
 ];
