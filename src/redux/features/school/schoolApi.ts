@@ -69,8 +69,39 @@ const schoolApi = baseApi.injectEndpoints({
       providesTags: [tagTypes.student],
     }),
 
+    getResultOfStudent: build.query({
+      query: ({ page, limit, searchTerm }) => {
+        return {
+          url: `${school_url}/result_of_students`,
+          method: "GET",
+          params: {
+            page,
+            limit,
+            searchTerm,
+          },
+        };
+      },
+      providesTags: [tagTypes.student],
+    }),
+
+    getResultBaseOnTermsAndStudentId: build.query({
+      query: ({ page, limit, searchTerm, termsId, studentId }) => {
+        return {
+          url: `/terms/result/get_result_based_on_terms/${termsId}`,
+          method: "GET",
+          params: {
+            page,
+            limit,
+            searchTerm,
+            studentId
+          },
+        };
+      },
+      providesTags: [tagTypes.student],
+    }),
+
     getNotification: build.query({
-      query: ({page, limit, searchTerm}) => {
+      query: ({ page, limit, searchTerm }) => {
         return {
           url: `/notification`,
           method: "GET",
@@ -107,7 +138,9 @@ export const {
   useAddSchoolMutation,
   useGetSchoolQuery,
   useGetAttendanceChartDataQuery,
+  useGetResultOfStudentQuery,
   useUpdateSchoolMutation,
+  useGetResultBaseOnTermsAndStudentIdQuery,
   useGetNotificationQuery,
   useGetAllStudentsQuery,
   useGetTotalOfOverviewQuery,

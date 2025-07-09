@@ -1,12 +1,12 @@
 import { useState } from "react";
-import ResultData from "../../../public/data/ResultData";
-import ReuseSearchInput from "../../ui/Form/ReuseSearchInput";
+import { useGetResultOfStudentQuery } from "../../redux/features/school/schoolApi";
 import { ResultType } from "../../types/ResultType";
-import ResultTable from "../../ui/Tables/ResultTable";
+import ReuseSearchInput from "../../ui/Form/ReuseSearchInput";
 import ResultView from "../../ui/Modal/Result/ResultView";
+import ResultTable from "../../ui/Tables/ResultTable";
 
 const ResultPage = () => {
-  const data: ResultType[] = ResultData;
+  // const data: ResultType[] = ResultData;
   const [page, setPage] = useState(1);
   const [searchText, setSearchText] = useState("");
   console.log(searchText);
@@ -14,6 +14,12 @@ const ResultPage = () => {
   const limit = 12;
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
   const [currentRecord, setCurrentRecord] = useState<ResultType | null>(null);
+
+  const { data, isFetching } = useGetResultOfStudentQuery({
+    page,
+    limit,
+    searchTerm: searchText,
+  });
 
   const showViewUserModal = (record: ResultType) => {
     setCurrentRecord(record);
@@ -44,12 +50,12 @@ const ResultPage = () => {
 
       <div className="border-2 border-[#e1e1e1] rounded-xl rounded-tr-xl">
         <ResultTable
-          data={data}
-          loading={false}
+          data={data?.data?.result}
+          loading={isFetching}
           showViewModal={showViewUserModal}
           setPage={setPage}
           page={page}
-          total={data.length}
+          total={data?.data?.meta?.total}
           limit={limit}
         />
       </div>
