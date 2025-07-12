@@ -17,9 +17,10 @@ export const tagTypes = {
   announcement: "Announcement",
   attendance: "Attendance",
   gradeSystem: "GradeSystem",
-  manager: "Manager"
+  manager: "Manager",
+  conversation: "Conversation",
 };
- 
+
 export const tagTypesList = [
   tagTypes.auth,
   tagTypes.school,
@@ -39,5 +40,6 @@ export const tagTypesList = [
   tagTypes.announcement,
   tagTypes.attendance,
   tagTypes.gradeSystem,
-  tagTypes.manager
+  tagTypes.manager,
+  tagTypes.conversation,
 ];
