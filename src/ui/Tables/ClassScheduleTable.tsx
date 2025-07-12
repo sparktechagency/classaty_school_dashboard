@@ -3,6 +3,7 @@ import React from "react";
 import { Space, Tooltip } from "antd";
 import { MdDelete, MdEdit } from "react-icons/md";
 import ReuseTable from "../../utils/ReuseTable";
+import dayjs from "dayjs";
 
 // Define the type for the props
 interface ClassScheduleTableProps {
@@ -10,6 +11,7 @@ interface ClassScheduleTableProps {
   loading: boolean;
   showDeleteModal: (record: any) => void; // Function to handle blocking a user
   ShowAddModal: () => void;
+  showEditModal: (record: any) => void;
   setPage?: (page: number) => void; // Function to handle pagination
   page?: number;
   total?: number;
@@ -20,7 +22,7 @@ const ClassScheduleTable: React.FC<ClassScheduleTableProps> = ({
   data,
   loading,
   showDeleteModal,
-  ShowAddModal,
+  showEditModal,
   setPage,
   page,
   total,
@@ -29,32 +31,39 @@ const ClassScheduleTable: React.FC<ClassScheduleTableProps> = ({
   const columns = [
     {
       title: "Class",
-      dataIndex: "Class",
-      key: "Class",
+      key: "className",
+      render: (_: any, record: any) => (
+        <div className="capitalize">
+          {record.className} - {record.section}
+        </div>
+      ),
     },
     {
       title: "Subject",
-      dataIndex: "Subject",
-      key: "Subject",
+      dataIndex: "subject",
+      key: "subject",
     },
-    { title: "Period", dataIndex: "Period", key: "Period" },
+    { title: "Period", dataIndex: "period", key: "period" },
     {
       title: "Teacher",
-      dataIndex: "Teacher",
-      key: "Teacher",
+      dataIndex: "teacherName",
+      key: "teacherName",
     },
-    { title: "Start Time", dataIndex: "StartTime", key: "StartTime" },
-    { title: "End Time", dataIndex: "EndTime", key: "EndTime" },
+    { title: "Start Time", dataIndex: "selectTime", key: "selectTime" },
+    { title: "End Time", dataIndex: "endTime", key: "endTime" },
     {
       title: "Date",
-      dataIndex: "Date",
-      key: "Date",
+      dataIndex: "date",
+      key: "date",
+      render: (_: any, record: any) => (
+        <p>{dayjs(record.date).format("DD MMMM")}</p>
+      ),
     },
-    { title: "Room", dataIndex: "Room", key: "Room" },
+    { title: "Room", dataIndex: "roomNo", key: "roomNo" },
     {
       title: "Active Student",
-      dataIndex: "ActiveStudent",
-      key: "ActiveStudent",
+      dataIndex: "totalStudent",
+      key: "totalStudent",
       align: "center",
     },
 
@@ -66,7 +75,7 @@ const ClassScheduleTable: React.FC<ClassScheduleTableProps> = ({
           <Tooltip placement="left" title="Edit">
             <button
               className="!p-0 !bg-transparent !border-none !text-secondary-color cursor-pointer"
-              onClick={ShowAddModal}
+              onClick={() => showEditModal(record)}
             >
               <MdEdit style={{ fontSize: "24px" }} />
             </button>

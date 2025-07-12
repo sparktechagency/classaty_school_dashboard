@@ -1,18 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 
-import SchoolAdminStudentData from "../../../../../public/data/SchoolAdminStudent";
-import SchoolAdminStudentTable from "../../../../ui/Tables/SchoolAdminStudentTable";
-import SendNotification from "../../../../ui/Modal/SchoolAdminStudent/SendNotification";
-import ViewSchoolAdminStudent from "../../../../ui/Modal/SchoolAdminStudent/ViewSchoolAdminStudent";
+import { useGetAllStudentsQuery } from "../../../../redux/features/school/schoolApi";
 import BlockModal from "../../../../ui/Modal/BlockModal";
-import UnblockModal from "../../../../ui/Modal/UnblockModal";
 import DeleteModal from "../../../../ui/Modal/DeleteModal";
 import EditSchoolAdminStudent from "../../../../ui/Modal/SchoolAdminStudent/EditSchoolAdminStudent";
+import SendNotification from "../../../../ui/Modal/SchoolAdminStudent/SendNotification";
+import ViewSchoolAdminStudent from "../../../../ui/Modal/SchoolAdminStudent/ViewSchoolAdminStudent";
+import UnblockModal from "../../../../ui/Modal/UnblockModal";
+import SchoolAdminStudentTable from "../../../../ui/Tables/SchoolAdminStudentTable";
 
 const RecentStudent = () => {
-  const data: any[] = SchoolAdminStudentData?.slice(0, 6);
-
   const [isSendModalVisible, setIsSendModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
 
@@ -21,6 +19,11 @@ const RecentStudent = () => {
   const [isUnblockModalVisible, setIsUnblockModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [currentRecord, setCurrentRecord] = useState<any | null>(null);
+
+  const { data: studentData } = useGetAllStudentsQuery({
+    page: 1,
+    limit: 6,
+  });
 
   const showViewUserModal = (record: any) => {
     setCurrentRecord(record);
@@ -57,6 +60,7 @@ const RecentStudent = () => {
     setIsBlockModalVisible(false);
     setIsUnblockModalVisible(false);
     setIsDeleteModalVisible(false);
+    setIsEditModalVisible(false);
     setCurrentRecord(null);
   };
 
@@ -78,6 +82,7 @@ const RecentStudent = () => {
     handleCancel();
     console.log(record);
   };
+
   return (
     <div className=" bg-primary-color rounded-xl  mt-10">
       <div className="flex justify-between items-center py-2">
@@ -87,7 +92,7 @@ const RecentStudent = () => {
       </div>
       <div className="border-2 border-[#e1e1e1] rounded-xl rounded-tr-xl">
         <SchoolAdminStudentTable
-          data={data}
+          data={studentData?.data?.result}
           loading={false}
           showSendModal={showSendModal}
           showViewModal={showViewUserModal}

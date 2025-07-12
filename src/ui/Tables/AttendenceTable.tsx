@@ -3,6 +3,7 @@ import { Space, Tooltip } from "antd";
 import { GoEye } from "react-icons/go";
 import ReuseTable from "../../utils/ReuseTable";
 import { IAttendence } from "../../types/AttendenceTable";
+import dayjs from "dayjs";
 
 // Define the type for the props
 interface AttendenceTableProps {
@@ -27,27 +28,39 @@ const AttendenceTable: React.FC<AttendenceTableProps> = ({
   const columns = [
     {
       title: "Class",
-      dataIndex: "Class",
-      key: "Class",
+      dataIndex: "className",
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      render: (_: any, record: any) => (
+        <div className="capitalize">
+          {record?.className} - {record?.section}
+        </div>
+      ),
+      align: "center",
+      key: "className",
     },
     {
       title: "Total Student",
-      dataIndex: "TotalStudent",
+      dataIndex: "totalStudents",
+      align: "center",
       key: "TotalStudent",
     },
     {
       title: "Present",
-      dataIndex: "Present",
+      dataIndex: "presentStudents",
+      align: "center",
       key: "Present",
     },
     {
       title: "Absent",
-      dataIndex: "Absent",
+      dataIndex: "absentStudents",
+      align: "center",
       key: "Absent",
     },
     {
       title: "Date",
-      dataIndex: "Date",
+      dataIndex: "date",
+      render: (date: string) => dayjs(date).format("D MMMM, YY"),
+      align: "center",
       key: "Date",
     },
     {

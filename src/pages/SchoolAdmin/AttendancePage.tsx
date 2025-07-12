@@ -1,19 +1,23 @@
 import { useState } from "react";
-import AttendanceData from "../../../public/data/AttendenceData";
-import ReuseSearchInput from "../../ui/Form/ReuseSearchInput";
-import AttendenceTable from "../../ui/Tables/AttendenceTable";
+import { useGetAllAttendancesQuery } from "../../redux/features/attendance/attendanceApi";
 import { IAttendence } from "../../types/AttendenceTable";
+import ReuseSearchInput from "../../ui/Form/ReuseSearchInput";
 import AttendenceViewModal from "../../ui/Modal/Attendence/AttendenceViewModal";
+import AttendenceTable from "../../ui/Tables/AttendenceTable";
 
 const AttendencePage = () => {
-  const data: IAttendence[] = AttendanceData;
   const [page, setPage] = useState(1);
   const [searchText, setSearchText] = useState("");
-  console.log(searchText);
 
   const limit = 12;
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
   const [currentRecord, setCurrentRecord] = useState<IAttendence | null>(null);
+
+  const { data: attendanceData , isFetching} = useGetAllAttendancesQuery({
+    page,
+    limit,
+    searchTerm: searchText,
+  });
 
   const showViewUserModal = (record: IAttendence) => {
     setCurrentRecord(record);
@@ -24,6 +28,7 @@ const AttendencePage = () => {
     setIsViewModalVisible(false);
     setCurrentRecord(null);
   };
+
 
   return (
     <div className=" bg-primary-color rounded-xl p-4 min-h-[90vh]">
@@ -44,12 +49,12 @@ const AttendencePage = () => {
 
       <div className="border-2 border-[#e1e1e1] rounded-xl rounded-tr-xl">
         <AttendenceTable
-          data={data}
-          loading={false}
+          data={attendanceData?.data?.result}
+          loading={isFetching}
           showViewModal={showViewUserModal}
           setPage={setPage}
           page={page}
-          total={data.length}
+          total={attendanceData?.data?.meta?.total}
           limit={limit}
         />
       </div>

@@ -13,6 +13,7 @@ const studentApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [tagTypes.student],
     }),
+
     getStudent: build.query({
       query: ({ page, limit, searchTerm }) => {
         return {
@@ -27,6 +28,29 @@ const studentApi = baseApi.injectEndpoints({
       },
       providesTags: [tagTypes.student],
     }),
+
+    editStudentInfo: build.mutation({
+      query: (req) => {
+        return {
+          url: `${student_url}/edit_student/${req?.params?.studentId}`,
+          method: "PATCH",
+          body: req?.body,
+        }
+      },
+      invalidatesTags: [tagTypes.student],
+    }),
+
+    userAction : build.mutation({
+      query: (req) => {
+        return {
+          url: `/users/action`,
+          method: "PATCH",
+          body: req?.body,
+        }
+      },
+      invalidatesTags: [tagTypes.student, tagTypes.parent, tagTypes.teacher , tagTypes.manager],
+    }),
+
     deleteStudent: build.mutation({
       query: (req) => ({
         url: `${student_url}/delete_student/${req?.params}`,
@@ -41,6 +65,8 @@ export const {
   useAddStudentMutation,
   useGetStudentQuery,
   useDeleteStudentMutation,
+  useUserActionMutation,
+  useEditStudentInfoMutation,
 } = studentApi;
 
 export default studentApi;

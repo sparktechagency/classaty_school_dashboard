@@ -14,9 +14,9 @@ interface SchoolAdminTeacherTableProps {
   showBlockModal: (record: any) => void; // Function to handle blocking a user
   showUnblockModal: (record: any) => void; // Function to handle unblocking a user
   setPage?: (page: number) => void; // Function to handle pagination
-  page?: number;
-  total?: number;
-  limit?: number;
+  page: number;
+  total: number;
+  limit: number;
 }
 
 const SchoolAdminTeacherTable: React.FC<SchoolAdminTeacherTableProps> = ({
@@ -33,35 +33,45 @@ const SchoolAdminTeacherTable: React.FC<SchoolAdminTeacherTableProps> = ({
   const columns = [
     {
       title: "UID",
-      dataIndex: "UID",
-      key: "UID",
+      dataIndex: "uid",
+      render: (_: unknown, __: unknown, index: number) =>
+        page * limit - limit + index + 1,
+      align: "center",
+      key: "uid",
     },
     {
       title: "Name",
-      dataIndex: "Name",
-      key: "Name",
+      dataIndex: "name",
+      align: "center",
+      key: "name",
     },
     {
       title: "Subject",
-      dataIndex: "Subject",
-      key: "Subject",
+      dataIndex: "subjectName",
+      align: "center",
+      key: "subjectName",
     },
     {
       title: "Contact No",
-      dataIndex: "ContactNo",
-      key: "ContactNo",
+      dataIndex: "phoneNumber",
+      align: "center",
+      key: "phoneNumber",
     },
     {
       title: "Status",
-      dataIndex: "Status",
-      key: "Status",
+      dataIndex: "status",
+      key: "status",
       filters: [
         { text: "Active", value: "Active" },
         { text: "Inactive", value: "Inactive" },
       ],
+      align: "center",
       onFilter: (value: string, record: any) => record.Status === value,
       render: (status: string) => (
-        <span style={{ color: status === "Active" ? "green" : "red" }}>
+        <span
+          className="capitalize"
+          style={{ color: status === "active" ? "green" : "red" }}
+        >
           {status}
         </span>
       ),
@@ -83,23 +93,25 @@ const SchoolAdminTeacherTable: React.FC<SchoolAdminTeacherTableProps> = ({
 
           {/* Block User Tooltip */}
 
-          <Tooltip placement="left" title="Unblock">
-            <button
-              className="!p-0 !bg-transparent !border-none !text-base-color cursor-pointer hidden"
-              onClick={() => showUnblockModal(record)}
-            >
-              <CgUnblock style={{ fontSize: "24px" }} />
-            </button>
-          </Tooltip>
-
-          <Tooltip placement="left" title="Block">
-            <button
-              className="!p-0 !bg-transparent !border-none !text-error-color cursor-pointer"
-              onClick={() => showBlockModal(record)}
-            >
-              <MdBlock style={{ fontSize: "24px" }} />
-            </button>
-          </Tooltip>
+          {record?.status === "active" ? (
+            <Tooltip placement="left" title="Block">
+              <button
+                className="!p-0 !bg-transparent !border-none !text-error-color cursor-pointer"
+                onClick={() => showBlockModal(record)}
+              >
+                <MdBlock style={{ fontSize: "24px" }} />
+              </button>
+            </Tooltip>
+          ) : (
+            <Tooltip placement="left" title="Unblock">
+              <button
+                className="!p-0 !bg-transparent !border-none !text-base-color cursor-pointer"
+                onClick={() => showUnblockModal(record)}
+              >
+                <CgUnblock style={{ fontSize: "24px" }} />
+              </button>
+            </Tooltip>
+          )}
         </Space>
       ),
       align: "center",

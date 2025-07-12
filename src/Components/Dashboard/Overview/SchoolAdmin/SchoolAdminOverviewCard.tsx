@@ -1,42 +1,54 @@
 import { AllIcons } from "../../../../../public/images/AllImages";
-
-const data = [
-  {
-    id: 1,
-    background: "#FFFFFF",
-    name: "Total Student",
-    icon: (
-      <div className="p-3 rounded-full bg-[#F2F6FC]">
-        <img src={AllIcons.student} className="w-6 h-6" alt="icon" />
-      </div>
-    ),
-    count: 10000,
-  },
-  {
-    id: 2,
-    background: "#FFFFFF",
-    name: "Total Teachers",
-    icon: (
-      <div className="p-3 rounded-full bg-[#F2F6FC]">
-        <img src={AllIcons.teachers} className="w-6 h-6" alt="icon" />
-      </div>
-    ),
-    count: 10000,
-  },
-  {
-    id: 3,
-    background: "#FFFFFF",
-    name: "Attendance rate",
-    icon: (
-      <div className="p-3 rounded-full bg-[#F2F6FC]">
-        <img src={AllIcons.attendenceRate} className="w-6 h-6" alt="icon" />
-      </div>
-    ),
-    count: "98%",
-  },
-];
+import { useGetTotalOfOverviewQuery } from "../../../../redux/features/school/schoolApi";
+import Loading from "../../../../ui/Loading";
 
 const SchoolAdminOverviewCard = () => {
+  const { data: schoolTotalOverview, isLoading } = useGetTotalOfOverviewQuery(
+    {}
+  );
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  const data = [
+    {
+      id: 1,
+      background: "#FFFFFF",
+      name: "Total Student",
+      icon: (
+        <div className="p-3 rounded-full bg-[#F2F6FC]">
+          <img src={AllIcons.student} className="w-6 h-6" alt="icon" />
+        </div>
+      ),
+      count: schoolTotalOverview?.data?.totalStudent,
+    },
+    {
+      id: 2,
+      background: "#FFFFFF",
+      name: "Total Teachers",
+      icon: (
+        <div className="p-3 rounded-full bg-[#F2F6FC]">
+          <img src={AllIcons.teachers} className="w-6 h-6" alt="icon" />
+        </div>
+      ),
+      count: schoolTotalOverview?.data?.totalTeacher,
+    },
+    {
+      id: 3,
+      background: "#FFFFFF",
+      name: "Attendance rate",
+      icon: (
+        <div className="p-3 rounded-full bg-[#F2F6FC]">
+          <img src={AllIcons.attendenceRate} className="w-6 h-6" alt="icon" />
+        </div>
+      ),
+      count: `${schoolTotalOverview?.data?.attendanceRate?.attendanceRate.toFixed(
+        2
+      )}%`,
+    },
+  ];
+
   return (
     <div className="flex flex-col lg:flex-row gap-1 lg:gap-5 mb-5">
       {/* Company  */}

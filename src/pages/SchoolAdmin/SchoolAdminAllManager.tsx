@@ -1,24 +1,23 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
+import ReuseSearchInput from "../../ui/Form/ReuseSearchInput";
 import BlockModal from "../../ui/Modal/BlockModal";
 import UnblockModal from "../../ui/Modal/UnblockModal";
-import ReuseSearchInput from "../../ui/Form/ReuseSearchInput";
 
-import AdminData from "../../../public/data/AdminData";
-import DeleteModal from "../../ui/Modal/DeleteModal";
-import ReuseButton from "../../ui/Button/ReuseButton";
 import { FiPlus } from "react-icons/fi";
-import SchoolAdminAllManagerTable from "../../ui/Tables/SchoolAdminAllManagerTable";
+import { useGetAllManagersQuery } from "../../redux/features/manager/managerApi";
+import ReuseButton from "../../ui/Button/ReuseButton";
+import DeleteModal from "../../ui/Modal/DeleteModal";
 import AddSchoolAdminAllManager from "../../ui/Modal/SchoolAdminAllManager/AddSchoolAdminAllManager";
 import EditSchoolAdminAllManager from "../../ui/Modal/SchoolAdminAllManager/EditSchoolAdminAllManager";
 import ViewSchoolAdminAllManager from "../../ui/Modal/SchoolAdminAllManager/ViewSchoolAdminAllManager";
+import SchoolAdminAllManagerTable from "../../ui/Tables/SchoolAdminAllManagerTable";
+import { useUserActionMutation } from "../../redux/features/student/studentAPi";
+import tryCatchWrapper from "../../utils/tryCatchWrapper";
 
 const SchoolAdminAllManager = () => {
-  const data: any[] = AdminData;
   const [page, setPage] = useState(1);
   const [searchText, setSearchText] = useState("");
-  console.log(searchText);
-
   const limit = 12;
 
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
@@ -28,6 +27,14 @@ const SchoolAdminAllManager = () => {
   const [isUnblockModalVisible, setIsUnblockModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [currentRecord, setCurrentRecord] = useState<any | null>(null);
+
+  const { data: managers, isFetching } = useGetAllManagersQuery({
+    page,
+    limit,
+    searchTerm: searchText,
+  });
+
+  const [userAction] = useUserActionMutation();
 
   const showAddModal = () => {
     setIsAddModalVisible(true);
@@ -72,19 +79,44 @@ const SchoolAdminAllManager = () => {
     // setCurrentRecord(null);
   };
 
-  const handleBlock = (record: any) => {
-    handleCancel();
-    console.log(record);
+  const handleBlock = async (record: any) => {
+    const res = await tryCatchWrapper(
+      userAction,
+      {
+        body: {
+          userId: record?.userId,
+          action: "blocked",
+        },
+      },
+      "Blocking..."
+    );
+
+    if (res?.statusCode === 200) {
+      handleCancel();
+    }
   };
-  const handleUnblock = (record: any) => {
-    handleCancel();
-    console.log(record);
+  const handleUnblock = async (record: any) => {
+    const res = await tryCatchWrapper(
+      userAction,
+      {
+        body: {
+          userId: record?.userId,
+          action: "active",
+        },
+      },
+      "Unblocking..."
+    );
+
+    if (res?.statusCode === 200) {
+      handleCancel();
+    }
   };
 
   const handleDelete = (record: any) => {
     handleCancel();
     console.log(record);
   };
+
   return (
     <div className=" bg-primary-color rounded-xl p-4 min-h-[90vh]">
       <div className="flex justify-between items-center mb-5">
@@ -112,15 +144,15 @@ const SchoolAdminAllManager = () => {
       </div>
       <div className="border-2 border-[#e1e1e1] rounded-xl rounded-tr-xl">
         <SchoolAdminAllManagerTable
-          data={data}
-          loading={false}
+          data={managers?.data?.result}
+          loading={isFetching}
           showViewModal={showViewUserModal}
           showEditModal={showEditModal}
           showBlockModal={showBlockModal}
           showUnblockModal={showUnblockModal}
           setPage={setPage}
           page={page}
-          total={data.length}
+          total={managers?.data?.meta?.total}
           limit={limit}
         />
       </div>
@@ -128,6 +160,7 @@ const SchoolAdminAllManager = () => {
       <EditSchoolAdminAllManager
         isEditModalVisible={isEditModalVisible}
         handleCancel={handleCancel}
+        currentRecord={currentRecord}
       />
       <AddSchoolAdminAllManager
         isAddModalVisible={isAddModalVisible}

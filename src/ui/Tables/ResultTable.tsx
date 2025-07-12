@@ -29,32 +29,32 @@ const ResultTable: React.FC<ResultTableProps> = ({
   const columns = [
     {
       title: "Student Name",
-      dataIndex: "StudentName",
+      dataIndex: "name",
       key: "StudentName",
     },
     {
       title: "Class",
-      dataIndex: "Class",
+      dataIndex: "class",
       key: "Class",
     },
     {
       title: "1st Term",
-      dataIndex: "FirstTerm",
+      dataIndex: "firstTerm",
       key: "FirstTerm",
     },
     {
       title: "2nd Term",
-      dataIndex: "SecondTerm",
+      dataIndex: "secondTerm",
       key: "SecondTerm",
     },
     {
       title: "Mid Term",
-      dataIndex: "MidTerm",
+      dataIndex: "midTerm",
       key: "MidTerm",
     },
     {
       title: "Overall",
-      dataIndex: "Overall",
+      dataIndex: "overall",
       key: "Overall",
     },
     {

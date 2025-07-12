@@ -5,19 +5,101 @@ import ReuseInput from "../../Form/ReuseInput";
 import ReuseButton from "../../Button/ReuseButton";
 import ReuseSelect from "../../Form/ReuseSelect";
 import dayjs from "dayjs";
+import { useGetSubjectBySchoolIdQuery } from "../../../redux/features/subject/subjectApi";
+import { useGetClassBySchoolIdQuery } from "../../../redux/features/class/classAPi";
+import { useGetTeacherQuery } from "../../../redux/features/teacher/teacherApi";
+import { useCreateExamMutation } from "../../../redux/features/exam/examApi";
+import tryCatchWrapper from "../../../utils/tryCatchWrapper";
 
 interface AddExamModalProps {
   isAddExamModalVisible: boolean;
   handleCancel: () => void;
+  activeKey: string[];
 }
 
 const AddExamModal: React.FC<AddExamModalProps> = ({
   isAddExamModalVisible,
   handleCancel,
+  activeKey,
 }) => {
   const [form] = Form.useForm();
-  const handleFinish = (values: any) => {
-    console.log(values);
+
+  const { data: subject } = useGetSubjectBySchoolIdQuery(
+    {
+      page: 1,
+      limit: 10000,
+    },
+    {
+      skip: !isAddExamModalVisible,
+    }
+  );
+
+  const { data: classes } = useGetClassBySchoolIdQuery(
+    {
+      page: 1,
+      limit: 10000,
+    },
+    {
+      skip: !isAddExamModalVisible,
+    }
+  );
+
+  const { data: teachers } = useGetTeacherQuery(
+    {
+      page: 1,
+      limit: 10000,
+    },
+    {
+      skip: !isAddExamModalVisible,
+    }
+  );
+
+  const [createExam] = useCreateExamMutation();
+
+  const handleFinish = async (values: any) => {
+    const subjectName = subject?.data?.result?.find(
+      (subject: any) => subject._id === values.subjectId
+    );
+
+    const className = classes?.data?.find(
+      (cls: any) => cls._id === values.classId
+    );
+
+    const assignedTeacher = teachers?.data?.result?.find(
+      (teacher: any) => teacher._id === values.teacherId
+    );
+
+    const isoDate = dayjs(values.date).toISOString();
+    values.date = isoDate;
+
+    const finalPayload = {
+      subjectId: values.subjectId,
+      classId: values.classId,
+      details: values.details,
+      passGrade: Number(values.passGrade),
+      className: className?.className,
+      date: values.date,
+      startTime: dayjs(values.startTime).format("HH:mm:ss"),
+      classRoom: values.classRoom,
+      duration: Number(values.duration),
+      assignedTeacher: assignedTeacher?.name,
+      teacherId: values.teacherId,
+      termsId: activeKey?.[0],
+      instruction: values.instruction,
+      totalMarks: values.totalMarks,
+      subjectName: subjectName?.subjectName,
+    };
+
+    const res = await tryCatchWrapper(
+      createExam,
+      { body: finalPayload },
+      "Adding Exam..."
+    ) as any;
+
+    if (res?.statusCode === 201) {
+      form.resetFields();
+      handleCancel();
+    }
   };
   return (
     <Modal
@@ -38,13 +120,13 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
               <ReuseSelect
                 Typolevel={5}
                 label="Subject"
-                name="subject"
+                name="subjectId"
                 placeholder="Select Subject"
-                options={[
-                  { value: "Subject 1", label: "Subject 1" },
-                  { value: "Subject 2", label: "Subject 2" },
-                  { value: "Subject 3", label: "Subject 3" },
-                ]}
+                labelClassName="!font-bold"
+                options={subject?.data?.result?.map((subject: any) => ({
+                  value: subject._id,
+                  label: subject.subjectName,
+                }))}
                 rules={[{ required: true, message: "Subject is required" }]}
               />
               <ReuseInput
@@ -52,7 +134,7 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
                 rows={4}
                 Typolevel={5}
                 label="Exam Details"
-                name="examDetails"
+                name="details"
                 placeholder="Enter Exam Details"
                 rules={[
                   { required: true, message: "Exam Details is required" },
@@ -61,22 +143,39 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
               <ReuseSelect
                 Typolevel={5}
                 label="Class"
-                name="class"
+                name="classId"
                 placeholder="Select Class"
-                options={[
-                  { value: "Class 1", label: "Class 1" },
-                  { value: "Class 2", label: "Class 2" },
-                  { value: "Class 3", label: "Class 3" },
-                ]}
+                labelClassName="!font-bold"
+                options={classes?.data?.map((classData: any) => ({
+                  value: classData._id,
+                  label: classData.className,
+                }))}
                 rules={[{ required: true, message: "Class is required" }]}
               />
 
               <ReuseInput
                 inputType="normal"
                 rows={4}
+                type="number"
+                Typolevel={5}
+                label="Total Mark"
+                name="totalMarks"
+                placeholder="Enter Required Pass Grader"
+                rules={[
+                  {
+                    required: true,
+                    message: "Required Pass Grader is required",
+                  },
+                ]}
+              />
+
+              <ReuseInput
+                inputType="normal"
+                rows={4}
+                type="number"
                 Typolevel={5}
                 label="Required Pass Grade"
-                name="requiredPassGrader"
+                name="passGrade"
                 placeholder="Enter Required Pass Grader"
                 rules={[
                   {
@@ -114,21 +213,6 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
                   }}
                 />
               </Form.Item>
-              <Typography.Title level={5} className="mb-1">
-                End Time
-              </Typography.Title>
-
-              <Form.Item name="endTime" rules={[{ required: true }]}>
-                <TimePicker
-                  className="w-full !py-2 !px-3 !rounded-lg !text-lg !bg-[#EFEFEF] !border !border-[#EFEFEF] !text-base-color"
-                  placeholder="End Time"
-                  size="large"
-                  disabledDate={(current) => {
-                    // Disable all dates before today
-                    return current && current < dayjs().startOf("day");
-                  }}
-                />
-              </Form.Item>
 
               <ReuseInput
                 Typolevel={5}
@@ -140,7 +224,8 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
               <ReuseInput
                 Typolevel={5}
                 label="Exam Duration"
-                name="examDuration"
+                name="duration"
+                type="number"
                 placeholder="Enter Exam Duration"
                 rules={[
                   { required: true, message: "Exam Duration is required" },
@@ -149,13 +234,13 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
               <ReuseSelect
                 Typolevel={5}
                 label="Teacher"
-                name="teacher"
+                name="teacherId"
+                labelClassName="!font-bold"
                 placeholder="Select Teacher"
-                options={[
-                  { value: "Teacher 1", label: "Teacher 1" },
-                  { value: "Teacher 2", label: "Teacher 2" },
-                  { value: "Teacher 3", label: "Teacher 3" },
-                ]}
+                options={teachers?.data?.result?.map((teacher: any) => ({
+                  value: teacher._id,
+                  label: teacher.name,
+                }))}
                 rules={[{ required: true, message: "Teacher is required" }]}
               />
 
@@ -163,10 +248,10 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
                 inputType="textarea"
                 rows={4}
                 Typolevel={5}
-                label="Description"
-                name="description"
-                placeholder="Enter Description"
-                rules={[{ required: true, message: "Description is required" }]}
+                label="Instruction"
+                name="instruction"
+                placeholder="Enter instruction"
+                rules={[{ required: true, message: "instruction is required" }]}
               />
 
               <ReuseButton

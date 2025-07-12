@@ -13,6 +13,7 @@ const schoolApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [tagTypes.school],
     }),
+
     getSchool: build.query({
       query: ({ page, limit, searchTerm }) => {
         return {
@@ -27,6 +28,93 @@ const schoolApi = baseApi.injectEndpoints({
       },
       providesTags: [tagTypes.school],
     }),
+
+    getAttendanceChartData: build.query({
+      query: ({ year }) => {
+
+        console.log(year, "year in redux");
+        return {
+          url: `/overview/student_attendance`,
+          method: "GET",
+          params: {
+            year,
+          },
+        };
+      },
+      providesTags: [tagTypes.school],
+    }),
+
+    getTotalOfOverview: build.query({
+      query: () => {
+        return {
+          url: `/users/count_total`,
+          method: "GET"
+        };
+      },
+      providesTags: [tagTypes.school],
+    }),
+
+    getAllStudents: build.query({
+      query: ({ page, limit, searchTerm }) => {
+        return {
+          url: `${school_url}/all_students`,
+          method: "GET",
+          params: {
+            page,
+            limit,
+            searchTerm,
+          },
+        };
+      },
+      providesTags: [tagTypes.student],
+    }),
+
+    getResultOfStudent: build.query({
+      query: ({ page, limit, searchTerm }) => {
+        return {
+          url: `${school_url}/result_of_students`,
+          method: "GET",
+          params: {
+            page,
+            limit,
+            searchTerm,
+          },
+        };
+      },
+      providesTags: [tagTypes.student],
+    }),
+
+    getResultBaseOnTermsAndStudentId: build.query({
+      query: ({ page, limit, searchTerm, termsId, studentId }) => {
+        return {
+          url: `/terms/result/get_result_based_on_terms/${termsId}`,
+          method: "GET",
+          params: {
+            page,
+            limit,
+            searchTerm,
+            studentId
+          },
+        };
+      },
+      providesTags: [tagTypes.student],
+    }),
+
+    getNotification: build.query({
+      query: ({ page, limit, searchTerm }) => {
+        return {
+          url: `/notification`,
+          method: "GET",
+          params: {
+            page,
+            limit,
+            searchTerm,
+          },
+        };
+      },
+      providesTags: [tagTypes.school],
+    }),
+
     updateSchool: build.mutation({
       query: (req) => ({
         url: `${school_url}/edit_school/${req?.params}`,
@@ -35,6 +123,7 @@ const schoolApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [tagTypes.school],
     }),
+
     deleteSchool: build.mutation({
       query: (req) => ({
         url: `${school_url}/delete_school/${req?.params}`,
@@ -48,7 +137,13 @@ const schoolApi = baseApi.injectEndpoints({
 export const {
   useAddSchoolMutation,
   useGetSchoolQuery,
+  useGetAttendanceChartDataQuery,
+  useGetResultOfStudentQuery,
   useUpdateSchoolMutation,
+  useGetResultBaseOnTermsAndStudentIdQuery,
+  useGetNotificationQuery,
+  useGetAllStudentsQuery,
+  useGetTotalOfOverviewQuery,
   useDeleteSchoolMutation,
 } = schoolApi;
 

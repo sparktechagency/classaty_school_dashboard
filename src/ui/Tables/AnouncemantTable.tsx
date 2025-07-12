@@ -4,6 +4,7 @@ import { GoEye } from "react-icons/go";
 import { MdDelete } from "react-icons/md";
 import ReuseTable from "../../utils/ReuseTable";
 import { IAnounceType } from "../../types";
+import dayjs from "dayjs";
 
 // Define the type for the props
 interface AnouncemantTableProps {
@@ -31,23 +32,36 @@ const AnouncemantTable: React.FC<AnouncemantTableProps> = ({
     {
       title: "UID",
       dataIndex: "UID",
+      render: (_: unknown, __: unknown, index: number) => index + 1,
       key: "UID",
     },
     {
       title: "Title",
-      dataIndex: "Title",
-      key: "Title",
+      dataIndex: "title",
+      key: "title",
       width: 400,
     },
     {
       title: "Description",
-      dataIndex: "Description",
-      key: "Description",
+      dataIndex: "description",
+      render: (description: string) => {
+        return <div dangerouslySetInnerHTML={{ __html: description }} />;
+      },
+      key: "description",
       width: 600,
     },
     {
+      title: "Announce To ",
+      dataIndex: "announcementTo",
+      render: (announcementTo: string) => {
+        return <p className="capitalize">{announcementTo}</p>;
+      },
+      key: "announcementTo",
+    },
+    {
       title: "Date",
-      dataIndex: "Date",
+      dataIndex: "date",
+      render: (date: string) => dayjs(date).format("D MMMM, YY"),
       key: "Date",
     },
     {

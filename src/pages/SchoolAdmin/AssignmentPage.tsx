@@ -1,24 +1,19 @@
 import { useState } from "react";
+import { useGetAllAssignmentQuery } from "../../redux/features/assignment/assignmentApi";
 import ReuseSearchInput from "../../ui/Form/ReuseSearchInput";
-import { IAssignment } from "../../types/AssignmentType";
 import AssignmentTable from "../../ui/Tables/AssignmentTable";
-import { useGetAssignmentQuery } from "../../redux/features/assignment/assignment";
-
+ 
 const AssignmentPage = () => {
   const [page, setPage] = useState(1);
   const [searchText, setSearchText] = useState("");
-
   const limit = 12;
-
-  const { data, isFetching } = useGetAssignmentQuery({
+ 
+  const { data: assignmentData, isFetching } = useGetAllAssignmentQuery({
     page,
     limit,
     searchTerm: searchText,
   });
-
-  const AssignmentData: IAssignment[] = data?.data?.result;
-  const AssignmentPagination = data?.data?.meta;
-
+ 
   return (
     <div className=" bg-primary-color rounded-xl p-4 min-h-[90vh]">
       <div className="flex justify-between items-center mb-5">
@@ -35,19 +30,19 @@ const AssignmentPage = () => {
           </div>
         </div>
       </div>
-
+ 
       <div className="border-2 border-[#e1e1e1] rounded-xl rounded-tr-xl">
         <AssignmentTable
-          data={AssignmentData}
+          data={assignmentData?.data?.result}
           loading={isFetching}
           setPage={setPage}
           page={page}
-          total={AssignmentPagination?.total}
+          total={assignmentData?.data?.meta.total}
           limit={limit}
         />
       </div>
     </div>
   );
 };
-
+ 
 export default AssignmentPage;

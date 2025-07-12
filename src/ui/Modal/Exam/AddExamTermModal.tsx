@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Form, Modal } from "antd";
+import { GiClassicalKnowledge } from "react-icons/gi";
+import { useCreateTermMutation } from "../../../redux/features/terms/termsApi";
+import ReuseButton from "../../Button/ReuseButton";
 import ReusableForm from "../../Form/ReuseForm";
 import ReuseInput from "../../Form/ReuseInput";
-import ReuseButton from "../../Button/ReuseButton";
-import { GiClassicalKnowledge } from "react-icons/gi";
+import tryCatchWrapper from "../../../utils/tryCatchWrapper";
 
 interface AddExamTermModalProps {
   isAddModalVisible: boolean;
@@ -12,7 +14,7 @@ interface AddExamTermModalProps {
 
 const inputStructure = [
   {
-    name: "termName",
+    name: "termsName",
     type: "text",
     inputType: "normal",
     label: "Term Name",
@@ -28,8 +30,20 @@ const AddExamTermModal: React.FC<AddExamTermModalProps> = ({
   handleCancel,
 }) => {
   const [form] = Form.useForm();
-  const handleFinish = (values: any) => {
-    console.log(values);
+
+  const [createTerm] = useCreateTermMutation();
+
+  const handleFinish = async (values: any) => {
+    const res = (await tryCatchWrapper(
+      createTerm,
+      { body: values },
+      "Adding Term..."
+    )) as any;
+
+    if (res?.statusCode === 201) {
+      form.resetFields();
+      handleCancel();
+    }
   };
   return (
     <Modal

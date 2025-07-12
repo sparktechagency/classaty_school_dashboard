@@ -7,15 +7,19 @@ export const tagTypes = {
   user: "User",
   payment: "Payment",
   feedback: "Feedback",
-
+  terms: "Terms",
+  exam: "Exam",
   section: "Section",
   subject: "Subject",
   level: "Level",
-  assignment: "Assignment",
-  announcement: "Announcement",
   class: "Class",
+  classSchedule: "ClassSchedule",
+  announcement: "Announcement",
+  attendance: "Attendance",
+  gradeSystem: "GradeSystem",
+  manager: "Manager"
 };
-
+ 
 export const tagTypesList = [
   tagTypes.auth,
   tagTypes.school,
@@ -29,6 +33,11 @@ export const tagTypesList = [
   tagTypes.class,
   tagTypes.level,
   tagTypes.section,
-  tagTypes.assignment,
+  tagTypes.classSchedule,
+  tagTypes.terms,
+  tagTypes.exam,
   tagTypes.announcement,
+  tagTypes.attendance,
+  tagTypes.gradeSystem,
+  tagTypes.manager
 ];

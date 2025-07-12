@@ -151,21 +151,25 @@ const ClassPage = () => {
       title: "#UID",
       dataIndex: "_id",
       render: (_: unknown, __: unknown, index: number) => index + 1,
+      align: "center",
       key: "_id",
     },
     {
       title: "Class",
       dataIndex: "className",
+      align: "center",
       key: "className",
     },
     {
       title: "Section",
       dataIndex: "section",
+      align: "center",
       key: "section",
     },
     {
       title: "Action",
       key: "action",
+      align: "center",
       render: (_: unknown, currentRecord: any) => (
         <Space size="middle">
           <Tooltip title="Delete">

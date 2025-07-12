@@ -4,15 +4,18 @@ import ReusableForm from "../../Form/ReuseForm";
 import ReuseInput from "../../Form/ReuseInput";
 import ReuseButton from "../../Button/ReuseButton";
 import { GiClassicalKnowledge } from "react-icons/gi";
+import { useUpdateTermMutation } from "../../../redux/features/terms/termsApi";
+import tryCatchWrapper from "../../../utils/tryCatchWrapper";
 
 interface EditExamTermModalProps {
   isEditModalVisible: boolean;
   handleCancel: () => void;
+  currentRecord: any;
 }
 
 const inputStructure = [
   {
-    name: "termName",
+    name: "termsName",
     type: "text",
     inputType: "normal",
     label: "Term Name",
@@ -26,10 +29,23 @@ const inputStructure = [
 const EditExamTermModal: React.FC<EditExamTermModalProps> = ({
   isEditModalVisible,
   handleCancel,
+  currentRecord,
 }) => {
   const [form] = Form.useForm();
-  const handleFinish = (values: any) => {
-    console.log(values);
+
+  const [updateTerm] = useUpdateTermMutation();
+
+  const handleFinish = async (values: any) => {
+    const res = await tryCatchWrapper(
+      updateTerm,
+      { body: values, params: currentRecord?._id },
+      "Updating Term..."
+    );
+
+    if (res?.statusCode === 200) {
+      form.resetFields();
+      handleCancel();
+    }
   };
   return (
     <Modal

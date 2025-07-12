@@ -5,7 +5,8 @@ import ReuseInput from "../../Form/ReuseInput";
 // import { RiShieldUserFill, RiSchoolFill } from "react-icons/ri";
 // import { FaPhone } from "react-icons/fa6";
 import ReuseButton from "../../Button/ReuseButton";
-import ReuseSelect from "../../Form/ReuseSelect";
+import { useCreateManagerMutation } from "../../../redux/features/manager/managerApi";
+import tryCatchWrapper from "../../../utils/tryCatchWrapper";
 
 interface AddSchoolAdminAllManagerProps {
   isAddModalVisible: boolean;
@@ -14,13 +15,12 @@ interface AddSchoolAdminAllManagerProps {
 
 const inputStructure = [
   {
-    name: "fullName",
+    name: "name",
     type: "text",
     inputType: "normal",
     label: "Manager Name",
     placeholder: "Enter Full Name",
     labelClassName: "!font-bold",
-    // prefix: <RiSchoolFill className="mr-1 text-secondary-color" />,
     rules: [{ required: true, message: "Full Name is required" }],
   },
   {
@@ -33,6 +33,16 @@ const inputStructure = [
     // prefix: <RiShieldUserFill className="mr-1 text-secondary-color" />,
     rules: [{ required: true, message: "Admin Phone Number is required" }],
   },
+  {
+    name: "managerRole",
+    type: "text",
+    inputType: "normal",
+    label: "Manager Role",
+    placeholder: "Manager Role",
+    labelClassName: "!font-bold",
+    // prefix: <RiShieldUserFill className="mr-1 text-secondary-color" />,
+    rules: [{ required: true, message: "Admin Phone Number is required" }],
+  },
 ];
 
 const AddSchoolAdminAllManager: React.FC<AddSchoolAdminAllManagerProps> = ({
@@ -40,8 +50,20 @@ const AddSchoolAdminAllManager: React.FC<AddSchoolAdminAllManagerProps> = ({
   handleCancel,
 }) => {
   const [form] = Form.useForm();
-  const handleFinish = (values: any) => {
-    console.log(values);
+
+  const [createManager] = useCreateManagerMutation();
+
+  const handleFinish = async (values: any) => {
+    const res = await tryCatchWrapper(
+      createManager,
+      { body: values },
+      "Adding Manager..."
+    );
+
+    if (res?.statusCode === 201) {
+      form.resetFields();
+      handleCancel();
+    }
   };
   return (
     <Modal
@@ -73,17 +95,7 @@ const AddSchoolAdminAllManager: React.FC<AddSchoolAdminAllManagerProps> = ({
                   rules={input.rules}
                 />
               ))}
-              <ReuseSelect
-                Typolevel={5}
-                name="role"
-                label="Manager Role"
-                placeholder="Select Role"
-                options={[
-                  { label: "Manager", value: "manager" },
-                  { label: "Admin", value: "admin" },
-                ]}
-                rules={[{ required: true, message: "Role is required" }]}
-              />
+
               <ReuseButton
                 htmlType="submit"
                 variant="secondary"

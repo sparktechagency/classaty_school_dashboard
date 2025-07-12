@@ -1,20 +1,22 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React from "react";
 import ReuseTable from "../../utils/ReuseTable";
 import ReuseButton from "../Button/ReuseButton";
 import { IAssignment } from "../../types/AssignmentType";
-import { formetDateAndTime } from "../../utils/dateFormet";
 import { getImageUrl } from "../../helpers/config/envConfig";
-
+import dayjs from "dayjs";
+ 
 // Define the type for the props
 interface AssignmentTableProps {
   data: IAssignment[]; // Replace `unknown` with the actual type of your data array
   loading: boolean;
   setPage?: (page: number) => void; // Function to handle pagination
-  page: number;
-  total: number;
-  limit: number;
+  page?: number;
+  total?: number;
+  limit?: number;
 }
-
+ 
 const AssignmentTable: React.FC<AssignmentTableProps> = ({
   data,
   loading,
@@ -23,24 +25,22 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
   total,
   limit,
 }) => {
-  const serverUrl = getImageUrl();
-  const handleDownload = (fileUrl: string) => {
+  const handleDownload = async (record: any) => {
+    const fileUrl = `${getImageUrl()}/${record.fileUrl}`;
+    const response = await fetch(fileUrl, {
+      method: "GET",
+    });
+ 
+    const blob = await response.blob();
     const link = document.createElement("a");
-    link.href = `${serverUrl}/download/${fileUrl}`; // call your backend download endpoint
-    link.setAttribute("download", ""); // this tells browser to download
+    link.href = URL.createObjectURL(blob);
+    link.download = record.fileUrl; // or your desired filename
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
-
+ 
   const columns = [
-    {
-      title: "#UID",
-      dataIndex: "_id",
-      render: (_: unknown, __: unknown, index: number) =>
-        page * limit - limit + index + 1,
-      key: "_id",
-    },
     {
       title: "Assignment Title",
       dataIndex: "title",
@@ -49,46 +49,51 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
     {
       title: "Description",
       dataIndex: "description",
+      align: "center",
       key: "description",
     },
     {
       title: "Class",
       dataIndex: "className",
+      align: "center",
       key: "className",
     },
     {
       title: "Subject",
       dataIndex: "subject",
+      align: "center",
       key: "subject",
     },
     {
       title: "Due Date",
       dataIndex: "dueDate",
+      align: "center",
+      render: (date: string) => dayjs(date).format("D MMMM, YY"),
       key: "dueDate",
-      render: (dueDate: string) => formetDateAndTime(dueDate),
     },
     {
       title: "Mark",
       dataIndex: "marks",
+      align: "center",
       key: "marks",
     },
-
+ 
     {
       title: "Attachment",
-      dataIndex: "fileUrl",
-      key: "fileUrl",
-      render: (fileUrl: string) => (
+      key: "attachment",
+      align: "center",
+      render: (_: any, record: any) => (
         <ReuseButton
-          onClick={() => handleDownload(fileUrl)}
           className="!w-fit !text-base !py-2 !px-3"
           variant="secondary"
+          onClick={() => handleDownload(record)}
         >
           Download
         </ReuseButton>
       ),
     },
   ];
-
+ 
   return (
     <ReuseTable
       columns={columns}
@@ -98,9 +103,9 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
       total={total}
       limit={limit}
       page={page}
-      keyValue={"_id"}
+      keyValue={"email"}
     />
   );
 };
-
+ 
 export default AssignmentTable;

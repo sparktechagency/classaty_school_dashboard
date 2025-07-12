@@ -33,11 +33,13 @@ const SubjectTable: React.FC<SubjectTableProps> = ({
       dataIndex: "_id",
       render: (_: unknown, __: unknown, index: number) =>
         page * limit - limit + index + 1,
+      align: "center",
       key: "_id",
     },
     {
       title: "Subject",
       dataIndex: "subjectName",
+      align: "center",
       key: "subjectName",
     },
     {

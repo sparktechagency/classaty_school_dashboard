@@ -11,24 +11,9 @@ import {
 
 // Define the structure of the chart data
 interface ChartData {
-  name: string;
-  uv: number;
+  month: string;
+  totalPresent: number;
 }
-
-const data: ChartData[] = [
-  { name: "Jan", uv: 475 },
-  { name: "Feb", uv: 580 },
-  { name: "Mar", uv: 300 },
-  { name: "Apr", uv: 525 },
-  { name: "May", uv: 375 },
-  { name: "Jun", uv: 450 },
-  { name: "Jul", uv: 575 },
-  { name: "Aug", uv: 360 },
-  { name: "Sep", uv: 200 },
-  { name: "Oct", uv: 400 },
-  { name: "Nov", uv: 300 },
-  { name: "Dec", uv: 600 },
-];
 
 const activeDotStyle = {
   r: 8, // Size of the hover dot
@@ -37,7 +22,8 @@ const activeDotStyle = {
   fill: "#28314E", // Inside color of the hover dot
 };
 
-const Area_Chart: React.FC = () => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const Area_Chart: React.FC<ChartData[] | any> = ({ chartData }) => {
   // Formatter function to add 'K' suffix to Y-axis values
   const yAxisTickFormatter = (value: number): string => `${value}`;
 
@@ -48,7 +34,7 @@ const Area_Chart: React.FC = () => {
     <div className="w-full h-96">
       <ResponsiveContainer>
         <AreaChart
-          data={data}
+          data={chartData}
           margin={{
             top: 20,
             right: 30,
@@ -61,7 +47,7 @@ const Area_Chart: React.FC = () => {
             stroke="#434E58"
             strokeDasharray="0"
           />
-          <XAxis dataKey="name" tick={{ ...tickStyle }} tickMargin={6} />
+          <XAxis dataKey="month" tick={{ ...tickStyle }} tickMargin={6} />
           <YAxis
             tickFormatter={yAxisTickFormatter}
             tick={{ ...tickStyle }}
@@ -87,12 +73,15 @@ const Area_Chart: React.FC = () => {
             }}
             itemStyle={{ color: "#0a0a08" }} // Tooltip text color
             labelStyle={{ color: "#202020" }} // Tooltip label color
-            formatter={(value: number): [string, string] => [`${value}K`, "UV"]}
+            formatter={(value: number): [string, string] => [
+              `${value}`,
+              "Total Present",
+            ]}
             labelFormatter={(label: string) => `Month: ${label}`}
           />
           <Area
             type="monotone"
-            dataKey="uv"
+            dataKey="totalPresent"
             stroke="#28314E"
             strokeWidth={3}
             fill="url(#colorUv)"

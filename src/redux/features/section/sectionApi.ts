@@ -19,6 +19,7 @@ const sectionApi = baseApi.injectEndpoints({
       },
       providesTags: [tagTypes.section],
     }),
+    
     getSectionByClassId: build.query({
       query: ({ page, limit, searchTerm, classId }) => {
         return {

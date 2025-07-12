@@ -1,31 +1,46 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
-import { Collapse, Table, Typography, Space, Tooltip } from "antd";
 import { EditOutlined } from "@ant-design/icons";
-import { RiDeleteBin6Line } from "react-icons/ri";
+import { Collapse, Space, Table, Tooltip, Typography } from "antd";
+import dayjs from "dayjs";
+import { useEffect, useState } from "react";
 import { FiPlus } from "react-icons/fi";
+import { RiDeleteBin6Line } from "react-icons/ri";
+import {
+  useDeleteExamMutation,
+  useGetAllExamsQuery,
+} from "../../redux/features/exam/examApi";
+import {
+  useDeleteTermMutation,
+  useGetAllTermsQuery,
+} from "../../redux/features/terms/termsApi";
 import ReuseButton from "../../ui/Button/ReuseButton";
 import DeleteModal from "../../ui/Modal/DeleteModal";
-import AddExamTermModal from "../../ui/Modal/Exam/AddExamTermModal";
-import EditExamTermModal from "../../ui/Modal/Exam/EditExamTermModal";
 import AddExamModal from "../../ui/Modal/Exam/AddExamModal";
+import AddExamTermModal from "../../ui/Modal/Exam/AddExamTermModal";
+import EditExamModal from "../../ui/Modal/Exam/EditExamModal";
+import EditExamTermModal from "../../ui/Modal/Exam/EditExamTermModal";
+import tryCatchWrapper from "../../utils/tryCatchWrapper";
 
 const { Panel } = Collapse;
 
-const examData = [
-  {
-    key: "1",
-    subject: "Mathematics",
-    examDetails: "-",
-    class: "7",
-    date: "24 Apr, 25",
-    startTime: "10:00 AM",
-    classRoom: "7A-2C",
-    duration: "2 Hr",
-    assignedTeacher: "Aman Islam",
-    instruction: "-",
-  },
-];
+// Interfaces
+interface ITerm {
+  _id: string;
+  termsName: string;
+}
+
+interface IExam {
+  _id: string;
+  subjectName: string;
+  details: string;
+  className: string;
+  date: string;
+  startTime: string;
+  classRoom: string;
+  duration: string;
+  teacherName: string;
+  instruction: string;
+}
 
 const MyPanelHeader = ({
   title,
@@ -60,71 +75,131 @@ const MyPanelHeader = ({
 );
 
 const ExamPage = () => {
-  const [activeKey, setActiveKey] = useState<string[]>(["1st Term"]);
-
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
-  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  const [isEditExamModalVisible, setIsEditExamModalVisible] = useState(false);
+  const [isAddTermModalVisible, setIsAddTermModalVisible] = useState(false);
   const [isAddExamModalVisible, setIsAddExamModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
-  const [currentRecord, setCurrentRecord] = useState<any | null>(null);
+  const [currentRecord, setCurrentRecord] = useState<ITerm | null>(null);
+  const [activeKey, setActiveKey] = useState<string[]>([]);
 
-  const showAddModal = () => {
-    setIsAddModalVisible(true);
+  const { data: terms } = useGetAllTermsQuery({});
+  const [deleteTerm] = useDeleteTermMutation();
+  const [deleteExam] = useDeleteExamMutation();
+
+  useEffect(() => {
+    if (terms?.data?.length) {
+      setActiveKey([terms.data[0]._id]);
+    }
+  }, [terms]);
+
+  const { data: exams, isFetching } = useGetAllExamsQuery(
+    {
+      termsId: activeKey?.[0],
+      page: 1,
+      limit: 1000,
+    },
+    {
+      skip: !activeKey?.length,
+    }
+  );
+
+  const showAddTermModal = () => setIsAddTermModalVisible(true);
+  const showAddExamModal = () => setIsAddExamModalVisible(true);
+
+  const showEditExamModal = (record: IExam | any) => {
+    setCurrentRecord(record);
+    setIsEditExamModalVisible(true);
   };
-  const showAddExamModal = () => {
-    setIsAddExamModalVisible(true);
-  };
-  const showEditModal = () => {
+
+  const showEditModal = (record: ITerm) => {
+    setCurrentRecord(record);
     setIsEditModalVisible(true);
   };
 
-  const showDeleteModal = (record: any) => {
+  const showDeleteModal = (record: ITerm) => {
     setCurrentRecord(record);
     setIsDeleteModalVisible(true);
   };
 
   const handleCancel = () => {
-    setIsAddExamModalVisible(false);
-    setIsAddModalVisible(false);
     setIsEditModalVisible(false);
+    setIsAddTermModalVisible(false);
+    setIsAddExamModalVisible(false);
     setIsDeleteModalVisible(false);
+    setIsEditExamModalVisible(false);
     setCurrentRecord(null);
   };
 
-  const handleDelete = (record: any) => {
+  const handleDelete = async (record: ITerm) => {
     handleCancel();
-    console.log(record);
+    const res = await tryCatchWrapper(
+      deleteTerm,
+      { params: record._id },
+      "Deleting..."
+    );
+    if (res.statusCode === 200) {
+      handleCancel();
+    }
+  };
+
+  const handleExamDelete = async (record: ITerm) => {
+    handleCancel();
+    const res = await tryCatchWrapper(
+      deleteExam,
+      { params: record._id },
+      "Deleting..."
+    );
+    if (res.statusCode === 200) {
+      handleCancel();
+    }
   };
 
   const columns = [
-    { title: "Subject Name", dataIndex: "subject", key: "subject" },
-    { title: "Exam Details", dataIndex: "examDetails", key: "examDetails" },
-    { title: "Class", dataIndex: "class", key: "class" },
-    { title: "Date", dataIndex: "date", key: "date" },
+    {
+      title: "Subject Name",
+      dataIndex: "subjectName",
+      key: "subject",
+      fixed: "left",
+    },
+    {
+      title: "Exam Details",
+      dataIndex: "details",
+      width: 400,
+      key: "examDetails",
+    },
+    { title: "Class", dataIndex: "className", key: "class" },
+    {
+      title: "Date",
+      dataIndex: "date",
+      render: (date: string) => dayjs(date).format("D MMMM, YY"),
+      key: "date",
+    },
     { title: "Start Time", dataIndex: "startTime", key: "startTime" },
     { title: "Class Room", dataIndex: "classRoom", key: "classRoom" },
     { title: "Duration", dataIndex: "duration", key: "duration" },
+    { title: "Assigned Teacher", dataIndex: "teacherName", key: "teacherName" },
     {
-      title: "Assigned Teacher",
-      dataIndex: "assignedTeacher",
-      key: "assignedTeacher",
+      title: "Instruction",
+      dataIndex: "instruction",
+      width: 400,
+      key: "instruction",
     },
-    { title: "Instruction", dataIndex: "instruction", key: "instruction" },
     {
       title: "Action",
       key: "action",
       width: 80,
-      render: () => (
+      render: (_: any, record: IExam | any) => (
         <Space size="middle">
           <Tooltip title="Edit">
             <EditOutlined
-              onClick={showAddExamModal}
+              onClick={() => showEditExamModal(record)}
               style={{ cursor: "pointer", color: "#1890ff" }}
             />
           </Tooltip>
           <Tooltip title="Delete">
             <RiDeleteBin6Line
-              onClick={() => showDeleteModal(currentRecord)}
+              onClick={() => showDeleteModal(record)}
               style={{ cursor: "pointer", color: "red", fontSize: 18 }}
             />
           </Tooltip>
@@ -139,56 +214,79 @@ const ExamPage = () => {
         <p className="text-xl sm:text-2xl lg:text-3xl text-secondary-color font-bold">
           Exam
         </p>
-        <div className="h-fit">
-          <div className="h-fit">
-            <ReuseButton
-              variant="secondary"
-              className="!py-4.5"
-              onClick={showAddModal}
-            >
-              <FiPlus className="!text-base" /> Add New Term
-            </ReuseButton>
-          </div>
-        </div>
+        <ReuseButton
+          variant="secondary"
+          className="!py-4.5 w-fit"
+          onClick={showAddTermModal}
+        >
+          <FiPlus className="!text-base" /> Add New Term
+        </ReuseButton>
       </div>
 
+      {/* Modals */}
       <AddExamTermModal
-        isAddModalVisible={isAddModalVisible}
+        isAddModalVisible={isAddTermModalVisible}
         handleCancel={handleCancel}
       />
       <EditExamTermModal
         isEditModalVisible={isEditModalVisible}
         handleCancel={handleCancel}
+        currentRecord={currentRecord}
       />
       <AddExamModal
         isAddExamModalVisible={isAddExamModalVisible}
         handleCancel={handleCancel}
-      />
-      <Collapse
         activeKey={activeKey}
-        onChange={(key) => setActiveKey(Array.isArray(key) ? key : [key])}
+      />
+      <EditExamModal
+        isEditExamModalVisible={isEditExamModalVisible}
+        handleCancel={handleCancel}
+        currentRecord={currentRecord}
+      />
+      <DeleteModal
+        isDeleteModalVisible={isDeleteModalVisible}
+        handleCancel={handleCancel}
+        currentRecord={currentRecord}
+        handleDelete={handleDelete}
+        description="Are you sure you want to delete this?"
+      />
+
+      <DeleteModal
+        isDeleteModalVisible={isDeleteModalVisible}
+        handleCancel={handleCancel}
+        currentRecord={currentRecord}
+        handleDelete={handleExamDelete}
+        description="Are you sure you want to delete this?"
+      />
+
+      {/* Collapse Panel */}
+      <Collapse
+        accordion
+        activeKey={activeKey}
+        onChange={(key) => setActiveKey(key)}
         bordered={false}
         expandIconPosition="right"
         style={{ backgroundColor: "#ffffff" }}
       >
-        {["1st Term", "2nd Term", "Mid Term"].map((term) => (
+        {terms?.data?.map((term: ITerm) => (
           <Panel
-            key={term}
+            key={term._id}
             header={
               <MyPanelHeader
-                title={term}
-                onEdit={showEditModal}
+                title={term.termsName}
+                onEdit={() => showEditModal(term)}
                 onDelete={() => showDeleteModal(term)}
               />
             }
           >
-            {term === "1st Term" && (
+            {activeKey.includes(term._id) ? (
               <>
                 <Table
                   columns={columns}
-                  dataSource={examData}
+                  dataSource={exams?.data?.result}
                   pagination={false}
-                  rowKey="key"
+                  loading={isFetching}
+                  rowKey="_id"
                   scroll={{ x: "max-content" }}
                   bordered
                   size="middle"
@@ -202,9 +300,8 @@ const ExamPage = () => {
                   Add Exam
                 </ReuseButton>
               </>
-            )}
-            {term !== "1st Term" && (
-              <div className="flex flex-col ">
+            ) : (
+              <div className="flex flex-col">
                 <Typography.Title
                   level={4}
                   className="!text-secondary-color !text-center"
@@ -224,13 +321,6 @@ const ExamPage = () => {
           </Panel>
         ))}
       </Collapse>
-      <DeleteModal
-        isDeleteModalVisible={isDeleteModalVisible}
-        handleCancel={handleCancel}
-        currentRecord={currentRecord}
-        handleDelete={handleDelete}
-        description=" Are You Sure You want to Delete This ?"
-      />
     </div>
   );
 };

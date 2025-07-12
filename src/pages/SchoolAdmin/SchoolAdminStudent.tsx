@@ -1,27 +1,37 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
+import ReuseSearchInput from "../../ui/Form/ReuseSearchInput";
 import BlockModal from "../../ui/Modal/BlockModal";
 import UnblockModal from "../../ui/Modal/UnblockModal";
-import ReuseSearchInput from "../../ui/Form/ReuseSearchInput";
 
-import SchoolAdminStudentData from "../../../public/data/SchoolAdminStudent";
-import DeleteModal from "../../ui/Modal/DeleteModal";
-import ReuseButton from "../../ui/Button/ReuseButton";
 import { FiPlus } from "react-icons/fi";
-import SchoolAdminStudentTable from "../../ui/Tables/SchoolAdminStudentTable";
-import AddSchoolAdminStudent from "../../ui/Modal/SchoolAdminStudent/AddSchoolAdminStudent";
-import ViewSchoolAdminStudent from "../../ui/Modal/SchoolAdminStudent/ViewSchoolAdminStudent";
 import { MdDownload, MdFileUpload } from "react-icons/md";
-import SendNotification from "../../ui/Modal/SchoolAdminStudent/SendNotification";
+import { useGetAllStudentsQuery } from "../../redux/features/school/schoolApi";
+import {
+  useDeleteStudentMutation,
+  useUserActionMutation
+} from "../../redux/features/student/studentAPi";
+import ReuseButton from "../../ui/Button/ReuseButton";
+import DeleteModal from "../../ui/Modal/DeleteModal";
+import AddSchoolAdminStudent from "../../ui/Modal/SchoolAdminStudent/AddSchoolAdminStudent";
 import EditSchoolAdminStudent from "../../ui/Modal/SchoolAdminStudent/EditSchoolAdminStudent";
+import SendNotification from "../../ui/Modal/SchoolAdminStudent/SendNotification";
+import ViewSchoolAdminStudent from "../../ui/Modal/SchoolAdminStudent/ViewSchoolAdminStudent";
+import SchoolAdminStudentTable from "../../ui/Tables/SchoolAdminStudentTable";
+import tryCatchWrapper from "../../utils/tryCatchWrapper";
 
 const SchoolAdminStudent = () => {
-  const data: any[] = SchoolAdminStudentData;
   const [page, setPage] = useState(1);
   const [searchText, setSearchText] = useState("");
   console.log(searchText);
 
   const limit = 12;
+
+  const { data: studentData, isFetching } = useGetAllStudentsQuery({
+    page,
+    limit,
+    searchTerm: searchText,
+  });
 
   const [isSendModalVisible, setIsSendModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
@@ -31,6 +41,9 @@ const SchoolAdminStudent = () => {
   const [isUnblockModalVisible, setIsUnblockModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [currentRecord, setCurrentRecord] = useState<any | null>(null);
+
+  const [userAction] = useUserActionMutation();
+  const [deleteStudent] = useDeleteStudentMutation();
 
   const showAddModal = () => {
     setIsAddModalVisible(true);
@@ -83,17 +96,44 @@ const SchoolAdminStudent = () => {
 
   const handleBlock = (record: any) => {
     handleCancel();
-    console.log(record);
+
+    tryCatchWrapper(
+      userAction,
+      {
+        body: {
+          userId: record?.userId,
+          action: "blocked",
+        },
+      },
+      "Blocking..."
+    );
   };
+
   const handleUnblock = (record: any) => {
+    tryCatchWrapper(
+      userAction,
+      {
+        body: {
+          userId: record?.userId,
+          action: "active",
+        },
+      },
+      "Blocking..."
+    );
     handleCancel();
-    console.log(record);
   };
 
   const handleDelete = (record: any) => {
     handleCancel();
-    console.log(record);
+    tryCatchWrapper(
+      deleteStudent,
+      {
+        params: record?._id,
+      },
+      "Deleting..."
+    );
   };
+
   return (
     <div className=" bg-primary-color rounded-xl p-4 min-h-[90vh]">
       <div className="flex justify-between items-center mb-5">
@@ -127,8 +167,8 @@ const SchoolAdminStudent = () => {
       </div>
       <div className="border-2 border-[#e1e1e1] rounded-xl rounded-tr-xl">
         <SchoolAdminStudentTable
-          data={data}
-          loading={false}
+          data={studentData?.data?.result}
+          loading={isFetching}
           showEditModal={showEditModal}
           showViewModal={showViewUserModal}
           showSendModal={showSendModal}
@@ -136,7 +176,7 @@ const SchoolAdminStudent = () => {
           showUnblockModal={showUnblockModal}
           setPage={setPage}
           page={page}
-          total={data.length}
+          total={studentData?.data?.meta?.total}
           limit={limit}
         />
       </div>
@@ -148,6 +188,7 @@ const SchoolAdminStudent = () => {
       <EditSchoolAdminStudent
         isEditModalVisible={isEditModalVisible}
         handleCancel={handleCancel}
+        currentRecord={currentRecord}
       />
       <SendNotification
         isSendModalVisible={isSendModalVisible}

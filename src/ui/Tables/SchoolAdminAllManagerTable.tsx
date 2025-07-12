@@ -39,15 +39,11 @@ const SchoolAdminAllManagerTable: React.FC<SchoolAdminAllManagerTableProps> = ({
       key: "_id",
     },
     {
-      title: " Name",
-      dataIndex: "fullName", // Data key for fullName
-      key: "fullName",
+      title: "Name",
+      dataIndex: "name", // Data key for fullName
+      key: "name",
     },
-    {
-      title: "Email",
-      dataIndex: "email", // Data key for email
-      key: "email",
-    },
+
     {
       title: "Phone Number",
       dataIndex: "phoneNumber", // Data key for phoneNumber
@@ -55,12 +51,15 @@ const SchoolAdminAllManagerTable: React.FC<SchoolAdminAllManagerTableProps> = ({
     },
     {
       title: "Role",
-      dataIndex: "role", // Data key for role
+      dataIndex: "role",
+
+      render: (role: string) => <div className="capitalize">{role}</div>,
+      // Data key for role
       key: "role",
     },
     {
       title: "Status",
-      dataIndex: "Status",
+      dataIndex: "status",
       key: "Status",
       filters: [
         { text: "Active", value: "Active" },
@@ -68,16 +67,15 @@ const SchoolAdminAllManagerTable: React.FC<SchoolAdminAllManagerTableProps> = ({
       ],
       onFilter: (value: string, record: any) => record.Status === value,
       render: (status: string) => (
-        <span style={{ color: status === "Active" ? "green" : "red" }}>
+        <span
+          className="capitalize"
+          style={{ color: status === "active" ? "green" : "red" }}
+        >
           {status}
         </span>
       ),
     },
-    {
-      title: "Address",
-      dataIndex: "address", // Data key for address
-      key: "address",
-    },
+
     {
       title: "Action",
       key: "action",
@@ -103,23 +101,30 @@ const SchoolAdminAllManagerTable: React.FC<SchoolAdminAllManagerTableProps> = ({
 
           {/* Block User Tooltip */}
 
-          <Tooltip placement="left" title="Unblock">
-            <button
-              className="!p-0 !bg-transparent !border-none !text-base-color cursor-pointer hidden"
-              onClick={() => showUnblockModal(record)}
-            >
-              <CgUnblock style={{ fontSize: "24px" }} />
-            </button>
-          </Tooltip>
-
-          <Tooltip placement="left" title="Block">
-            <button
-              className="!p-0 !bg-transparent !border-none !text-error-color cursor-pointer"
-              onClick={() => showBlockModal(record)}
-            >
-              <MdBlock style={{ fontSize: "24px" }} />
-            </button>
-          </Tooltip>
+          {record?.status === "active" ? (
+            <>
+              {" "}
+              <Tooltip placement="left" title="Block">
+                <button
+                  className="!p-0 !bg-transparent !border-none !text-error-color cursor-pointer"
+                  onClick={() => showBlockModal(record)}
+                >
+                  <MdBlock style={{ fontSize: "24px" }} />
+                </button>
+              </Tooltip>
+            </>
+          ) : (
+            <>
+              <Tooltip placement="left" title="Unblock">
+                <button
+                  className="!p-0 !bg-transparent !border-none !text-base-color cursor-pointer"
+                  onClick={() => showUnblockModal(record)}
+                >
+                  <CgUnblock style={{ fontSize: "24px" }} />
+                </button>
+              </Tooltip>
+            </>
+          )}
         </Space>
       ),
       align: "center",

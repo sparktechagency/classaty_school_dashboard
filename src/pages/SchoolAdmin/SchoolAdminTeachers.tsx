@@ -1,22 +1,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
+import ReuseSearchInput from "../../ui/Form/ReuseSearchInput";
 import BlockModal from "../../ui/Modal/BlockModal";
 import UnblockModal from "../../ui/Modal/UnblockModal";
-import ReuseSearchInput from "../../ui/Form/ReuseSearchInput";
 
-import SchoolAdminTeacher from "../../../public/data/SchoolAdminTeacher";
-import DeleteModal from "../../ui/Modal/DeleteModal";
-import ReuseButton from "../../ui/Button/ReuseButton";
 import { FiPlus } from "react-icons/fi";
-import SchoolAdminTeacherTable from "../../ui/Tables/SchoolAdminTeacherTable";
-import SchoolAdminTeacherView from "../../ui/Modal/SchoolAdminTeacher/SchoolAdminTeacherView";
+import { useGetTeacherQuery } from "../../redux/features/teacher/teacherApi";
+import ReuseButton from "../../ui/Button/ReuseButton";
+import DeleteModal from "../../ui/Modal/DeleteModal";
 import AddSchoolAdminTeacher from "../../ui/Modal/SchoolAdminTeacher/AddSchoolAdminTeacher";
+import SchoolAdminTeacherView from "../../ui/Modal/SchoolAdminTeacher/SchoolAdminTeacherView";
+import SchoolAdminTeacherTable from "../../ui/Tables/SchoolAdminTeacherTable";
+import { useUserActionMutation } from "../../redux/features/student/studentAPi";
+import tryCatchWrapper from "../../utils/tryCatchWrapper";
 
 const SchoolAdminTeachers = () => {
-  const data: any[] = SchoolAdminTeacher;
   const [page, setPage] = useState(1);
   const [searchText, setSearchText] = useState("");
-  console.log(searchText);
 
   const limit = 12;
 
@@ -26,6 +26,14 @@ const SchoolAdminTeachers = () => {
   const [isUnblockModalVisible, setIsUnblockModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [currentRecord, setCurrentRecord] = useState<any | null>(null);
+
+  const [userAction] = useUserActionMutation();
+
+  const { data: teacherData, isFetching } = useGetTeacherQuery({
+    page,
+    limit,
+    searchTerm: searchText,
+  });
 
   const showAddModal = () => {
     setIsAddModalVisible(true);
@@ -65,18 +73,37 @@ const SchoolAdminTeachers = () => {
   };
 
   const handleBlock = (record: any) => {
+    tryCatchWrapper(
+      userAction,
+      {
+        body: {
+          userId: record?.userId,
+          action: "blocked",
+        },
+      },
+      "Blocking..."
+    );
     handleCancel();
-    console.log(record);
   };
   const handleUnblock = (record: any) => {
     handleCancel();
-    console.log(record);
+    tryCatchWrapper(
+      userAction,
+      {
+        body: {
+          userId: record?.userId,
+          action: "active",
+        },
+      },
+      "Unblocking..."
+    );
   };
 
   const handleDelete = (record: any) => {
     handleCancel();
     console.log(record);
   };
+
   return (
     <div className=" bg-primary-color rounded-xl p-4 min-h-[90vh]">
       <div className="flex justify-between items-center mb-5">
@@ -104,14 +131,14 @@ const SchoolAdminTeachers = () => {
       </div>
       <div className="border-2 border-[#e1e1e1] rounded-xl rounded-tr-xl">
         <SchoolAdminTeacherTable
-          data={data}
-          loading={false}
+          data={teacherData?.data?.result}
+          loading={isFetching}
           showViewModal={showViewUserModal}
           showBlockModal={showBlockModal}
           showUnblockModal={showUnblockModal}
           setPage={setPage}
           page={page}
-          total={data.length}
+          total={teacherData?.data?.meta?.total}
           limit={limit}
         />
       </div>
