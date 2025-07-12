@@ -1,12 +1,12 @@
 import { baseApi } from "../../api/baseApi";
 import { tagTypes } from "../../tagTypes";
-
+ 
 const announcement_url = "/announcement";
-
+ 
 const announcementApi = baseApi.injectEndpoints({
     endpoints: (build) => ({
-
-
+ 
+ 
         createAnnouncement: build.mutation({
             query: (req) => ({
                 url: `${announcement_url}/create`,
@@ -15,8 +15,8 @@ const announcementApi = baseApi.injectEndpoints({
             }),
             invalidatesTags: [tagTypes.announcement],
         }),
-
-
+ 
+ 
         getAllAnnouncements: build.query({
             query: ({ page, limit, searchTerm }) => {
                 return {
@@ -31,7 +31,7 @@ const announcementApi = baseApi.injectEndpoints({
             },
             providesTags: [tagTypes.announcement],
         }),
-
+ 
         updateAnnouncement: build.mutation({
             query: (req) => ({
                 url: `${announcement_url}/${req?.params}`,
@@ -40,7 +40,7 @@ const announcementApi = baseApi.injectEndpoints({
             }),
             invalidatesTags: [tagTypes.announcement],
         }),
-
+ 
         deleteAnnouncement: build.mutation({
             query: (req) => ({
                 url: `${announcement_url}/${req?.params}`,
@@ -50,12 +50,12 @@ const announcementApi = baseApi.injectEndpoints({
         }),
     }),
 });
-
+ 
 export const {
     useGetAllAnnouncementsQuery,
     useCreateAnnouncementMutation,
     useUpdateAnnouncementMutation,
     useDeleteAnnouncementMutation,
 } = announcementApi;
-
+ 
 export default announcementApi;

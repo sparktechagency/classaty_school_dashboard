@@ -8,49 +8,49 @@ import AddAnouncementModal from "../../ui/Modal/Anouncement/AddAnouncementModal"
 import AnouncementViewModal from "../../ui/Modal/Anouncement/AnouncementViewModal";
 import DeleteModal from "../../ui/Modal/DeleteModal";
 import AnouncemantTable from "../../ui/Tables/AnouncemantTable";
-
+ 
 const AnnouncementPage = () => {
   const [page, setPage] = useState(1);
   const [searchText, setSearchText] = useState("");
-
+ 
   const limit = 12;
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [currentRecord, setCurrentRecord] = useState<IAnounceType | null>(null);
-
+ 
   const { data: announcements, isFetching } = useGetAllAnnouncementsQuery({
     page,
     limit,
     searchTerm: searchText,
   });
-
+ 
   const showAddModal = () => {
     setIsAddModalVisible(true);
   };
-
+ 
   const showViewUserModal = (record: IAnounceType) => {
     setCurrentRecord(record);
     setIsViewModalVisible(true);
   };
-
+ 
   const showDeleteModal = (record: IAnounceType) => {
     setCurrentRecord(record);
     setIsDeleteModalVisible(true);
   };
-
+ 
   const handleCancel = () => {
     setIsAddModalVisible(false);
     setIsViewModalVisible(false);
     setIsDeleteModalVisible(false);
     setCurrentRecord(null);
   };
-
+ 
   const handleDelete = (record: IAnounceType) => {
     handleCancel();
     console.log(record);
   };
-
+ 
   return (
     <div className=" bg-primary-color rounded-xl p-4 min-h-[90vh]">
       <div className="flex justify-between items-center mb-5">
@@ -109,5 +109,5 @@ const AnnouncementPage = () => {
     </div>
   );
 };
-
+ 
 export default AnnouncementPage;

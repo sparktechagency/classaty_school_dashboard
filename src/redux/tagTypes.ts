@@ -19,7 +19,7 @@ export const tagTypes = {
   gradeSystem: "GradeSystem",
   manager: "Manager"
 };
-
+ 
 export const tagTypesList = [
   tagTypes.auth,
   tagTypes.school,

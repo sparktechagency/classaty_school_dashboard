@@ -6,7 +6,7 @@ import ReuseButton from "../Button/ReuseButton";
 import { IAssignment } from "../../types/AssignmentType";
 import { getImageUrl } from "../../helpers/config/envConfig";
 import dayjs from "dayjs";
-
+ 
 // Define the type for the props
 interface AssignmentTableProps {
   data: IAssignment[]; // Replace `unknown` with the actual type of your data array
@@ -16,7 +16,7 @@ interface AssignmentTableProps {
   total?: number;
   limit?: number;
 }
-
+ 
 const AssignmentTable: React.FC<AssignmentTableProps> = ({
   data,
   loading,
@@ -30,7 +30,7 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
     const response = await fetch(fileUrl, {
       method: "GET",
     });
-
+ 
     const blob = await response.blob();
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
@@ -39,7 +39,7 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
     link.click();
     document.body.removeChild(link);
   };
-
+ 
   const columns = [
     {
       title: "Assignment Title",
@@ -77,7 +77,7 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
       align: "center",
       key: "marks",
     },
-
+ 
     {
       title: "Attachment",
       key: "attachment",
@@ -93,7 +93,7 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
       ),
     },
   ];
-
+ 
   return (
     <ReuseTable
       columns={columns}
@@ -107,5 +107,5 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
     />
   );
 };
-
+ 
 export default AssignmentTable;
