@@ -45,18 +45,22 @@ const ConversationChatList = ({ userData, onlineUsers }: any) => {
       return;
     }
 
-    const handleNewMessageSocket = (message: any) => {
+    socket.on("new_message", (message: any) => {
       console.log("📨 New Message Received from socket:", message);
-    };
-
-    socket.on("new_message", handleNewMessageSocket);
+    });
     socket.on("online_users", (online: any) => {
       console.log("Online Users:", online);
       dispatch(setOnlineUsers(online));
     });
 
+    // const handleNewMessageSocket = (message: any) => {
+    //   console.log("📨 New Message Received from socket:", message);
+    // };
+
     return () => {
-      socket.off("new_message", handleNewMessageSocket);
+      socket.off("new_message", (message: any) => {
+        console.log("📨 New Message Received from socket:", message);
+      });
     };
   }, [dispatch, socket]);
 

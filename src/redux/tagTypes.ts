@@ -19,6 +19,10 @@ export const tagTypes = {
   gradeSystem: "GradeSystem",
   manager: "Manager",
   conversation: "Conversation",
+  subscription: "Subscription",
+  allAdmin: "AllAdmin",
+  adminOverview: "AdminOverview",
+  profile: "Profile",
 };
 
 export const tagTypesList = [
@@ -42,4 +46,8 @@ export const tagTypesList = [
   tagTypes.gradeSystem,
   tagTypes.manager,
   tagTypes.conversation,
+  tagTypes.subscription,
+  tagTypes.allAdmin,
+  tagTypes.adminOverview,
+  tagTypes.profile,
 ];

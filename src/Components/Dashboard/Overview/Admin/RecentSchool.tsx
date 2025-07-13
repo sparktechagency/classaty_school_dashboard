@@ -1,21 +1,28 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
-import BlockModal from "../../../../ui/Modal/BlockModal";
-import UnblockModal from "../../../../ui/Modal/UnblockModal";
-import UserModal from "../../../../ui/Modal/User/SchoolModal";
-import SchoolsData from "../../../../../public/data/SchoolData";
 import DeleteModal from "../../../../ui/Modal/DeleteModal";
 import AllSchoolTable from "../../../../ui/Tables/SchoolTable";
 import EditSchoolModal from "../../../../ui/Modal/User/EditSchoolModal";
+import SchoolModal from "../../../../ui/Modal/User/SchoolModal";
+import tryCatchWrapper from "../../../../utils/tryCatchWrapper";
+import { ISchoolDetails } from "../../../../types";
+import {
+  useDeleteSchoolMutation,
+  useGetSchoolQuery,
+} from "../../../../redux/features/school/schoolApi";
 
 const RecentSchool = () => {
-  const recentUserData: any[] = SchoolsData.slice(0, 6);
+  const { data, isFetching } = useGetSchoolQuery({
+    page: 1,
+    limit: 6,
+    searchTerm: "",
+  });
+  const [deleteSchool] = useDeleteSchoolMutation();
+  const schoolData: ISchoolDetails[] = data?.data?.result;
+  const schoolPagination = data?.data?.meta;
 
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
-
-  const [isBlockModalVisible, setIsBlockModalVisible] = useState(false);
-  const [isUnblockModalVisible, setIsUnblockModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
 
   const [currentRecord, setCurrentRecord] = useState<any | null>(null);
@@ -30,15 +37,6 @@ const RecentSchool = () => {
     setIsEditModalVisible(true);
   };
 
-  const showBlockModal = (record: any) => {
-    setCurrentRecord(record);
-    setIsBlockModalVisible(true);
-  };
-  const showUnblockModal = (record: any) => {
-    setCurrentRecord(record);
-    setIsUnblockModalVisible(true);
-  };
-
   const showDeleteModal = (record: any) => {
     setCurrentRecord(record);
     setIsDeleteModalVisible(true);
@@ -46,8 +44,6 @@ const RecentSchool = () => {
 
   const handleCancel = () => {
     setIsViewModalVisible(false);
-    setIsBlockModalVisible(false);
-    setIsUnblockModalVisible(false);
     setIsDeleteModalVisible(false);
     setCurrentRecord(null);
   };
@@ -57,16 +53,15 @@ const RecentSchool = () => {
     // setCurrentRecord(null);
   };
 
-  const handleBlock = (data: any) => {
-    console.log("block", data);
-  };
-  const handleUnblock = (data: any) => {
-    console.log("unblock", data);
-  };
-
-  const handleDelete = (record: any) => {
-    handleCancel();
-    console.log(record);
+  const handleDelete = async (data: ISchoolDetails) => {
+    const res = await tryCatchWrapper(
+      deleteSchool,
+      { params: data?.school?._id },
+      "Deleting..."
+    );
+    if (res.statusCode === 200) {
+      handleCancel();
+    }
   };
   return (
     <div className="mt-10 rounded-xl">
@@ -75,41 +70,32 @@ const RecentSchool = () => {
           Recent Added School
         </p>
       </div>
-      <div className="border-2 border-[#e1e1e1] rounded-tl-xl rounded-tr-xl">
+      <div className="border-2 border-[#e1e1e1] rounded-xl rounded-tr-xl">
         <AllSchoolTable
-          data={recentUserData}
-          loading={false}
+          data={schoolData}
+          loading={isFetching}
           showViewModal={showViewUserModal}
-          showBlockModal={showBlockModal}
           showEditModal={showEditModal}
-          showUnblockModal={showUnblockModal}
-          showFilter={false}
+          setPage={undefined}
+          page={1}
+          total={schoolPagination?.total}
+          limit={6}
         />
       </div>
+
       <EditSchoolModal
         isEditModalVisible={isEditModalVisible}
         handleCancel={handleCancel}
+        currentRecord={currentRecord}
       />
-      <UserModal
+
+      <SchoolModal
         isViewModalVisible={isViewModalVisible}
         handleCancel={handleCancel}
         currentRecord={currentRecord}
         showDeleteModal={showDeleteModal}
       />
-      <BlockModal
-        isBlockModalVisible={isBlockModalVisible}
-        handleCancel={handleCancel}
-        currentRecord={currentRecord}
-        handleBlock={handleBlock}
-        description=" Are You Sure You want to Block This School?"
-      />
-      <UnblockModal
-        isUnblockModalVisible={isUnblockModalVisible}
-        handleCancel={handleCancel}
-        currentRecord={currentRecord}
-        handleUnblock={handleUnblock}
-        description=" Are You Sure You want to Unblock This School?"
-      />
+
       <DeleteModal
         isDeleteModalVisible={isDeleteModalVisible}
         handleCancel={handleDeleteCancel}

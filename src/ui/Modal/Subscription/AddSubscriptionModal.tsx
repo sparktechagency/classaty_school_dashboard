@@ -11,6 +11,8 @@ import {
 } from "antd";
 import { useState } from "react";
 import { MdDelete } from "react-icons/md";
+import tryCatchWrapper from "../../../utils/tryCatchWrapper";
+import { useAddSubscriptionMutation } from "../../../redux/features/subscription/subscriptionApi";
 
 interface Feature {
   feature: string;
@@ -25,15 +27,16 @@ const AddSubscriptionModal: React.FC<AddSubscriptionModalProps> = ({
   isModalOpen,
   setIsModalOpen,
 }) => {
+  const [addSubscription] = useAddSubscriptionMutation();
   const { Panel } = Collapse;
   const [form] = Form.useForm();
-  const [featureList, setFeatureList] = useState<Feature[]>([{ feature: "" }]); // Initial feature
-  const [activeKey, setActiveKey] = useState<string[]>(["0"]); // Track the active panel
+  const [featureList, setFeatureList] = useState<Feature[]>([{ feature: "" }]);
+  const [activeKey, setActiveKey] = useState<string[]>(["0"]);
 
   const handleAddQus = () => {
-    const newfeatureList = [...featureList, { feature: "" }]; // Add new feature
+    const newfeatureList = [...featureList, { feature: "" }];
     setFeatureList(newfeatureList);
-    setActiveKey([String(newfeatureList.length - 1)]); // Set the new panel as active
+    setActiveKey([String(newfeatureList.length - 1)]);
   };
 
   const handleFeatureChange = (index: number, value: string) => {
@@ -45,8 +48,6 @@ const AddSubscriptionModal: React.FC<AddSubscriptionModalProps> = ({
   const handleRemoveFeature = (index: number) => {
     const newFeatureList = featureList.filter((_, i) => i !== index);
     setFeatureList(newFeatureList);
-
-    // Adjust active key if the removed feature was the active one
     if (index === parseInt(activeKey[0])) {
       setActiveKey([String(newFeatureList.length - 1)]);
     }
@@ -56,14 +57,25 @@ const AddSubscriptionModal: React.FC<AddSubscriptionModalProps> = ({
     const values = await form.validateFields();
     const formattedFeatures = featureList.map((item) => item.feature);
 
-    // Create a new subscription object
     const newSubscription = {
-      name: values.name,
+      planName: values.planName,
       price: parseInt(values.price),
-      duration: parseInt(values.duration),
+      timeline: parseInt(values.timeline),
+      numberOfChildren: parseInt(values.numberOfChildren),
       features: formattedFeatures,
     };
-    console.log(newSubscription);
+
+    const res = await tryCatchWrapper(
+      addSubscription,
+      { body: newSubscription },
+      "Adding Subscription..."
+    );
+
+    if (res.statusCode === 200) {
+      form.resetFields();
+      setIsModalOpen(false);
+      setFeatureList([{ feature: "" }]);
+    }
   };
 
   return (
@@ -72,53 +84,46 @@ const AddSubscriptionModal: React.FC<AddSubscriptionModalProps> = ({
       onCancel={() => setIsModalOpen(false)}
       footer={null}
     >
-      <Form
-        form={form}
-        layout="vertical"
-        initialValues={{
-          facilities: ["Boost voucher to popular"],
-        }}
-        className="p-4 mt-5"
-      >
+      <Form form={form} layout="vertical" className="p-4 mt-5">
         <Typography.Title level={5}>Plan Name</Typography.Title>
         <Form.Item
-          name="name"
+          name="planName"
           rules={[{ required: true, message: "Please input the plan name!" }]}
-          style={{ fontWeight: "500" }}
         >
           <Input
             placeholder="Enter plan name"
-            className="font-medium h-12  !text-base-color  placeholder:text-gray-700 border !border-secondary-color"
+            className="h-12 !text-base-color placeholder:text-gray-700 border !border-secondary-color"
           />
         </Form.Item>
 
-        <Typography.Title level={5}>Plan Price- Monthly</Typography.Title>
+        <Typography.Title level={5}>Plan Price</Typography.Title>
         <Form.Item
-          name="monthlyPrice"
+          name="price"
           rules={[{ required: true, message: "Please input the plan price!" }]}
-          style={{ fontWeight: "500" }}
         >
           <Input
-            placeholder="Enter plan price"
             type="number"
-            className="font-medium h-12  !text-base-color  placeholder:text-gray-700 border !border-secondary-color"
+            placeholder="Enter plan price"
+            className="h-12 !text-base-color placeholder:text-gray-700 border !border-secondary-color"
           />
         </Form.Item>
-        <Typography.Title level={5}>Plan Price- Yearly</Typography.Title>
+
+        <Typography.Title level={5}>Number of Children</Typography.Title>
         <Form.Item
-          name="yearlyPrice"
-          rules={[{ required: true, message: "Please input the plan price!" }]}
-          style={{ fontWeight: "500" }}
+          name="numberOfChildren"
+          rules={[
+            { required: true, message: "Please input number of children!" },
+          ]}
         >
           <Input
-            placeholder="Enter plan price"
             type="number"
-            className="font-medium h-12  !text-base-color  placeholder:text-gray-700 border !border-secondary-color"
+            placeholder="Enter number of children"
+            className="h-12 !text-base-color placeholder:text-gray-700 border !border-secondary-color"
           />
         </Form.Item>
 
         <Typography.Title level={5}>Features</Typography.Title>
-        <Form.Item name="features" style={{ fontWeight: "500" }}>
+        <Form.Item name="features">
           <ConfigProvider
             theme={{
               components: {
@@ -143,7 +148,7 @@ const AddSubscriptionModal: React.FC<AddSubscriptionModalProps> = ({
                 <Panel
                   header={`Feature ${index + 1}`}
                   key={String(index)}
-                  className="!text-base-color bg-primary-color flex flex-col gap-1"
+                  className="!text-base-color bg-primary-color"
                   extra={
                     featureList.length > 1 && (
                       <button
@@ -155,24 +160,21 @@ const AddSubscriptionModal: React.FC<AddSubscriptionModalProps> = ({
                     )
                   }
                 >
-                  <div className="flex flex-col gap-3">
-                    <Input
-                      value={faq.feature}
-                      placeholder="Type your feature"
-                      onChange={(e) =>
-                        handleFeatureChange(index, e.target.value)
-                      }
-                      className="h-10  border !border-secondary-color  !text-base-color placeholder:text-gray-600"
-                    />
-                  </div>
+                  <Input
+                    value={faq.feature}
+                    placeholder="Type your feature"
+                    onChange={(e) => handleFeatureChange(index, e.target.value)}
+                    className="h-10 border !border-secondary-color !text-base-color placeholder:text-gray-600"
+                  />
                 </Panel>
               ))}
             </Collapse>
           </ConfigProvider>
+
           <Button
             block
-            className="!mt-5"
             onClick={handleAddQus}
+            className="!mt-5"
             style={{
               padding: "1px",
               fontSize: "16px",
@@ -180,37 +182,23 @@ const AddSubscriptionModal: React.FC<AddSubscriptionModalProps> = ({
               color: "#ffffff",
               background: "#28314E",
               height: "40px",
-              border: "1px solid #28314E ",
+              border: "1px solid #28314E",
             }}
           >
-            <PlusOutlined />
-            Add More Features
+            <PlusOutlined /> Add More Features
           </Button>
         </Form.Item>
 
         <Typography.Title level={5}>Timeline</Typography.Title>
         <Form.Item
-          name="duration"
-          style={{ fontWeight: "500" }}
+          name="timeline"
           rules={[{ required: true, message: "Please select a timeline!" }]}
         >
-          <Radio.Group className="font-normal w-full flex flex-col">
-            <Radio value={30}>
-              {" "}
-              <span className="font-normal text-base-color">30 Days</span>{" "}
-            </Radio>
-            <Radio value={90}>
-              {" "}
-              <span className="font-normal text-base-color">90 Days</span>{" "}
-            </Radio>
-            <Radio value={180}>
-              {" "}
-              <span className="font-normal text-base-color">180 Days</span>{" "}
-            </Radio>
-            <Radio value={365}>
-              {" "}
-              <span className="font-normal text-base-color">1 Year</span>{" "}
-            </Radio>
+          <Radio.Group className="w-full flex flex-col">
+            <Radio value={30}>30 Days</Radio>
+            <Radio value={90}>90 Days</Radio>
+            <Radio value={180}>180 Days</Radio>
+            <Radio value={365}>1 Year</Radio>
           </Radio.Group>
         </Form.Item>
 

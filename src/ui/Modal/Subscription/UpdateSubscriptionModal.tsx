@@ -10,6 +10,8 @@ import {
   Typography,
 } from "antd";
 import { useEffect, useState } from "react";
+import tryCatchWrapper from "../../../utils/tryCatchWrapper";
+import { useUpdateSubscriptionMutation } from "../../../redux/features/subscription/subscriptionApi";
 
 const { Panel } = Collapse;
 
@@ -19,12 +21,12 @@ interface Feature {
 
 interface SubscriptionRecord {
   _id?: string;
-  name?: string;
+  planName?: string;
   price?: number;
-  monthlyPrice?: number;
-  yearlyPrice?: number;
   duration?: number | string;
   features?: string[];
+  timeline?: number;
+  numberOfChildren?: number;
 }
 
 interface UpdateSubscriptionModalProps {
@@ -38,18 +40,17 @@ const UpdateSubscriptionModal: React.FC<UpdateSubscriptionModalProps> = ({
   handleCancelUpdateModal,
   currentRecord,
 }) => {
+  const [updateSubscription] = useUpdateSubscriptionMutation();
   const [form] = Form.useForm();
   const [featureList, setFeatureList] = useState<Feature[]>([]);
   const [activeKey, setActiveKey] = useState<string[]>(["0"]);
 
   useEffect(() => {
     form.setFieldsValue({
-      name: currentRecord?.name || "",
-      monthlyPrice: currentRecord?.monthlyPrice || currentRecord?.price || "",
-      yearlyPrice: currentRecord?.yearlyPrice || "",
-      duration: currentRecord?.duration
-        ? parseInt(currentRecord.duration as string)
-        : "",
+      planName: currentRecord?.planName || "",
+      monthlyPrice: currentRecord?.price || "",
+      duration: currentRecord?.timeline || currentRecord?.duration || "",
+      numberOfChildren: currentRecord?.numberOfChildren || "",
     });
 
     if (currentRecord?.features) {
@@ -81,24 +82,27 @@ const UpdateSubscriptionModal: React.FC<UpdateSubscriptionModalProps> = ({
     const values = await form.validateFields();
     const formattedFeatures = featureList.map((item) => item.feature);
 
-    const newSubscription = {
-      ...values,
+    const updatedSubscription = {
+      planName: values.planName,
+      price: Number(values.monthlyPrice),
+      timeline: values.duration,
+      numberOfChildren: values.numberOfChildren, // You can make this dynamic if needed
       features: formattedFeatures,
     };
-    console.log(newSubscription);
 
-    // Uncomment for actual update logic
-    /*
-    const res = await UpdateSubscription({
-      data: newSubscription,
-      id: currentRecord?._id,
-    }).unwrap();
-    if (res.success) {
-      toast.success(res.message);
-      form.resetFields();
+    const res = await tryCatchWrapper(
+      updateSubscription,
+      {
+        params: currentRecord?._id,
+        body: updatedSubscription,
+      },
+      "Updating Subscription..."
+    );
+
+    if (res?.statusCode === 200) {
       handleCancelUpdateModal();
+      form.resetFields();
     }
-    */
   };
 
   return (
@@ -107,27 +111,20 @@ const UpdateSubscriptionModal: React.FC<UpdateSubscriptionModalProps> = ({
       onCancel={handleCancelUpdateModal}
       footer={null}
     >
-      <Form
-        form={form}
-        layout="vertical"
-        initialValues={{
-          facilities: ["Boost voucher to popular"],
-        }}
-        className="p-4 mt-5"
-      >
+      <Form form={form} layout="vertical" className="p-4 mt-5">
         <Typography.Title level={5}>Plan Name</Typography.Title>
         <Form.Item
-          name="name"
+          name="planName"
           rules={[{ required: true, message: "Please input the plan name!" }]}
           style={{ fontWeight: "500" }}
         >
           <Input
             placeholder="Enter plan name"
-            className="font-medium h-12  !text-base-color  placeholder:text-gray-700 border"
+            className="font-medium h-12 !text-base-color placeholder:text-gray-700 border"
           />
         </Form.Item>
 
-        <Typography.Title level={5}>Plan Price- Monthly</Typography.Title>
+        <Typography.Title level={5}>Plan Price (Monthly)</Typography.Title>
         <Form.Item
           name="monthlyPrice"
           rules={[{ required: true, message: "Please input the plan price!" }]}
@@ -136,19 +133,21 @@ const UpdateSubscriptionModal: React.FC<UpdateSubscriptionModalProps> = ({
           <Input
             placeholder="Enter plan price"
             type="number"
-            className="font-medium h-12  !text-base-color  placeholder:text-gray-700 border !border-secondary-color"
+            className="font-medium h-12 !text-base-color placeholder:text-gray-700 border !border-secondary-color"
           />
         </Form.Item>
-        <Typography.Title level={5}>Plan Price- Yearly</Typography.Title>
+
+        <Typography.Title level={5}>Number of Children</Typography.Title>
         <Form.Item
-          name="yearlyPrice"
-          rules={[{ required: true, message: "Please input the plan price!" }]}
-          style={{ fontWeight: "500" }}
+          name="numberOfChildren"
+          rules={[
+            { required: true, message: "Please input number of children!" },
+          ]}
         >
           <Input
-            placeholder="Enter plan price"
             type="number"
-            className="font-medium h-12  !text-base-color  placeholder:text-gray-700 border !border-secondary-color"
+            placeholder="Enter number of children"
+            className="h-12 !text-base-color placeholder:text-gray-700 border !border-secondary-color"
           />
         </Form.Item>
 
@@ -202,7 +201,7 @@ const UpdateSubscriptionModal: React.FC<UpdateSubscriptionModalProps> = ({
                       onChange={(e) =>
                         handleFeatureChange(index, e.target.value)
                       }
-                      className="h-10  border  !text-base-color placeholder:text-gray-600"
+                      className="h-10 border !text-base-color placeholder:text-gray-600"
                     />
                   </div>
                 </Panel>
@@ -220,7 +219,7 @@ const UpdateSubscriptionModal: React.FC<UpdateSubscriptionModalProps> = ({
               color: "#ffffff",
               background: "#28314E",
               height: "40px",
-              border: "1px solid #28314E ",
+              border: "1px solid #28314E",
             }}
           >
             <PlusOutlined />

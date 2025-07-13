@@ -1,11 +1,11 @@
-import { Switch } from "antd";
 import { MdDelete, MdOutlineDone } from "react-icons/md";
 
 // Define the type for a subscription (sub)
 interface Subscription {
-  name: string;
+  planName: string;
   price: number;
-  duration: number;
+  timeline: number;
+  numberOfChildren: number;
   features: string[];
 }
 
@@ -24,21 +24,31 @@ const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
     <div className="w-full max-w-full sm:max-w-[300px] md:max-w-[350px] lg:max-w-[400px] xl:max-w-[400px] flex flex-col justify-between  text-secondary-color p-6 rounded-3xl shadow-lg border border-[#E1E1E1]">
       <div>
         <div className="p-1 bg-primary-color rounded-full w-fit ml-auto cursor-pointer flex justify-end items-center gap-2">
-          <Switch defaultChecked size="small" />
+          {/* <Switch defaultChecked size="small" /> */}
           <MdDelete
             onClick={() => showDeleteModal(sub)}
             className="text-red-500 size-6 "
           />
         </div>
         <h3 className="text-xl md:text-2xl lg:text-3xl text-start text-secondary-color font-bold mb-2">
-          {sub?.name}
+          {sub?.planName}
         </h3>
         <p className="text-xl sm:text-2xl lg:text-4xl xl:text-5xl text-start font-bold mb-5">
           {sub?.price} KWD/
-          <span className="text-lg sm:text-xl lg:text-2xl">mo</span>
+          <span className="text-lg sm:text-xl lg:text-2xl">
+            {sub?.timeline}
+          </span>
         </p>
         <ul className="mb-5">
-          {sub?.features.map((feature, featureIndex) => (
+          <li className="flex items-center gap-2">
+            <div className="p-1 rounded-full bg-secondary-color -mt-4">
+              <MdOutlineDone className="size-3 text-primary-color" />
+            </div>
+            <p className="lg:text-lg text-secondary-color mb-5">
+              Number of children {sub?.numberOfChildren}
+            </p>
+          </li>
+          {sub?.features?.map((feature, featureIndex) => (
             <li key={featureIndex} className="flex items-center gap-2">
               <div className="p-1 rounded-full bg-secondary-color -mt-4">
                 <MdOutlineDone className="size-3 text-primary-color" />
