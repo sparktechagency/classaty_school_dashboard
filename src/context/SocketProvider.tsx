@@ -1,22 +1,21 @@
-"use client"; // if using Next.js App Router
-
 import { ReactNode, useEffect, useMemo } from "react";
 import { io } from "socket.io-client";
 import Cookies from "js-cookie";
 import { toast } from "sonner";
-import { decodedToken } from "../utils/jwt";
-import { getSocketUrl } from "../helpers/config/socket-config";
-import { SocketContext } from "./socket-context"; // import from new file
+import { decodedToken } from "../utils/jwt"; // Adjust path as needed
+import { getSocketUrl } from "../helpers/config/socket-config"; // Adjust path as needed
+import { SocketContext } from "./socket-context"; // Adjust path as needed
 
 export const SocketProvider = ({ children }: { children: ReactNode }) => {
-  let user;
   const token = Cookies.get("classaty_accessToken");
+  let user;
 
   if (token) {
     user = decodedToken(token);
     if (!user) {
       Cookies.remove("classaty_accessToken");
-      window.location.reload();
+      // Optionally redirect to login or handle invalid token
+      toast.error("Invalid token. Please log in again.");
     }
   }
 
@@ -24,6 +23,8 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
     if (!token) return null;
 
     const socketInstance = io(getSocketUrl(), {
+      autoConnect: true,
+      withCredentials: true,
       transports: ["websocket"],
       auth: { token },
       reconnection: true,

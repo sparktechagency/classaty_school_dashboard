@@ -5,7 +5,6 @@ import ConversationMessage from "../../Components/Conversation/ConversationMessa
 
 const ConversationPage = () => {
   const userData = useUserData();
-  console.log("userData", userData);
   const onlineUsers = useAppSelector((state) => state.conversation.onlineUser);
 
   return (

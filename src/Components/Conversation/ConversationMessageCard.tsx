@@ -6,7 +6,7 @@ const ConversationMessageCard = ({ msg, userData, imageUrl }: any) => {
   return (
     <div>
       <div>
-        <div className="flex items-start gap-1">
+        <div className="flex items-start gap-1 mb-2">
           {/* {msg?.sender !== null && (
             <Image
               loading="lazy"
@@ -42,12 +42,12 @@ const ConversationMessageCard = ({ msg, userData, imageUrl }: any) => {
             <div>
               {msg?.file && (
                 <div
-                  className={`grid grid-cols-1 gap-2.5 ${
+                  className={`grid grid-cols-1  ${
                     msg?.images?.length > 2 ? " md:grid-cols-2" : "grid-cols-1"
-                  } py-1 px-3 my-2 rounded-md ${
+                  } rounded-md ${
                     msg?.sender === userData?.userId ||
                     msg?.sender?.toString() === userData?.userId
-                      ? "w-fit ml-auto text-right text-white bg-[#28314E]/10"
+                      ? "w-fit ml-auto text-right text-white "
                       : "w-fit text-left text-base-color bg-[#F1F1F1]"
                   }`}
                 >
@@ -61,7 +61,7 @@ const ConversationMessageCard = ({ msg, userData, imageUrl }: any) => {
               )}
               {msg?.text_message?.length > 0 && (
                 <p
-                  className={`py-1 px-3 my-2 rounded-md ${
+                  className={`py-1 px-3 mt-0.5 rounded-md ${
                     msg?.sender === userData?.userId ||
                     msg?.sender?.toString() === userData?.userId
                       ? "w-fit ml-auto text-right  text-white bg-[#28314E]"
@@ -74,7 +74,7 @@ const ConversationMessageCard = ({ msg, userData, imageUrl }: any) => {
 
               {msg?.sender !== null && (
                 <p
-                  className={`text-[11px] text-secondary-color ${
+                  className={`text-[11px] mt-0.5 text-secondary-color ${
                     msg?.sender === userData?.userId ||
                     msg?.sender?.toString() === userData?.userId
                       ? "text-right"

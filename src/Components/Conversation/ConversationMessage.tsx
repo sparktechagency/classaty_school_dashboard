@@ -7,13 +7,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { useSocket } from "../../context/socket-context";
 import {
   selectSelectedChatUser,
-  selectTypingUser,
-  setOnlineUsers,
   setSelectedChatUser,
-  setTypingUser,
 } from "../../redux/features/conversation/conversationSlice";
 import { useGetConversationMessageListQuery } from "../../redux/features/conversation/conversationApi";
-import { useAppSelector } from "../../redux/hooks";
 import { getImageUrl } from "../../helpers/config/envConfig";
 import { FadeLoader } from "react-spinners";
 import ConversationMessageCard from "./ConversationMessageCard";
@@ -27,79 +23,133 @@ const ConversationMessage = ({ userData, onlineUsers }: any) => {
   const selectedConversation = useSelector(selectSelectedChatUser);
   const messagesContainerRef = useRef<HTMLDivElement | null>(null);
   const messagesEndRef = useRef(null);
-  const [messages, setMessages] = useState<any>([]);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [page, setPage] = useState(1);
+  const limit = 100;
 
-  console.log("messages", messages);
-
-  useEffect(() => {
-    if (messagesContainerRef.current) {
-      messagesContainerRef.current.scrollTop =
-        messagesContainerRef.current.scrollHeight;
-    }
-  });
-
+  // Query with conditional param to skip fetching if no conversation selected
   const {
     data: allMessages,
     isFetching: isAllMessageFetching,
     refetch,
   } = useGetConversationMessageListQuery(
-    { id: selectedConversation?._id },
-    {
-      skip: !selectedConversation?._id,
-    }
+    selectedConversation?._id
+      ? { id: selectedConversation._id, page, limit }
+      : undefined
   );
-  useEffect(() => {
-    // if (selectedConversation?._id) {
-    //   refetch();
-    // }
-    if (allMessages?.data) {
-      setMessages(allMessages?.data?.result);
-    }
-  }, [allMessages, refetch, selectedConversation?._id]);
 
+  // Reset page and messages, then refetch on conversation change
+  useEffect(() => {
+    if (!selectedConversation?._id) return;
+
+    setPage(1);
+    setMessages([]);
+
+    // Small timeout to avoid race conditions
+    setTimeout(() => {
+      refetch();
+    }, 0);
+  }, [selectedConversation?._id, refetch]);
+
+  // Scroll to bottom on messages or conversation change
+  useEffect(() => {
+    messagesContainerRef.current?.scrollTo({
+      top: messagesContainerRef.current.scrollHeight,
+    });
+  }, [messages, selectedConversation?._id]);
+
+  // Append older messages or replace messages depending on page number
+  useEffect(() => {
+    if (!allMessages?.data) return;
+
+    const container = messagesContainerRef.current;
+    const prevScrollHeight = container?.scrollHeight || 0;
+
+    setMessages((prev) => {
+      if (page === 1) {
+        // Replace messages on first page or conversation change
+        return allMessages.data.result;
+      } else {
+        // Prepend older messages on pagination, avoid duplicates by filtering
+        const newMessages = allMessages.data.result.filter(
+          (msg: any) => !prev.some((p) => p._id === msg._id)
+        );
+        return [...newMessages, ...prev];
+      }
+    });
+
+    // Maintain scroll position after prepending older messages
+    setTimeout(() => {
+      if (container) {
+        const newScrollHeight = container.scrollHeight;
+        if (page === 1) {
+          // Scroll to bottom for new conversation or first page
+          container.scrollTop = newScrollHeight;
+        } else {
+          // Maintain scroll position after loading older messages
+          container.scrollTop = newScrollHeight - prevScrollHeight;
+        }
+      }
+    }, 100);
+  }, [allMessages, page]);
+
+  // Infinite scroll: fetch older messages when scroll to top
+  useEffect(() => {
+    const handleScroll = () => {
+      const container = messagesContainerRef.current;
+      if (!container || isAllMessageFetching) return;
+
+      if (container.scrollTop === 0) {
+        if (
+          allMessages?.data?.meta?.totalPage &&
+          page < allMessages.data.meta.totalPage
+        ) {
+          setPage((prev) => prev + 1);
+        }
+      }
+    };
+
+    const container = messagesContainerRef.current;
+    container?.addEventListener("scroll", handleScroll);
+
+    return () => {
+      container?.removeEventListener("scroll", handleScroll);
+    };
+  }, [isAllMessageFetching, allMessages, page]);
+
+  // Handle incoming socket message by appending to messages
   const handleMessage = useCallback(
     (message: any) => {
-      console.log("message", message);
-      setMessages((prev: any) => [...prev, message]);
+      setMessages((prev) => [...prev, message]);
     },
     [setMessages]
   );
 
+  // Setup socket listeners for online users, typing, and receiving messages
   useEffect(() => {
     const roomId = selectedConversation?._id;
-    socket?.emit("join", roomId?.toString());
-    socket?.on("online_users", (online: any) => {
-      console.log("online-users-updated", online);
-      dispatch(setOnlineUsers(online));
-    });
-    if (selectedConversation?._id && socket) {
-      socket?.on(`typing::${selectedConversation?._id}`, (typing: any) => {
-        dispatch(setTypingUser(typing));
-      });
-      socket?.on(
-        `receive_message::${selectedConversation?._id}`,
-        handleMessage
-      );
-    }
+    if (!roomId || !socket) return;
+
+    socket.emit("join", roomId.toString());
+
+    socket.on(`receive_message::${roomId}`, handleMessage);
 
     return () => {
-      socket?.off(`receive_message::${selectedConversation?._id}`);
-      socket?.emit("leave", roomId);
+      socket.off(`receive_message::${roomId}`);
+      socket.off("new_message");
+      socket.emit("leave", roomId);
     };
-  }, [socket, selectedConversation?._id, dispatch, handleMessage]);
+  }, [socket, selectedConversation?._id, handleMessage]);
 
-  const typingUsers = useAppSelector(selectTypingUser);
-  console.log("typingUsers", typingUsers);
-
-  const convertnewMessageFirst = [...(messages || [])].sort(
+  // Sort messages by createdAt ascending
+  const convertnewMessageFirst = [...messages].sort(
     (a: IConversation, b: IConversation) =>
       new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
   );
-  console.log("convertnewMessageFirst", convertnewMessageFirst);
 
   return (
     <div
-      className={`w-full overflow-y-auto  ${
+      className={`w-full overflow-y-auto ${
         selectedConversation ? "block lg:block" : "hidden lg:block"
       }`}
     >
@@ -107,7 +157,7 @@ const ConversationMessage = ({ userData, onlineUsers }: any) => {
         <Layout
           className={`py-6 px-2 !bg-[#FFFAF5] lg:col-span-3 xl:col-span-4 h-full`}
         >
-          {/* Header Part */}
+          {/* Header */}
           <div className="!bg-[#FFFFFF] p-2 lg:p-4 border-b-2 flex justify-between items-center">
             <div className="flex items-center gap-2">
               <div className="flex items-center mr-2">
@@ -116,83 +166,51 @@ const ConversationMessage = ({ userData, onlineUsers }: any) => {
                   className="text-2xl cursor-pointer text-[#F88D58] "
                 />
               </div>
-
               <div className="flex justify-center items-center gap-2">
                 <img
                   loading="lazy"
-                  className="h-12 w-12 lg:h-12 lg:w-12 object-cover rounded-full relative"
+                  className="h-12 w-12 object-cover rounded-full"
                   src={`${imageUrl}/${selectedConversation?.otherUser?.image}`}
-                  width={100}
-                  height={100}
                   alt="Profile"
                 />
                 <div>
-                  <div className="flex justify-center gap-2">
-                    <div>
-                      <span className="font-bold text-base sm:text-lg lg:text-xl flex items-center gap-1">
-                        {selectedConversation?.otherUser?.name}
-
-                        <Tooltip title="Online">
-                          {onlineUsers.includes(
-                            selectedConversation?.otherUser?._id
-                          ) && (
-                            <div className="size-2 rounded-full bg-green-500"></div>
-                          )}
-                        </Tooltip>
-                      </span>
-                      {/* {typingUser?.message} */}
-                      {/* <span className="text-xs lg:text-sm h-fit">
-                        {selectedConversation?.user}
-                      </span> */}
-                    </div>
-                  </div>
-                  {/* <p>
-                    {typingUsers?.writeId !== userData?.userId &&
-                      typingUsers?.message}
-                  </p> */}
+                  <span className="font-bold text-base sm:text-lg lg:text-xl flex items-center gap-1">
+                    {selectedConversation?.otherUser?.name}
+                    <Tooltip title="Online">
+                      {onlineUsers.includes(
+                        selectedConversation?.otherUser?._id
+                      ) && (
+                        <div className="size-2 rounded-full bg-green-500"></div>
+                      )}
+                    </Tooltip>
+                  </span>
                 </div>
               </div>
             </div>
-
-            {/* {selectedConversation?.isGroupChat ? (
-              <div>
-                <Dropdown overlay={leaveMenu} trigger={["click"]}>
-                  <BsThreeDotsVertical className="text-2xl cursor-pointer text-[#F88D58]" />
-                </Dropdown>
-              </div>
-            ) : (
-              <div>
-                <Dropdown overlay={blockMenu} trigger={["click"]}>
-                  <BsThreeDotsVertical className="text-2xl cursor-pointer text-[#F88D58]" />
-                </Dropdown>
-              </div>
-            )} */}
           </div>
 
-          {/* message Part  */}
-          <Content className="bg-white flex flex-col gap-5 rounded-none relative ">
+          {/* Message List */}
+          <Content className="bg-white flex flex-col gap-5 relative">
             <div className="h-full flex flex-col justify-end">
               <Card
-                className="!border-0 !pb-14 overflow-y-auto border-none h-full overflow-x-hidden"
+                className="!border-0 !pb-5 overflow-y-auto border-none h-full overflow-x-hidden"
                 ref={messagesContainerRef}
               >
                 {isAllMessageFetching ? (
-                  <div className="mx-auto w-[80vw] flex justify-center items-center h-full">
-                    <FadeLoader className="h-full" />
+                  <div className="flex justify-center items-end h-[70vh] ">
+                    <FadeLoader />
                   </div>
                 ) : (
-                  convertnewMessageFirst?.map((msg, i) => (
+                  convertnewMessageFirst.map((msg, i) => (
                     <ConversationMessageCard
-                      key={i}
+                      key={msg._id ?? i}
                       msg={msg}
                       userData={userData}
                       imageUrl={imageUrl}
                     />
                   ))
                 )}
-
-                {/* Add this div for the scroll target */}
-                <div ref={messagesEndRef}></div>
+                <div ref={messagesEndRef} />
               </Card>
             </div>
 
@@ -223,14 +241,8 @@ const ConversationMessage = ({ userData, onlineUsers }: any) => {
               Welcome to Messages
             </h3>
             <p className="text-gray-600 max-w-md mx-auto leading-relaxed">
-              Select a conversation from the sidebar to start messaging. Connect
-              with your colleagues and friends seamlessly.
+              Select a conversation from the sidebar to start messaging.
             </p>
-            <div className="mt-6">
-              <div className="inline-flex items-center px-4 py-2 bg-secondary-color/10 text-secondary-color rounded-full text-sm font-medium">
-                💬 Select a conversation to view messages
-              </div>
-            </div>
           </div>
         </div>
       )}

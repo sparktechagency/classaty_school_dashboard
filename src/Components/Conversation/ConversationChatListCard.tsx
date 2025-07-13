@@ -58,11 +58,11 @@ const ConversationChatListCard = ({
                       : conversation?.users?.[0]?.petName.length > 10
                       ? `${conversation?.users?.[0]?.petName.slice(0, 10)}...`
                       : conversation?.users?.[0]?.petName} */}
-                    {conversation?.otherUser?.name.length > 15
+                    {conversation?.otherUser?.name?.length > 15
                       ? `${conversation?.otherUser?.name.slice(0, 15)}...`
                       : conversation?.otherUser?.name}
                   </p>
-                  {onlineUsers.includes(conversation?.otherUser?._id) && (
+                  {onlineUsers?.includes(conversation?.otherUser?._id) && (
                     <div className="size-2 rounded-full bg-green-500"></div>
                   )}
                 </div>

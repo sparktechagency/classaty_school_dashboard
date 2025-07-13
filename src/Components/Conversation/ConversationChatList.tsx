@@ -1,18 +1,26 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Input } from "antd";
-import { useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { SearchOutlined } from "@ant-design/icons";
 import { useGetConversationListQuery } from "../../redux/features/conversation/conversationApi";
 import { FadeLoader } from "react-spinners";
 import ConversationChatListCard from "./ConversationChatListCard";
 import { IConversation } from "../../types/conversation.type";
-import { useAppSelector } from "../../redux/hooks";
-import { selectSelectedChatUser } from "../../redux/features/conversation/conversationSlice";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import {
+  selectSelectedChatUser,
+  setOnlineUsers,
+} from "../../redux/features/conversation/conversationSlice";
+import { useSocket } from "../../context/socket-context";
 
 const ConversationChatList = ({ userData, onlineUsers }: any) => {
+  const socket = useSocket()?.socket;
+  const dispatch = useAppDispatch();
+
   const [searchTerm, setSearchTerm] = useState("");
   const seletedConversation = useAppSelector(selectSelectedChatUser);
+  const [chatList, setChatList] = useState<IConversation[]>([]);
 
   const { data: allChatList, isFetching: isAllChatFeacthing } =
     useGetConversationListQuery(
@@ -24,13 +32,47 @@ const ConversationChatList = ({ userData, onlineUsers }: any) => {
       }
     );
 
-  const filteredConversations = allChatList?.data?.result
-    ?.slice()
-    ?.sort((a: IConversation, b: IConversation) => {
-      const dateA = a?.updatedAt ? new Date(a.updatedAt).getTime() : 0;
-      const dateB = b?.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+  const handleNewMessage = useCallback((message: any) => {
+    console.log({ message });
+    // setChatList((prev) => [...prev, message]);
+  }, []);
+
+  useEffect(() => {
+    console.log("🧠 Checking socket:", socket);
+
+    if (!socket) {
+      console.warn("❌ Socket not ready yet.");
+      return;
+    }
+
+    const handleNewMessageSocket = (message: any) => {
+      console.log("📨 New Message Received from socket:", message);
+    };
+
+    socket.on("new_message", handleNewMessageSocket);
+    socket.on("online_users", (online: any) => {
+      console.log("Online Users:", online);
+      dispatch(setOnlineUsers(online));
+    });
+
+    return () => {
+      socket.off("new_message", handleNewMessageSocket);
+    };
+  }, [dispatch, socket]);
+
+  useEffect(() => {
+    if (allChatList?.data?.result) {
+      setChatList(allChatList?.data?.result);
+    }
+  }, [allChatList?.data?.result]);
+
+  const filteredConversations = useMemo(() => {
+    return chatList?.slice()?.sort((a: IConversation, b: IConversation) => {
+      const dateA = new Date(a?.lastMessage?.updatedAt || 0).getTime();
+      const dateB = new Date(b?.lastMessage?.updatedAt || 0).getTime();
       return dateB - dateA;
     });
+  }, [chatList]);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);

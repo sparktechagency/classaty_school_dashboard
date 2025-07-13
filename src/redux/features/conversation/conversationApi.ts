@@ -20,9 +20,13 @@ const conversationApi = baseApi.injectEndpoints({
       providesTags: [tagTypes.conversation],
     }),
     getConversationMessageList: build.query({
-      query: ({ id }) => ({
+      query: ({ id, page, limit }) => ({
         url: `${conversation_url}/messages/${id}`,
         method: "GET",
+        params: {
+          page,
+          limit,
+        },
       }),
       providesTags: [tagTypes.conversation],
     }),
