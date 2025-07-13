@@ -19,7 +19,6 @@ import gradeLogo from "../../public/images/dashboard-logo/grade.svg";
 
 //* ------------------IMPORT COMPONENTS------------------
 import Notifications from "../pages/Common/Notifications";
-import AdminMessage from "../pages/Admin/AdminMessage";
 import SchoolAdmin from "../pages/SchoolAdmin/SchoolAdmin";
 import AlarmsPage from "../pages/SchoolAdmin/Alarms";
 import AnouncementPage from "../pages/SchoolAdmin/Anouncement";
@@ -36,6 +35,7 @@ import ExamPage from "../pages/SchoolAdmin/Exam";
 import Profile from "../pages/Common/settings/Profile";
 import SchoolAdminAllManager from "../pages/SchoolAdmin/SchoolAdminAllManager";
 import GradeSystem from "../pages/SchoolAdmin/GradeSystem";
+import ConversationPage from "../pages/Common/ConversationPage";
 
 export const schoolAdminPaths = [
   {
@@ -87,7 +87,7 @@ export const schoolAdminPaths = [
   },
   {
     path: "message",
-    element: <AdminMessage />,
+    element: <ConversationPage />,
     key: "message",
     name: "Messages",
     icon: messageLogo,

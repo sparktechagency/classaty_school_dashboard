@@ -6,44 +6,16 @@ import SubscriptionCard from "../../Components/Dashboard/Subscription/Subscripti
 import AddSubscriptionModal from "../../ui/Modal/Subscription/AddSubscriptionModal";
 import UpdateSubscriptionModal from "../../ui/Modal/Subscription/UpdateSubscriptionModal";
 import DeleteSubscriptionModal from "../../ui/Modal/Subscription/DeleteSubscriptionModal";
-
-const subscription = [
-  {
-    name: "Plus",
-    price: 1.9,
-    duration: 30,
-    currency: "KWD",
-    features: [
-      "Access for 1 student",
-      "Basic features included",
-      "Monthly progress reports",
-    ],
-  },
-  {
-    name: "Silver",
-    price: 2.9,
-    duration: 30,
-    currency: "KWD",
-    features: [
-      "Unlimited students under 1 parent",
-      "All Plus features included",
-      "Priority support",
-    ],
-  },
-  {
-    name: "Gold",
-    price: 3.9,
-    duration: 30,
-    currency: "KWD",
-    features: [
-      "Unlimited students under both parents",
-      "All Silver features included",
-      "Premium support",
-    ],
-  },
-];
+import { useGetSubscriptionQuery } from "../../redux/features/subscription/subscriptionApi";
+import { FadeLoader } from "react-spinners";
 
 export default function Subscription() {
+  const { data, isFetching } = useGetSubscriptionQuery({});
+
+  const subscriptionData = data?.data;
+
+  console.log("data", data);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -78,6 +50,13 @@ export default function Subscription() {
     setCurrentRecord(null);
   };
 
+  if (isFetching)
+    return (
+      <div className="flex justify-center items-center h-[88vh]">
+        <FadeLoader color="#28314E" />
+      </div>
+    );
+
   return (
     <div className=" min-h-screen py-4 px-4 sm:px-6 md:px-8 rounded-lg pb-20">
       <div className="w-full">
@@ -101,7 +80,7 @@ export default function Subscription() {
               <Loading />
             </div>
           ) : ( */}
-          {subscription?.map((sub, index) => (
+          {subscriptionData?.map((sub: any, index: number) => (
             <SubscriptionCard
               key={index}
               sub={sub}

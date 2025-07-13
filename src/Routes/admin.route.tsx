@@ -23,12 +23,12 @@ import Notifications from "../pages/Common/Notifications";
 import AdminAllSchools from "../pages/Admin/AdminAllSchools";
 import AdminAllParents from "../pages/Admin/AdminAllParents";
 import AdminAllTeacher from "../pages/Admin/AdminAllTeacher";
-import AdminMessage from "../pages/Admin/AdminMessage";
 import Subscription from "../pages/Admin/AdminSubscription";
 import AdminAllTransaction from "../pages/Admin/AdminAllTransaction";
 import AdminFeedback from "../pages/Admin/AdminFeedbcak";
 import AdminAllStudent from "../pages/Admin/AdminAllStudent";
 import AdminAllAdmin from "../pages/Admin/AdmiAllAdmin";
+import ConversationPage from "../pages/Common/ConversationPage";
 
 export const adminPaths = [
   {
@@ -73,7 +73,7 @@ export const adminPaths = [
   },
   {
     path: "message",
-    element: <AdminMessage />,
+    element: <ConversationPage />,
     key: "message",
     name: "Messages",
     icon: messageLogo,

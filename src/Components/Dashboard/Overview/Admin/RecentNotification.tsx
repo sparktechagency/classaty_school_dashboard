@@ -29,7 +29,7 @@ const RecentNotification = () => {
         <h1 className="text-xl lg:text-2xl text-base-color font-semibold">
           Recent Activity
         </h1>
-        <Link to={`/${user?.role}/notifications`}>
+        <Link to={`/${user?.role}/alarms`}>
           <p className="cursor-pointer text-[#898c8d] underline ">View all</p>
         </Link>
       </div>
@@ -45,7 +45,7 @@ const RecentNotification = () => {
             </div>
             <div>
               <p className="text-base-color text-base font-semibold">
-               At {dayjs(activity.createdAt).format("hh:mm A")} {", "}
+                At {dayjs(activity.createdAt).format("hh:mm A")} {", "}
                 {activity.message}
               </p>
 

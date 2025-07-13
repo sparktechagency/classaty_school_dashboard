@@ -2,26 +2,20 @@
 import { Form, Upload } from "antd";
 import { useState } from "react";
 import { IoCameraOutline } from "react-icons/io5";
-import { AllImages } from "../../../../public/images/AllImages";
 import ReusableForm from "../../../ui/Form/ReuseForm";
 import ReuseInput from "../../../ui/Form/ReuseInput";
 import ReuseButton from "../../../ui/Button/ReuseButton";
+import {
+  useGetProfileQuery,
+  useUpdateProfileMutation,
+} from "../../../redux/features/profile/profileApi";
+import { FadeLoader } from "react-spinners";
+import { getImageUrl } from "../../../helpers/config/envConfig";
+import tryCatchWrapper from "../../../utils/tryCatchWrapper";
 
 const inputStructure = [
   {
-    name: "email",
-    type: "email",
-    inputType: "email",
-    label: "Email",
-    placeholder: "Enter your email",
-    labelClassName: "!font-medium",
-    inputClassName:
-      "!py-2 !w-full disabled:!text-base-color disabled:!border-input-color/60 disabled:!bg-input-color/10",
-    rules: [{ required: true, message: "Email is required" }],
-    disable: true,
-  },
-  {
-    name: "userName",
+    name: "name",
     type: "text",
     inputType: "text",
     label: "User name",
@@ -32,7 +26,7 @@ const inputStructure = [
     disable: false,
   },
   {
-    name: "contactNumber",
+    name: "phoneNumber",
     type: "text",
     inputType: "tel",
     label: "Contact number",
@@ -40,20 +34,17 @@ const inputStructure = [
     labelClassName: "!font-medium",
     inputClassName: "!py-2 !w-full",
     rules: [{ required: true, message: "Contact number is required" }],
-    disable: false,
+    disable: true,
   },
 ];
 
 const EditProfile = () => {
+  const serverUrl = getImageUrl();
   const [form] = Form.useForm();
-  const profileData = {
-    userName: "James Mitchell",
-    email: "emily@gmail.com",
-    address: "Vancouver, BC VG1Z4, Canada",
-    contactNumber: "+99-01846875456",
-  };
-
-  const profileImage = AllImages.profile;
+  const [updateProfile] = useUpdateProfileMutation();
+  const { data, isFetching } = useGetProfileQuery({});
+  const profileData = data?.data;
+  const profileImage = serverUrl + profileData?.image;
 
   const [imageUrl, setImageUrl] = useState(profileImage);
 
@@ -70,10 +61,29 @@ const EditProfile = () => {
     }
   };
 
-  const onFinish = (values: any) => {
-    console.log("Success:", values);
-    console.log(imageUrl);
+  const onFinish = async (values: any) => {
+    const formData = new FormData();
+    if (values?.image?.file?.originFileObj) {
+      formData.append("image", values?.image?.file?.originFileObj);
+    }
+    const data = {
+      name: values?.name,
+    };
+    formData.append("data", JSON.stringify(data));
+    await tryCatchWrapper(
+      updateProfile,
+      { body: formData },
+      "Updating Profile..."
+    );
   };
+
+  if (isFetching) {
+    return (
+      <div className="flex justify-center items-center h-[88vh]">
+        <FadeLoader color="#28314E" />
+      </div>
+    );
+  }
 
   return (
     <div className=" mt-10  rounded-xl">
@@ -118,9 +128,9 @@ const EditProfile = () => {
                     style={{
                       zIndex: 1,
                     }}
-                    className="bg-base-color/70 p-2 w-fit h-fit !border-none absolute -top-12 left-[115px] rounded-full cursor-pointer shadow-lg"
+                    className="!bg-base-color/70 p-2 w-fit h-fit !border-none absolute -top-12 left-[115px] rounded-full cursor-pointer shadow-lg"
                   >
-                    <IoCameraOutline className="w-6 h-6 text-primary-color" />
+                    <IoCameraOutline className="w-6 h-6 !text-primary-color" />
                   </button>
                 </Upload>
               </Form.Item>

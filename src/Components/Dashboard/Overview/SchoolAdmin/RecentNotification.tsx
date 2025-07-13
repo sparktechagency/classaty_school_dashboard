@@ -1,12 +1,10 @@
 import { Link } from "react-router-dom";
 import { AllIcons } from "../../../../../public/images/AllImages";
-import useUserData from "../../../../hooks/useUserData";
 import { useGetNotificationQuery } from "../../../../redux/features/school/schoolApi";
 import { INotification } from "../Admin/RecentNotification";
 import dayjs from "dayjs";
 
 const RecentNotification = () => {
-  const user = useUserData();
   const { data: activities } = useGetNotificationQuery({});
 
   return (
@@ -15,7 +13,7 @@ const RecentNotification = () => {
         <h1 className="text-xl lg:text-2xl text-base-color font-semibold">
           Recent Activity
         </h1>
-        <Link to={`/${user?.role}/notifications`}>
+        <Link to={`/school/alarms`}>
           <p className="cursor-pointer text-[#898c8d] underline ">View all</p>
         </Link>
       </div>

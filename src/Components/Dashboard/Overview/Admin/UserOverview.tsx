@@ -1,10 +1,13 @@
 import { useState } from "react";
 import YearOption from "../../../../utils/YearOption";
-import Area_Chart from "../../../Chart/AreaChart";
+import { useGetUserChartQuery } from "../../../../redux/features/adminOverview/adminOverviewApi";
+import UserChart from "../../../Chart/UserChart";
 
 const UserOverview = () => {
   const currentYear = new Date().getFullYear();
   const [year, setYear] = useState(currentYear);
+
+  const { data: chartData } = useGetUserChartQuery({ year });
 
   console.log(year);
   return (
@@ -23,7 +26,7 @@ const UserOverview = () => {
         </div>
       </div>
       <div>
-        <Area_Chart />
+        <UserChart chartData={chartData?.data} />
       </div>
     </div>
   );

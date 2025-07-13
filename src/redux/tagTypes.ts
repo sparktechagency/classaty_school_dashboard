@@ -17,9 +17,14 @@ export const tagTypes = {
   announcement: "Announcement",
   attendance: "Attendance",
   gradeSystem: "GradeSystem",
-  manager: "Manager"
+  manager: "Manager",
+  conversation: "Conversation",
+  subscription: "Subscription",
+  allAdmin: "AllAdmin",
+  adminOverview: "AdminOverview",
+  profile: "Profile",
 };
- 
+
 export const tagTypesList = [
   tagTypes.auth,
   tagTypes.school,
@@ -39,5 +44,10 @@ export const tagTypesList = [
   tagTypes.announcement,
   tagTypes.attendance,
   tagTypes.gradeSystem,
-  tagTypes.manager
+  tagTypes.manager,
+  tagTypes.conversation,
+  tagTypes.subscription,
+  tagTypes.allAdmin,
+  tagTypes.adminOverview,
+  tagTypes.profile,
 ];

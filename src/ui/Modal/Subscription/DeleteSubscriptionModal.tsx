@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button, Modal } from "antd";
+import { useDeleteSubscriptionMutation } from "../../../redux/features/subscription/subscriptionApi";
+import { toast } from "sonner";
 
 const DeleteSubscriptionModal = ({
   isDeleteModalOpen,
@@ -10,24 +12,25 @@ const DeleteSubscriptionModal = ({
   handleCancelDeleteModal: () => void;
   currentRecord: any;
 }) => {
-  //   const [deleteSubscription] = useDeleteSubscriptionMutation();
+  const [deleteSubscription] = useDeleteSubscriptionMutation();
   const handleDelete = async () => {
-    console.log({ id: currentRecord?._id });
-    // const toastId = toast.loading("Deleting subscription...");
-    // try {
-    //   const res = await deleteSubscription({ id: currentRecord?._id }).unwrap();
-    //   toast.success(res?.message, {
-    //     id: toastId,
-    //     duration: 2000,
-    //   });
-    //   handleCancelDeleteModal();
-    // } catch (error) {
-    //   console.log(error);
-    //   toast.error("Failed to delete subscription", {
-    //     id: toastId,
-    //     duration: 2000,
-    //   });
-    // }
+    const toastId = toast.loading("Deleting subscription...");
+    try {
+      const res = await deleteSubscription({
+        params: currentRecord?._id,
+      }).unwrap();
+      toast.success(res?.message, {
+        id: toastId,
+        duration: 2000,
+      });
+      handleCancelDeleteModal();
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to delete subscription", {
+        id: toastId,
+        duration: 2000,
+      });
+    }
   };
   return (
     <Modal
