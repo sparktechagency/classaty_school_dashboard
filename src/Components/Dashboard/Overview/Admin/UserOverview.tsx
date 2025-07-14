@@ -1,15 +1,15 @@
 import { useState } from "react";
-import YearOption from "../../../../utils/YearOption";
 import { useGetUserChartQuery } from "../../../../redux/features/adminOverview/adminOverviewApi";
+import UserSelectOption from "../../../../utils/UserSelectOption";
 import UserChart from "../../../Chart/UserChart";
 
 const UserOverview = () => {
-  const currentYear = new Date().getFullYear();
-  const [year, setYear] = useState(currentYear);
+  // const currentUser = new Date().getFullYear();
+  const [currentUser, setCurrentUser] = useState("parents");
 
-  const { data: chartData } = useGetUserChartQuery({ year });
+  const { data: chartData } = useGetUserChartQuery({ role: currentUser });
 
-  console.log(year);
+  console.log(chartData);
   return (
     <div
       className="w-full p-3 bg-primary-color rounded-lg "
@@ -21,7 +21,10 @@ const UserOverview = () => {
         </p>
         <div className="flex items-center gap-2">
           <div>
-            <YearOption currentYear={currentYear} setThisYear={setYear} />
+            <UserSelectOption
+              currentUser={currentUser}
+              setCurrentUser={setCurrentUser}
+            />
           </div>
         </div>
       </div>
