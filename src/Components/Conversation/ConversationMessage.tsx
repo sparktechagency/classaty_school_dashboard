@@ -22,12 +22,11 @@ const ConversationMessage = ({ userData, onlineUsers }: any) => {
   const dispatch = useDispatch();
   const selectedConversation = useSelector(selectSelectedChatUser);
   const messagesContainerRef = useRef<HTMLDivElement | null>(null);
-  const messagesEndRef = useRef(null);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
   const [page, setPage] = useState(1);
-  const limit = 100;
+  const limit = 200;
 
-  // Query with conditional param to skip fetching if no conversation selected
   const {
     data: allMessages,
     isFetching: isAllMessageFetching,
@@ -38,27 +37,25 @@ const ConversationMessage = ({ userData, onlineUsers }: any) => {
       : undefined
   );
 
-  // Reset page and messages, then refetch on conversation change
+  // Reset on conversation change
   useEffect(() => {
     if (!selectedConversation?._id) return;
 
     setPage(1);
     setMessages([]);
-
-    // Small timeout to avoid race conditions
     setTimeout(() => {
       refetch();
     }, 0);
   }, [selectedConversation?._id, refetch]);
 
-  // Scroll to bottom on messages or conversation change
+  // Scroll to bottom when new messages loaded on first page
   useEffect(() => {
-    messagesContainerRef.current?.scrollTo({
-      top: messagesContainerRef.current.scrollHeight,
-    });
-  }, [messages, selectedConversation?._id]);
+    if (page === 1 && messages.length > 0) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
+    }
+  }, [messages, selectedConversation?._id, page]);
 
-  // Append older messages or replace messages depending on page number
+  // Append/prepend messages on fetch
   useEffect(() => {
     if (!allMessages?.data) return;
 
@@ -67,10 +64,8 @@ const ConversationMessage = ({ userData, onlineUsers }: any) => {
 
     setMessages((prev) => {
       if (page === 1) {
-        // Replace messages on first page or conversation change
         return allMessages.data.result;
       } else {
-        // Prepend older messages on pagination, avoid duplicates by filtering
         const newMessages = allMessages.data.result.filter(
           (msg: any) => !prev.some((p) => p._id === msg._id)
         );
@@ -78,22 +73,16 @@ const ConversationMessage = ({ userData, onlineUsers }: any) => {
       }
     });
 
-    // Maintain scroll position after prepending older messages
+    // Adjust scroll for infinite scroll
     setTimeout(() => {
-      if (container) {
+      if (container && page > 1) {
         const newScrollHeight = container.scrollHeight;
-        if (page === 1) {
-          // Scroll to bottom for new conversation or first page
-          container.scrollTop = newScrollHeight;
-        } else {
-          // Maintain scroll position after loading older messages
-          container.scrollTop = newScrollHeight - prevScrollHeight;
-        }
+        container.scrollTop = newScrollHeight - prevScrollHeight;
       }
     }, 100);
   }, [allMessages, page]);
 
-  // Infinite scroll: fetch older messages when scroll to top
+  // Infinite scroll handler
   useEffect(() => {
     const handleScroll = () => {
       const container = messagesContainerRef.current;
@@ -111,37 +100,31 @@ const ConversationMessage = ({ userData, onlineUsers }: any) => {
 
     const container = messagesContainerRef.current;
     container?.addEventListener("scroll", handleScroll);
-
-    return () => {
-      container?.removeEventListener("scroll", handleScroll);
-    };
+    return () => container?.removeEventListener("scroll", handleScroll);
   }, [isAllMessageFetching, allMessages, page]);
 
-  // Handle incoming socket message by appending to messages
-  const handleMessage = useCallback(
-    (message: any) => {
-      setMessages((prev) => [...prev, message]);
-    },
-    [setMessages]
-  );
+  // New socket message handler
+  const handleMessage = useCallback((message: any) => {
+    setMessages((prev) => [...prev, message]);
 
-  // Setup socket listeners for online users, typing, and receiving messages
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+  }, []);
+
   useEffect(() => {
     const roomId = selectedConversation?._id;
     if (!roomId || !socket) return;
 
     socket.emit("join", roomId.toString());
-
     socket.on(`receive_message::${roomId}`, handleMessage);
 
     return () => {
-      socket.off(`receive_message::${roomId}`);
-      socket.off("new_message");
+      socket.off(`receive_message::${roomId}`, handleMessage);
       socket.emit("leave", roomId);
     };
   }, [socket, selectedConversation?._id, handleMessage]);
 
-  // Sort messages by createdAt ascending
   const convertnewMessageFirst = [...messages].sort(
     (a: IConversation, b: IConversation) =>
       new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
@@ -163,7 +146,7 @@ const ConversationMessage = ({ userData, onlineUsers }: any) => {
               <div className="flex items-center mr-2">
                 <MdOutlineArrowBackIosNew
                   onClick={() => dispatch(setSelectedChatUser(null))}
-                  className="text-2xl cursor-pointer text-[#F88D58] "
+                  className="text-2xl cursor-pointer text-secondary-color"
                 />
               </div>
               <div className="flex justify-center items-center gap-2">
@@ -197,7 +180,7 @@ const ConversationMessage = ({ userData, onlineUsers }: any) => {
                 ref={messagesContainerRef}
               >
                 {isAllMessageFetching ? (
-                  <div className="flex justify-center items-end h-[70vh] ">
+                  <div className="flex justify-center items-end h-[70vh]">
                     <FadeLoader />
                   </div>
                 ) : (

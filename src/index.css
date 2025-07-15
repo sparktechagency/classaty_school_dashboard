@@ -131,6 +131,10 @@ input[type="number"]::-webkit-outer-spin-button {
   color: #28314E !important;
 } */
 
+.ant-upload-select {
+  opacity: 100 !important;
+}
+
 /** SIDEBAR:  Selected Backgorund Color Change  */
 
 .ant-menu-item .ant-menu-title-content {

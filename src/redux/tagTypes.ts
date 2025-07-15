@@ -23,6 +23,7 @@ export const tagTypes = {
   allAdmin: "AllAdmin",
   adminOverview: "AdminOverview",
   profile: "Profile",
+  staticContent: "StaticContent",
 };
 
 export const tagTypesList = [
@@ -50,4 +51,5 @@ export const tagTypesList = [
   tagTypes.allAdmin,
   tagTypes.adminOverview,
   tagTypes.profile,
+  tagTypes.staticContent,
 ];

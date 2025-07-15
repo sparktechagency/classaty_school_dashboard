@@ -9,6 +9,7 @@ type TRole =
 type TStatus = "active" | "blocked";
 
 interface IUser {
+  userId?: string;
   uid: string;
   studentId?: string;
   parentsId?: string;
