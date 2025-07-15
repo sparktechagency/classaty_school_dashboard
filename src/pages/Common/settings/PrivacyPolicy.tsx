@@ -1,14 +1,53 @@
 import JoditEditor from "jodit-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ReuseButton from "../../../ui/Button/ReuseButton";
+import {
+  useCreateStaticContentMutation,
+  useGetStaticContentQuery,
+} from "../../../redux/features/adminOverview/adminOverviewApi";
+import { toast } from "sonner";
+import Loading from "../../../ui/Loading";
 
 const PrivacyPolicy = () => {
+  const { data, isFetching } = useGetStaticContentQuery({
+    type: "privacy-policy",
+  });
+  const [updateStaticContent] = useCreateStaticContentMutation();
   const editor = useRef(null);
   const [content, setContent] = useState("");
 
-  const handleOnSave = () => {
-    console.log(content);
+  useEffect(() => {
+    if (data) {
+      setContent(data?.data?.content);
+    }
+  }, [data]);
+
+  const handleOnSave = async () => {
+    const toastId = toast.loading("Updating privacy policy...");
+
+    const data = {
+      type: "privacy-policy",
+      content: content,
+    };
+    try {
+      const res = await updateStaticContent(data).unwrap();
+      toast.success(res?.message, { id: toastId, duration: 2000 });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to update privacy policy", {
+        id: toastId,
+        duration: 2000,
+      });
+    }
   };
+
+  if (isFetching) {
+    return (
+      <div className="flex items-center justify-center min-h-[70vh]">
+        <Loading />
+      </div>
+    );
+  }
 
   return (
     <div

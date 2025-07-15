@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Form, Upload } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IoCameraOutline } from "react-icons/io5";
 import ReusableForm from "../../../ui/Form/ReuseForm";
 import ReuseInput from "../../../ui/Form/ReuseInput";
@@ -44,9 +44,13 @@ const EditProfile = () => {
   const [updateProfile] = useUpdateProfileMutation();
   const { data, isFetching } = useGetProfileQuery({});
   const profileData = data?.data;
-  const profileImage = serverUrl + profileData?.image;
+  const profileImage = serverUrl + "/" + profileData?.image;
 
   const [imageUrl, setImageUrl] = useState(profileImage);
+
+  useEffect(() => {
+    setImageUrl(profileImage);
+  }, [profileImage]);
 
   const handleImageUpload = (info: any) => {
     if (info.file.status === "removed") {
@@ -87,7 +91,6 @@ const EditProfile = () => {
 
   return (
     <div className=" mt-10  rounded-xl">
-      <h1 className="text-3xl font-bold text-secondary-color">Edit Profile</h1>
       <div className=" flex justify-start items-center">
         <ReusableForm
           form={form}
@@ -114,7 +117,7 @@ const EditProfile = () => {
                   onChange={handleImageUpload}
                   maxCount={1}
                   accept="image/*"
-                  className=" text-start"
+                  className="text-start"
                   style={{
                     width: "100%",
                     height: "100%",
@@ -128,7 +131,7 @@ const EditProfile = () => {
                     style={{
                       zIndex: 1,
                     }}
-                    className="!bg-base-color/70 p-2 w-fit h-fit !border-none absolute -top-12 left-[115px] rounded-full cursor-pointer shadow-lg"
+                    className="bg-base-color !text-primary-color p-2 w-fit h-fit !border-none absolute -top-12 left-[115px] rounded-full cursor-pointer shadow-lg"
                   >
                     <IoCameraOutline className="w-6 h-6 !text-primary-color" />
                   </button>
@@ -137,7 +140,7 @@ const EditProfile = () => {
             </div>
           </div>
 
-          {inputStructure.map((input, index) => (
+          {inputStructure?.map((input, index) => (
             <ReuseInput
               key={index}
               name={input.name}

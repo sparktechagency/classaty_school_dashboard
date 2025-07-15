@@ -17,7 +17,6 @@ const AdminAllAdmin = () => {
   const data: any[] = AdminData;
   const [page, setPage] = useState(1);
   const [searchText, setSearchText] = useState("");
-  console.log(searchText);
 
   const limit = 12;
 

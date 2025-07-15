@@ -13,14 +13,18 @@ import {
   setOnlineUsers,
 } from "../../redux/features/conversation/conversationSlice";
 import { useSocket } from "../../context/socket-context";
+import useUserData from "../../hooks/useUserData";
 
 const ConversationChatList = ({ userData, onlineUsers }: any) => {
+  const user = useUserData();
   const socket = useSocket()?.socket;
   const dispatch = useAppDispatch();
 
   const [searchTerm, setSearchTerm] = useState("");
   const seletedConversation = useAppSelector(selectSelectedChatUser);
   const [chatList, setChatList] = useState<IConversation[]>([]);
+
+  console.log("chatList", chatList);
 
   const { data: allChatList, isFetching: isAllChatFeacthing } =
     useGetConversationListQuery(
@@ -33,8 +37,38 @@ const ConversationChatList = ({ userData, onlineUsers }: any) => {
     );
 
   const handleNewMessage = useCallback((message: any) => {
-    console.log({ message });
-    // setChatList((prev) => [...prev, message]);
+    const newMessage = message?.data;
+    console.log("newMessage", newMessage);
+    if (!newMessage?.conversationId) return;
+
+    setChatList((prevChatList: any) => {
+      const existingIndex = prevChatList.findIndex(
+        (item: any) =>
+          item.lastMessage?.conversationId === newMessage.conversationId
+      );
+
+      if (existingIndex !== -1) {
+        // Update the existing conversation's lastMessage
+        const updatedList = [...prevChatList];
+        updatedList[existingIndex] = {
+          ...updatedList[existingIndex],
+          lastMessage: newMessage,
+          updatedAt: newMessage.updatedAt,
+        };
+        return updatedList;
+      } else {
+        // Push a new conversation (you need to define what a new conversation looks like)
+        const newConversation = {
+          _id: newMessage.conversationId,
+          lastMessage: newMessage,
+          createdAt: newMessage.createdAt,
+          updatedAt: newMessage.updatedAt,
+          self: {}, // You should populate this from context or existing data
+          otherUser: {}, // Same as above
+        };
+        return [newConversation, ...prevChatList];
+      }
+    });
   }, []);
 
   useEffect(() => {
@@ -45,9 +79,7 @@ const ConversationChatList = ({ userData, onlineUsers }: any) => {
       return;
     }
 
-    socket.on("new_message", (message: any) => {
-      console.log("📨 New Message Received from socket:", message);
-    });
+    socket.on(`new_message::${user?.userId}`, handleNewMessage);
     socket.on("online_users", (online: any) => {
       console.log("Online Users:", online);
       dispatch(setOnlineUsers(online));
@@ -58,11 +90,14 @@ const ConversationChatList = ({ userData, onlineUsers }: any) => {
     // };
 
     return () => {
+      socket.off("online_users", (message: any) => {
+        console.log("📨 online_users Received from socket:", message);
+      });
       socket.off("new_message", (message: any) => {
-        console.log("📨 New Message Received from socket:", message);
+        console.log("📨New Message Off:", message);
       });
     };
-  }, [dispatch, socket]);
+  }, [dispatch, handleNewMessage, socket, user?.userId]);
 
   useEffect(() => {
     if (allChatList?.data?.result) {
@@ -71,6 +106,14 @@ const ConversationChatList = ({ userData, onlineUsers }: any) => {
   }, [allChatList?.data?.result]);
 
   const filteredConversations = useMemo(() => {
+    console.log(
+      "chatList ===>",
+      chatList?.slice()?.sort((a: IConversation, b: IConversation) => {
+        const dateA = new Date(a?.lastMessage?.updatedAt || 0).getTime();
+        const dateB = new Date(b?.lastMessage?.updatedAt || 0).getTime();
+        return dateB - dateA;
+      })
+    );
     return chatList?.slice()?.sort((a: IConversation, b: IConversation) => {
       const dateA = new Date(a?.lastMessage?.updatedAt || 0).getTime();
       const dateB = new Date(b?.lastMessage?.updatedAt || 0).getTime();
