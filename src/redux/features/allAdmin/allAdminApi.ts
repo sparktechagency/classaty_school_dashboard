@@ -16,7 +16,7 @@ const allAdminApi = baseApi.injectEndpoints({
     getAdmin: build.query({
       query: ({ page, limit, searchTerm }) => {
         return {
-          url: `${allAdmin_url}`,
+          url: `${allAdmin_url}/all_admin`,
           method: "GET",
           params: {
             page,
@@ -29,7 +29,7 @@ const allAdminApi = baseApi.injectEndpoints({
     }),
     updateAdmin: build.mutation({
       query: (req) => ({
-        url: `${allAdmin_url}/${req?.params}`,
+        url: `/users/edit_admin`,
         method: "PATCH",
         body: req?.body,
       }),
@@ -37,7 +37,7 @@ const allAdminApi = baseApi.injectEndpoints({
     }),
     deleteAdmin: build.mutation({
       query: (req) => ({
-        url: `${allAdmin_url}/${req?.params}`,
+        url: `/users/delete_admin/${req?.params}`,
         method: "DELETE",
       }),
       invalidatesTags: [tagTypes.allAdmin],

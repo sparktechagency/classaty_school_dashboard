@@ -5,15 +5,19 @@ import ReuseInput from "../../Form/ReuseInput";
 // import { RiShieldUserFill, RiSchoolFill } from "react-icons/ri";
 // import { FaPhone } from "react-icons/fa6";
 import ReuseButton from "../../Button/ReuseButton";
+import tryCatchWrapper from "../../../utils/tryCatchWrapper";
+import { useUpdateAdminMutation } from "../../../redux/features/allAdmin/allAdminApi";
+import { useEffect } from "react";
 
 interface EditAdminModalProps {
   isEditModalVisible: boolean;
   handleCancel: () => void;
+  currentRecord: any;
 }
 
 const inputStructure = [
   {
-    name: "fullName",
+    name: "name",
     type: "text",
     inputType: "normal",
     label: "Full Name",
@@ -22,16 +26,7 @@ const inputStructure = [
     // prefix: <RiSchoolFill className="mr-1 text-secondary-color" />,
     rules: [{ required: true, message: "Full Name is required" }],
   },
-  {
-    name: "email",
-    type: "text",
-    inputType: "normal",
-    label: "Email",
-    placeholder: "Enter Email",
-    labelClassName: "!font-bold",
-    // prefix: <FaPhone className="mr-1 text-secondary-color" />,
-    rules: [{ required: true, message: "Email is required" }],
-  },
+
   {
     name: "phoneNumber",
     type: "text",
@@ -42,25 +37,33 @@ const inputStructure = [
     // prefix: <RiShieldUserFill className="mr-1 text-secondary-color" />,
     rules: [{ required: true, message: "Admin Phone Number is required" }],
   },
-  {
-    name: "address",
-    type: "text",
-    inputType: "normal",
-    label: "Address",
-    placeholder: "Enter Address ",
-    labelClassName: "!font-bold",
-    // prefix: <RiShieldUserFill className="mr-1 text-secondary-color" />,
-    rules: [{ required: true, message: "Admin Address is required" }],
-  },
 ];
 
 const EditAdminModal: React.FC<EditAdminModalProps> = ({
   isEditModalVisible,
   handleCancel,
+  currentRecord,
 }) => {
+  const [editAdmin] = useUpdateAdminMutation();
   const [form] = Form.useForm();
-  const handleFinish = (values: any) => {
-    console.log(values);
+
+  useEffect(() => {
+    form.setFieldsValue(currentRecord);
+  }, [currentRecord, form]);
+
+  const handleFinish = async (values: any) => {
+    const res = await tryCatchWrapper(
+      editAdmin,
+      {
+        body: { ...values, userId: currentRecord?._id },
+      },
+      "Updating Admin..."
+    );
+
+    if (res?.statusCode === 200) {
+      form.resetFields();
+      handleCancel();
+    }
   };
   return (
     <Modal
@@ -77,7 +80,11 @@ const EditAdminModal: React.FC<EditAdminModalProps> = ({
           </h3>
 
           <div className="mt-5">
-            <ReusableForm form={form} handleFinish={handleFinish}>
+            <ReusableForm
+              defaultValues={currentRecord}
+              form={form}
+              handleFinish={handleFinish}
+            >
               {inputStructure.map((input, index) => (
                 <ReuseInput
                   key={index}
@@ -97,7 +104,7 @@ const EditAdminModal: React.FC<EditAdminModalProps> = ({
                 variant="secondary"
                 className="w-full mt-4"
               >
-                Add Admin
+                Update Admin
               </ReuseButton>
             </ReusableForm>
           </div>

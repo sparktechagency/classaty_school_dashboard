@@ -4,7 +4,6 @@ import BlockModal from "../../ui/Modal/BlockModal";
 import UnblockModal from "../../ui/Modal/UnblockModal";
 import ReuseSearchInput from "../../ui/Form/ReuseSearchInput";
 
-import AdminData from "../../../public/data/AdminData";
 import DeleteModal from "../../ui/Modal/DeleteModal";
 import ReuseButton from "../../ui/Button/ReuseButton";
 import { FiPlus } from "react-icons/fi";
@@ -12,13 +11,30 @@ import AdminAllAdminTable from "../../ui/Tables/AdminAllAdminTable";
 import EditAdminModal from "../../ui/Modal/AdminAllAdmin/EditAdminAllAdmin";
 import AddAdminModal from "../../ui/Modal/AdminAllAdmin/AddAdminModal";
 import ViewAdminModal from "../../ui/Modal/AdminAllAdmin/ViewAdminModal";
+import {
+  useDeleteAdminMutation,
+  useGetAdminQuery,
+} from "../../redux/features/allAdmin/allAdminApi";
+import tryCatchWrapper from "../../utils/tryCatchWrapper";
+import { useBlockUserMutation } from "../../redux/features/parents/parentsApi";
 
 const AdminAllAdmin = () => {
-  const data: any[] = AdminData;
+  const [deleteAdmin] = useDeleteAdminMutation();
+  const [userAction] = useBlockUserMutation();
+
   const [page, setPage] = useState(1);
   const [searchText, setSearchText] = useState("");
 
   const limit = 12;
+
+  const { data, isFetching } = useGetAdminQuery({
+    page,
+    limit,
+    searchTerm: searchText,
+  });
+
+  const allAdminData = data?.data?.result;
+  const allAdminPagination = data?.data?.meta;
 
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
@@ -71,18 +87,46 @@ const AdminAllAdmin = () => {
     // setCurrentRecord(null);
   };
 
-  const handleBlock = (record: any) => {
-    handleCancel();
-    console.log(record);
+  const handleBlock = async (data: any) => {
+    const res = await tryCatchWrapper(
+      userAction,
+      {
+        body: {
+          userId: data?._id,
+          action: "blocked",
+        },
+      },
+      "Blocking..."
+    );
+    if (res.statusCode === 200) {
+      handleCancel();
+    }
   };
-  const handleUnblock = (record: any) => {
-    handleCancel();
-    console.log(record);
+  const handleUnblock = async (data: any) => {
+    const res = await tryCatchWrapper(
+      userAction,
+      {
+        body: {
+          userId: data?._id,
+          action: "active",
+        },
+      },
+      "Unblocking..."
+    );
+    if (res.statusCode === 200) {
+      handleCancel();
+    }
   };
 
-  const handleDelete = (record: any) => {
-    handleCancel();
-    console.log(record);
+  const handleDelete = async () => {
+    const res = await tryCatchWrapper(
+      deleteAdmin,
+      { params: currentRecord?._id },
+      "Deleting..."
+    );
+    if (res.statusCode === 200) {
+      handleCancel();
+    }
   };
   return (
     <div className=" bg-primary-color rounded-xl p-4 min-h-[90vh]">
@@ -111,15 +155,15 @@ const AdminAllAdmin = () => {
       </div>
       <div className="border-2 border-[#e1e1e1] rounded-xl rounded-tr-xl">
         <AdminAllAdminTable
-          data={data}
-          loading={false}
+          data={allAdminData}
+          loading={isFetching}
           showViewModal={showViewUserModal}
           showEditModal={showEditModal}
           showBlockModal={showBlockModal}
           showUnblockModal={showUnblockModal}
           setPage={setPage}
           page={page}
-          total={data.length}
+          total={allAdminPagination?.total}
           limit={limit}
         />
       </div>
@@ -127,6 +171,7 @@ const AdminAllAdmin = () => {
       <EditAdminModal
         isEditModalVisible={isEditModalVisible}
         handleCancel={handleCancel}
+        currentRecord={currentRecord}
       />
       <AddAdminModal
         isAddModalVisible={isAddModalVisible}

@@ -11,6 +11,14 @@ const overviewApi = baseApi.injectEndpoints({
       }),
       providesTags: [tagTypes.adminOverview, tagTypes.user],
     }),
+    getEarningChart: builder.query({
+      query: ({ year }) => ({
+        url: `payment/earning_statistic?year=${year}`,
+        method: "GET",
+        // params: { role },
+      }),
+      providesTags: [tagTypes.adminOverview, tagTypes.user],
+    }),
     getCounts: builder.query({
       query: () => ({
         url: `/users/count_total`,
@@ -39,6 +47,7 @@ const overviewApi = baseApi.injectEndpoints({
 
 export const {
   useGetUserChartQuery,
+  useGetEarningChartQuery,
   useGetCountsQuery,
   useGetStaticContentQuery,
   useCreateStaticContentMutation,

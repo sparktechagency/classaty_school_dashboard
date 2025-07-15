@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import {
   BarChart,
@@ -9,35 +10,9 @@ import {
   Tooltip as RechartsTooltip,
 } from "recharts";
 
-// Define the structure of each data point in the chart
-interface ChartData {
-  name: string;
-  uv: number;
-}
-
-const data: ChartData[] = [
-  { name: "Jan", uv: 80 },
-  { name: "Feb", uv: 70 },
-  { name: "Mar", uv: 50 },
-  { name: "Apr", uv: 60 },
-  { name: "May", uv: 30 },
-  { name: "Jun", uv: 20 },
-  { name: "Jul", uv: 45 },
-  { name: "Aug", uv: 36 },
-  { name: "Sep", uv: 53 },
-  { name: "Oct", uv: 69 },
-  { name: "Nov", uv: 78 },
-  { name: "Dec", uv: 36 },
-];
-
-interface CustomTooltipProps {
-  active?: boolean;
-  payload?: { payload: ChartData; uv: number }[];
-}
-
-const Bar_Chart: React.FC = () => {
+const Bar_Chart = ({ data }: any) => {
   // Custom tooltip to display the information
-  const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload }) => {
+  const CustomTooltip: React.FC<any> = ({ active, payload }) => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-white shadow-md p-2 rounded-md border border-gray-300">
@@ -46,7 +21,7 @@ const Bar_Chart: React.FC = () => {
           </p>
           <p className="text-xs text-gray-600">
             Total Income:{" "}
-            <span className="font-semibold">${payload[0].uv}</span>
+            <span className="font-semibold">${payload[0].amount}</span>
           </p>
         </div>
       );
@@ -89,7 +64,7 @@ const Bar_Chart: React.FC = () => {
           <ReferenceLine y={50} stroke="#E5E5EF" />
           <ReferenceLine y={60} stroke="#E5E5EF" />
           <Bar
-            dataKey="uv"
+            dataKey="amount"
             fill="url(#incomeGradient)" // Bar color
             barSize={20} // Width of each bar
             radius={[10, 10, 10, 10]} // Rounded corners for bars
