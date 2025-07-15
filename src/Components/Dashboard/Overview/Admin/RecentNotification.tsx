@@ -1,8 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Link } from "react-router-dom";
 import { AllIcons } from "../../../../../public/images/AllImages";
 import useUserData from "../../../../hooks/useUserData";
 import { useGetNotificationQuery } from "../../../../redux/features/school/schoolApi";
 import dayjs from "dayjs";
+import { useEffect, useState } from "react";
+import { useSocket } from "../../../../context/socket-context";
+import { formatDateTime } from "../../../../utils/dateFormet";
 
 export interface INotification {
   _id: string;
@@ -20,8 +24,46 @@ export interface INotification {
 
 const RecentNotification = () => {
   const user = useUserData();
+  const socket = useSocket()?.socket;
+  const limit = 10;
 
-  const { data: activities } = useGetNotificationQuery({});
+  const [allNotifications, setAllNotifications] = useState<INotification[]>([]);
+
+  const { data: activities } = useGetNotificationQuery({
+    page: 1,
+    limit,
+  });
+
+  useEffect(() => {
+    setAllNotifications(activities?.data?.result || []);
+  }, [activities]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    if (!socket.connected) {
+      socket.connect();
+    }
+
+    const handleNotification = (data: any) => {
+      setAllNotifications((prev) => [...prev, data?.notification]);
+    };
+
+    const eventName = `notification::${user?.userId}`;
+
+    socket.on(eventName, handleNotification);
+
+    return () => {
+      socket.off(eventName, handleNotification); // <-- Match eventName here!
+    };
+  }, [socket, user]);
+
+  const newNotificationsByTime = allNotifications
+    ?.slice() // clone array to avoid mutating state
+    .sort(
+      (a: INotification, b: INotification) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
 
   return (
     <div className="w-full max-h-[300px] xl:max-h-[660px] overflow-y-auto  rounded-xl relative border-2 border-[#e1e1e1]">
@@ -35,7 +77,7 @@ const RecentNotification = () => {
       </div>
 
       <div className="flex flex-col  p-5">
-        {activities?.data?.result?.map((activity: INotification, i: number) => (
+        {newNotificationsByTime?.map((activity: INotification, i: number) => (
           <div
             key={i}
             className="flex items-center gap-2 border-b border-[#e1e1e1] py-3"
@@ -50,7 +92,7 @@ const RecentNotification = () => {
               </p>
 
               <p className="text-sm text-[#8A8D8E] mt-1">
-                {dayjs(activity.createdAt).format("DD-MM-YYYY hh:mm A")}
+                {formatDateTime(activity.createdAt)}
               </p>
             </div>
           </div>

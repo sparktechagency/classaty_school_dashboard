@@ -15,9 +15,9 @@ interface AdminAllAdminTableProps {
   showBlockModal: (record: any) => void; // Function to handle blocking a user
   showUnblockModal: (record: any) => void; // Function to handle unblocking a user
   setPage?: (page: number) => void; // Function to handle pagination
-  page?: number;
-  total?: number;
-  limit?: number;
+  page: number;
+  total: number;
+  limit: number;
 }
 
 const AdminAllAdminTable: React.FC<AdminAllAdminTableProps> = ({
@@ -35,19 +35,17 @@ const AdminAllAdminTable: React.FC<AdminAllAdminTableProps> = ({
   const columns = [
     {
       title: "#UID",
-      render: (_: unknown, __: unknown, index: number) => index + 1,
+      dataIndex: "_id",
+      render: (_: unknown, __: unknown, index: number) =>
+        page * limit - limit + index + 1,
       key: "_id",
     },
     {
       title: " Name",
-      dataIndex: "fullName", // Data key for fullName
-      key: "fullName",
+      dataIndex: "name", // Data key for name
+      key: "name",
     },
-    {
-      title: "Email",
-      dataIndex: "email", // Data key for email
-      key: "email",
-    },
+
     {
       title: "Phone Number",
       dataIndex: "phoneNumber", // Data key for phoneNumber
@@ -60,24 +58,15 @@ const AdminAllAdminTable: React.FC<AdminAllAdminTableProps> = ({
     },
     {
       title: "Status",
-      dataIndex: "Status",
-      key: "Status",
-      filters: [
-        { text: "Active", value: "Active" },
-        { text: "Inactive", value: "Inactive" },
-      ],
-      onFilter: (value: string, record: any) => record.Status === value,
+      dataIndex: "status",
+      key: "status",
       render: (status: string) => (
-        <span style={{ color: status === "Active" ? "green" : "red" }}>
+        <span style={{ color: status === "active" ? "green" : "red" }}>
           {status}
         </span>
       ),
     },
-    {
-      title: "Address",
-      dataIndex: "address", // Data key for address
-      key: "address",
-    },
+
     {
       title: "Action",
       key: "action",
@@ -103,23 +92,25 @@ const AdminAllAdminTable: React.FC<AdminAllAdminTableProps> = ({
 
           {/* Block User Tooltip */}
 
-          <Tooltip placement="left" title="Unblock">
-            <button
-              className="!p-0 !bg-transparent !border-none !text-base-color cursor-pointer hidden"
-              onClick={() => showUnblockModal(record)}
-            >
-              <CgUnblock style={{ fontSize: "24px" }} />
-            </button>
-          </Tooltip>
-
-          <Tooltip placement="left" title="Block">
-            <button
-              className="!p-0 !bg-transparent !border-none !text-error-color cursor-pointer"
-              onClick={() => showBlockModal(record)}
-            >
-              <MdBlock style={{ fontSize: "24px" }} />
-            </button>
-          </Tooltip>
+          {record?.status !== "blocked" ? (
+            <Tooltip placement="left" title="Block">
+              <button
+                className="!p-0 !bg-transparent !border-none !text-error-color cursor-pointer"
+                onClick={() => showBlockModal(record)}
+              >
+                <MdBlock style={{ fontSize: "24px" }} />
+              </button>
+            </Tooltip>
+          ) : (
+            <Tooltip placement="left" title="Unblock">
+              <button
+                className="!p-0 !bg-transparent !border-none !text-base-color cursor-pointer"
+                onClick={() => showUnblockModal(record)}
+              >
+                <CgUnblock style={{ fontSize: "24px" }} />
+              </button>
+            </Tooltip>
+          )}
         </Space>
       ),
       align: "center",

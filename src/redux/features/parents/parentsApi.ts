@@ -37,6 +37,7 @@ const parentsApi = baseApi.injectEndpoints({
         tagTypes.user,
         tagTypes.teacher,
         tagTypes.student,
+        tagTypes.allAdmin,
       ],
     }),
   }),

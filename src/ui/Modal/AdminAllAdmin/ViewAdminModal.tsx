@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Modal } from "antd";
 import ReuseButton from "../../Button/ReuseButton";
+import { getImageUrl } from "../../../helpers/config/envConfig";
+import { AllImages } from "../../../../public/images/AllImages";
 interface ViewAdminModalProps {
   isViewModalVisible: boolean;
   handleCancel: () => void;
@@ -13,6 +15,7 @@ const ViewAdminModal: React.FC<ViewAdminModalProps> = ({
   currentRecord,
   showDeleteModal,
 }) => {
+  const serverUrl = getImageUrl();
   return (
     <Modal
       open={isViewModalVisible}
@@ -30,19 +33,18 @@ const ViewAdminModal: React.FC<ViewAdminModalProps> = ({
           <div className="flex flex-col justify-center items-center gap-2 mt-3">
             {/* Avatar */}
             <img
-              src={currentRecord?.image}
+              src={
+                currentRecord?.image
+                  ? serverUrl + "/" + currentRecord?.image
+                  : AllImages.profile
+              }
               alt={currentRecord?.fullName}
               className="w-20 h-20 object-cover rounded"
             />
             <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-secondary-color mt-5">
-              {currentRecord?.fullName}
+              {currentRecord?.name}
             </h2>
-            <h2 className="text-base sm:text-lg lg:text-xl font-semibold text-secondary-color mt-1">
-              Email: {currentRecord?.email}
-            </h2>
-            <h2 className="text-base sm:text-lg lg:text-xl font-semibold text-secondary-color mt-1">
-              Address: {currentRecord?.address}
-            </h2>
+
             <h2 className="text-base sm:text-lg lg:text-xl font-semibold text-secondary-color mt-1">
               Phone Number: {currentRecord?.phoneNumber}
             </h2>

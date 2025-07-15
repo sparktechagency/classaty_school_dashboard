@@ -5,6 +5,8 @@ import ReuseInput from "../../Form/ReuseInput";
 // import { RiShieldUserFill, RiSchoolFill } from "react-icons/ri";
 // import { FaPhone } from "react-icons/fa6";
 import ReuseButton from "../../Button/ReuseButton";
+import { useAddAdminMutation } from "../../../redux/features/allAdmin/allAdminApi";
+import tryCatchWrapper from "../../../utils/tryCatchWrapper";
 
 interface AddAdminModalProps {
   isAddModalVisible: boolean;
@@ -13,7 +15,7 @@ interface AddAdminModalProps {
 
 const inputStructure = [
   {
-    name: "fullName",
+    name: "name",
     type: "text",
     inputType: "normal",
     label: "Full Name",
@@ -21,16 +23,6 @@ const inputStructure = [
     labelClassName: "!font-bold",
     // prefix: <RiSchoolFill className="mr-1 text-secondary-color" />,
     rules: [{ required: true, message: "Full Name is required" }],
-  },
-  {
-    name: "email",
-    type: "text",
-    inputType: "normal",
-    label: "Email",
-    placeholder: "Enter Email",
-    labelClassName: "!font-bold",
-    // prefix: <FaPhone className="mr-1 text-secondary-color" />,
-    rules: [{ required: true, message: "Email is required" }],
   },
   {
     name: "phoneNumber",
@@ -42,25 +34,25 @@ const inputStructure = [
     // prefix: <RiShieldUserFill className="mr-1 text-secondary-color" />,
     rules: [{ required: true, message: "Admin Phone Number is required" }],
   },
-  {
-    name: "address",
-    type: "text",
-    inputType: "normal",
-    label: "Address",
-    placeholder: "Enter Address ",
-    labelClassName: "!font-bold",
-    // prefix: <RiShieldUserFill className="mr-1 text-secondary-color" />,
-    rules: [{ required: true, message: "Admin Address is required" }],
-  },
 ];
 
 const AddAdminModal: React.FC<AddAdminModalProps> = ({
   isAddModalVisible,
   handleCancel,
 }) => {
+  const [addAdmin] = useAddAdminMutation();
   const [form] = Form.useForm();
-  const handleFinish = (values: any) => {
-    console.log(values);
+  const handleFinish = async (values: any) => {
+    const res = await tryCatchWrapper(
+      addAdmin,
+      { body: values },
+      "Creating New Admin..."
+    );
+
+    if (res?.statusCode === 200) {
+      form.resetFields();
+      handleCancel();
+    }
   };
   return (
     <Modal
