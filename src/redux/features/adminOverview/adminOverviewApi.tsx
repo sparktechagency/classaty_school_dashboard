@@ -4,10 +4,10 @@ import { tagTypes } from "../../tagTypes";
 const overviewApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getUserChart: builder.query({
-      query: ({ year }) => ({
-        url: `/users/user_overview`,
+      query: ({ role }) => ({
+        url: `/users/user_overview?role=${role}`,
         method: "GET",
-        params: { year },
+        // params: { role },
       }),
       providesTags: [tagTypes.adminOverview, tagTypes.user],
     }),
