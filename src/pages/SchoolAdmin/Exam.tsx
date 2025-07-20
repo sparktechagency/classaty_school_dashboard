@@ -20,6 +20,7 @@ import AddExamTermModal from "../../ui/Modal/Exam/AddExamTermModal";
 import EditExamModal from "../../ui/Modal/Exam/EditExamModal";
 import EditExamTermModal from "../../ui/Modal/Exam/EditExamTermModal";
 import tryCatchWrapper from "../../utils/tryCatchWrapper";
+import { ColumnsType } from "antd/es/table";
 
 const { Panel } = Collapse;
 
@@ -155,7 +156,7 @@ const ExamPage = () => {
     }
   };
 
-  const columns = [
+  const columns: ColumnsType<IExam> = [
     {
       title: "Subject Name",
       dataIndex: "subjectName",

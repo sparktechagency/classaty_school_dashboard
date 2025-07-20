@@ -109,6 +109,7 @@ const RecentStudent = () => {
       <EditSchoolAdminStudent
         isEditModalVisible={isEditModalVisible}
         handleCancel={handleCancel}
+        currentRecord={currentRecord}
       />
 
       <ViewSchoolAdminStudent
