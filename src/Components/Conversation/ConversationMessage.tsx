@@ -116,6 +116,10 @@ const ConversationMessage = ({ userData, onlineUsers }: any) => {
     const roomId = selectedConversation?._id;
     if (!roomId || !socket) return;
 
+    if (!socket.connected) {
+      socket.connect();
+    }
+
     socket.emit("join", roomId.toString());
     socket.on(`receive_message::${roomId}`, handleMessage);
 

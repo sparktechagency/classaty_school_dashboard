@@ -79,6 +79,9 @@ const ConversationChatList = ({ userData, onlineUsers }: any) => {
       return;
     }
 
+    if (!socket.connected) {
+      socket.connect();
+    }
     socket.on(`new_message::${user?.userId}`, handleNewMessage);
     socket.on("online_users", (online: any) => {
       console.log("Online Users:", online);
