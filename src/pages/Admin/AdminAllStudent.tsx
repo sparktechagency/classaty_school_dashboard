@@ -130,7 +130,7 @@ const AdminAllStudent = () => {
 
   const handleDownload = () => {
     const link = document.createElement("a");
-    link.href = "../../../public/file/Student.xlsx"; // Your file URL (can be relative or absolute)
+    link.href = "../../file/Student.xlsx"; // Your file URL (can be relative or absolute)
     link.download = "Student-Format.xlsx"; // Desired download filename
     link.click();
   };
