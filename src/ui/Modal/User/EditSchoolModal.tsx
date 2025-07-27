@@ -79,6 +79,8 @@ const EditSchoolModal: React.FC<EditSchoolModalProps> = ({
   }, [currentRecord, form]);
 
   const handleSubmit = async (values: any) => {
+    console.log(values);
+    console.log(currentRecord?.school?._id);
     const res = await tryCatchWrapper(
       updateSchool,
       {
