@@ -14,6 +14,15 @@ const studentApi = baseApi.injectEndpoints({
       invalidatesTags: [tagTypes.student],
     }),
 
+    addStudentWithXlsxFile: build.mutation({
+      query: (req) => ({
+        url: `${student_url}/create_student_using_xlsx`,
+        method: "POST",
+        body: req.body,
+      }),
+      invalidatesTags: [tagTypes.student],
+    }),
+
     getStudent: build.query({
       query: ({ page, limit, searchTerm }) => {
         return {
@@ -40,7 +49,7 @@ const studentApi = baseApi.injectEndpoints({
       invalidatesTags: [tagTypes.student],
     }),
 
-    userAction : build.mutation({
+    userAction: build.mutation({
       query: (req) => {
         return {
           url: `/users/action`,
@@ -48,7 +57,7 @@ const studentApi = baseApi.injectEndpoints({
           body: req?.body,
         }
       },
-      invalidatesTags: [tagTypes.student, tagTypes.parent, tagTypes.teacher , tagTypes.manager],
+      invalidatesTags: [tagTypes.student, tagTypes.parent, tagTypes.teacher, tagTypes.manager],
     }),
 
     deleteStudent: build.mutation({
@@ -63,6 +72,7 @@ const studentApi = baseApi.injectEndpoints({
 
 export const {
   useAddStudentMutation,
+  useAddStudentWithXlsxFileMutation,
   useGetStudentQuery,
   useDeleteStudentMutation,
   useUserActionMutation,
