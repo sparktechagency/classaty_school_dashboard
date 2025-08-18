@@ -3,25 +3,22 @@ import { useNavigate } from "react-router-dom";
 import Container from "../../ui/Container";
 import { AllImages } from "../../../public/images/AllImages";
 import ReusableForm from "../../ui/Form/ReuseForm";
-import ReuseInput from "../../ui/Form/ReuseInput";
 import ReuseButton from "../../ui/Button/ReuseButton";
-import { FaPhone } from "react-icons/fa6";
 import tryCatchWrapper from "../../utils/tryCatchWrapper";
 import { useLoginMutation } from "../../redux/features/auth/authApi";
-import { Form } from "antd";
+import { Form, Input, Typography } from "antd";
 import Cookies from "js-cookie";
 
-const inputStructure = [
-  {
-    name: "phoneNumber",
-    inputType: "email",
-    label: "Phone Number",
-    placeholder: "Enter your phone number",
-    labelClassName: "!font-bold",
-    prefix: <FaPhone className="mr-1" />,
+import { Select } from "antd";
 
-    rules: [{ required: true, message: "Phone Number is required" }],
-  },
+// Country codes
+const countryCodes = [
+  { name: "Kuwait", code: "+965" },
+  { name: "Bahrain", code: "+973" },
+  { name: "Qatar", code: "+974" },
+  { name: "Saudi Arabia", code: "+966" },
+  { name: "United Arab Emirates", code: "+971" },
+  { name: "Oman", code: "+968" },
 ];
 
 const SignIn = () => {
@@ -30,26 +27,29 @@ const SignIn = () => {
   const [login] = useLoginMutation();
 
   const onFinish = async (values: any) => {
-    const res = await tryCatchWrapper(login, { body: values }, "Signing In...");
+    const fullPhoneNumber = `${values.countryCode}${values.phoneNumber}`;
 
-    console.log("res", res);
+    const res = await tryCatchWrapper(
+      login,
+      { body: { phoneNumber: fullPhoneNumber } },
+      "Signing In..."
+    );
 
     if (res?.data?.signInToken) {
       Cookies.set("classaty_signInToken", res?.data?.signInToken, {
         path: "/",
         expires: 1,
-        secure: false,
       });
-      Cookies.set("classaty_phoneNumber", values.phoneNumber, {
+      Cookies.set("classaty_phoneNumber", fullPhoneNumber, {
         path: "/",
         expires: 1,
-        secure: false,
       });
 
       form.resetFields();
       router("/sign-in/verify-otp", { replace: true });
     }
   };
+
   return (
     <div className="!bg-primary-color">
       <Container>
@@ -70,19 +70,56 @@ const SignIn = () => {
             </div>
             {/* -------- Form Start ------------ */}
             <ReusableForm form={form} handleFinish={onFinish}>
-              {inputStructure.map((input, index) => (
-                <ReuseInput
-                  key={index}
-                  name={input.name}
-                  Typolevel={4}
-                  prefix={input.prefix}
-                  inputType={input.inputType}
-                  label={input.label}
-                  placeholder={input.placeholder}
-                  labelClassName={input.labelClassName}
-                  rules={input.rules}
-                />
-              ))}
+              <Typography.Title
+                level={5}
+                className="!text-base-color !font-bold"
+              >
+                Phone Number
+              </Typography.Title>
+              <Form.Item>
+                <Input.Group compact>
+                  <Form.Item
+                    name="countryCode"
+                    noStyle
+                    initialValue="+965"
+                    rules={[
+                      { required: true, message: "Country code is required" },
+                    ]}
+                  >
+                    <Select
+                      style={{
+                        width: 90,
+                        height: 45,
+                      }}
+                      className="!border-0 hover:outline-0 hover:ring-0 focus:outline-0 focus:ring-0 "
+                    >
+                      {countryCodes.map((c) => (
+                        <Select.Option key={c.code} value={c.code}>
+                          {c.code}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+
+                  <Form.Item
+                    name="phoneNumber"
+                    noStyle
+                    rules={[
+                      { required: true, message: "Phone number is required" },
+                    ]}
+                  >
+                    <Input
+                      className="!text-lg !bg-[#EFEFEF] !border !border-[#EFEFEF] !text-base-color !ring-0"
+                      style={{
+                        width: "calc(100% - 90px)",
+                        height: 45,
+                        borderRadius: "0 8px 8px 0",
+                      }}
+                      placeholder="Enter your phone number"
+                    />
+                  </Form.Item>
+                </Input.Group>
+              </Form.Item>
 
               <ReuseButton
                 variant="secondary"
