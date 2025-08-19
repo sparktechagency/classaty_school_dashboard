@@ -13,12 +13,12 @@ import { Select } from "antd";
 
 // Country codes
 const countryCodes = [
-  { name: "Kuwait", code: "+965" },
-  { name: "Bahrain", code: "+973" },
-  { name: "Qatar", code: "+974" },
-  { name: "Saudi Arabia", code: "+966" },
-  { name: "United Arab Emirates", code: "+971" },
-  { name: "Oman", code: "+968" },
+  { name: "+965", code: "965" },
+  { name: "+973", code: "973" },
+  { name: "+974", code: "974" },
+  { name: "+966", code: "966" },
+  { name: "+971", code: "971" },
+  { name: "+968", code: "968" },
 ];
 
 const SignIn = () => {
@@ -95,7 +95,7 @@ const SignIn = () => {
                     >
                       {countryCodes.map((c) => (
                         <Select.Option key={c.code} value={c.code}>
-                          {c.code}
+                          {c.name}
                         </Select.Option>
                       ))}
                     </Select>
