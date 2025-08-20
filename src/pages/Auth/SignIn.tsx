@@ -28,7 +28,7 @@ const SignIn = () => {
 
   const onFinish = async (values: any) => {
     const fullPhoneNumber = `${values.countryCode}${values.phoneNumber}`;
-
+    console.log(fullPhoneNumber, "fullPhoneNumber");
     const res = await tryCatchWrapper(
       login,
       { body: { phoneNumber: fullPhoneNumber } },
@@ -81,7 +81,7 @@ const SignIn = () => {
                   <Form.Item
                     name="countryCode"
                     noStyle
-                    initialValue="+965"
+                    initialValue="965"
                     rules={[
                       { required: true, message: "Country code is required" },
                     ]}
