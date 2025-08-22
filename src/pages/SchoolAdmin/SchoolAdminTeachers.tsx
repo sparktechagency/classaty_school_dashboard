@@ -13,6 +13,7 @@ import SchoolAdminTeacherView from "../../ui/Modal/SchoolAdminTeacher/SchoolAdmi
 import SchoolAdminTeacherTable from "../../ui/Tables/SchoolAdminTeacherTable";
 import { useUserActionMutation } from "../../redux/features/student/studentAPi";
 import tryCatchWrapper from "../../utils/tryCatchWrapper";
+import EditSchollAdminTeacher from "../../ui/Modal/SchoolAdminTeacher/EditSchollAdminTeacher";
 
 const SchoolAdminTeachers = () => {
   const [page, setPage] = useState(1);
@@ -21,6 +22,7 @@ const SchoolAdminTeachers = () => {
   const limit = 12;
 
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
   const [isBlockModalVisible, setIsBlockModalVisible] = useState(false);
   const [isUnblockModalVisible, setIsUnblockModalVisible] = useState(false);
@@ -39,6 +41,10 @@ const SchoolAdminTeachers = () => {
     setIsAddModalVisible(true);
   };
 
+  const showEditModal = (record: any) => {
+    setCurrentRecord(record);
+    setIsEditModalVisible(true);
+  };
   const showViewUserModal = (record: any) => {
     setCurrentRecord(record);
     setIsViewModalVisible(true);
@@ -60,6 +66,7 @@ const SchoolAdminTeachers = () => {
 
   const handleCancel = () => {
     setIsAddModalVisible(false);
+    setIsEditModalVisible(false);
     setIsViewModalVisible(false);
     setIsBlockModalVisible(false);
     setIsUnblockModalVisible(false);
@@ -134,6 +141,7 @@ const SchoolAdminTeachers = () => {
           data={teacherData?.data?.result}
           loading={isFetching}
           showViewModal={showViewUserModal}
+          showEditModal={showEditModal}
           showBlockModal={showBlockModal}
           showUnblockModal={showUnblockModal}
           setPage={setPage}
@@ -174,6 +182,11 @@ const SchoolAdminTeachers = () => {
         currentRecord={currentRecord}
         handleDelete={handleDelete}
         description=" Are You Sure You want to Delete This Teacher ?"
+      />
+      <EditSchollAdminTeacher
+        isEditModalVisible={isEditModalVisible}
+        handleCancel={handleCancel}
+        currentRecord={currentRecord}
       />
     </div>
   );

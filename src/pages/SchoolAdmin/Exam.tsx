@@ -61,13 +61,19 @@ const MyPanelHeader = ({
     <Space>
       <Tooltip title="Edit Section">
         <EditOutlined
-          onClick={onEdit}
+          onClick={(e) => {
+            e.stopPropagation();
+            onEdit();
+          }}
           style={{ color: "white", cursor: "pointer" }}
         />
       </Tooltip>
       <Tooltip title="Delete Section">
         <RiDeleteBin6Line
-          onClick={onDelete}
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete();
+          }}
           style={{ color: "red", cursor: "pointer" }}
         />
       </Tooltip>
@@ -81,6 +87,8 @@ const ExamPage = () => {
   const [isAddTermModalVisible, setIsAddTermModalVisible] = useState(false);
   const [isAddExamModalVisible, setIsAddExamModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [isDeleteExamModalVisible, setIsDeleteExamModalVisible] =
+    useState(false);
   const [currentRecord, setCurrentRecord] = useState<ITerm | null>(null);
   const [activeKey, setActiveKey] = useState<string[]>([]);
 
@@ -121,6 +129,11 @@ const ExamPage = () => {
   const showDeleteModal = (record: ITerm) => {
     setCurrentRecord(record);
     setIsDeleteModalVisible(true);
+  };
+
+  const showExamDeleteModal = (record: IExam | any) => {
+    setCurrentRecord(record);
+    setIsDeleteExamModalVisible(true);
   };
 
   const handleCancel = () => {
@@ -200,7 +213,7 @@ const ExamPage = () => {
           </Tooltip>
           <Tooltip title="Delete">
             <RiDeleteBin6Line
-              onClick={() => showDeleteModal(record)}
+              onClick={() => showExamDeleteModal(record)}
               style={{ cursor: "pointer", color: "red", fontSize: 18 }}
             />
           </Tooltip>
@@ -249,15 +262,15 @@ const ExamPage = () => {
         handleCancel={handleCancel}
         currentRecord={currentRecord}
         handleDelete={handleDelete}
-        description="Are you sure you want to delete this?"
+        description="Are you sure you want to delete this Term?"
       />
 
       <DeleteModal
-        isDeleteModalVisible={isDeleteModalVisible}
+        isDeleteModalVisible={isDeleteExamModalVisible}
         handleCancel={handleCancel}
         currentRecord={currentRecord}
         handleDelete={handleExamDelete}
-        description="Are you sure you want to delete this?"
+        description="Are you sure you want to delete this Exam?"
       />
 
       {/* Collapse Panel */}

@@ -6,6 +6,7 @@ import tryCatchWrapper from "../../../utils/tryCatchWrapper";
 import ReuseButton from "../../Button/ReuseButton";
 import ReusableForm from "../../Form/ReuseForm";
 import ReuseInput from "../../Form/ReuseInput";
+import { useEffect } from "react";
 interface EditGradeSystemProps {
   isEditModalVisible: boolean;
   handleCancel: () => void;
@@ -17,8 +18,8 @@ const inputStructure = [
     name: "mark",
     type: "text",
     inputType: "normal",
-    label: "Make",
-    placeholder: "Enter Make",
+    label: "Mark",
+    placeholder: "Enter Mark",
     labelClassName: "!font-bold",
     prefix: <RiSchoolFill className="mr-1 text-secondary-color" />,
   },
@@ -40,6 +41,15 @@ const EditGradeSystem: React.FC<EditGradeSystemProps> = ({
 }) => {
   const [form] = Form.useForm();
   const [updateGradeSystem] = useUpdateGradeSystemMutation();
+
+  useEffect(() => {
+    if (isEditModalVisible && currentRecord) {
+      form.setFieldsValue({
+        mark: currentRecord.mark,
+        grade: currentRecord.grade,
+      });
+    }
+  }, [isEditModalVisible, currentRecord, form]);
 
   const handleFinish = async (values: any) => {
     const res = await tryCatchWrapper(
@@ -65,7 +75,7 @@ const EditGradeSystem: React.FC<EditGradeSystemProps> = ({
       <div className="py-5">
         <div className="text-base-color">
           <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-secondary-color text-center">
-            Edit Announcement
+            Edit Grade System
           </h3>
 
           <div className="mt-5">

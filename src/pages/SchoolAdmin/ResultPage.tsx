@@ -4,6 +4,7 @@ import { ResultType } from "../../types/ResultType";
 import ReuseSearchInput from "../../ui/Form/ReuseSearchInput";
 import ResultView from "../../ui/Modal/Result/ResultView";
 import ResultTable from "../../ui/Tables/ResultTable";
+import ResultEdit from "../../ui/Modal/Result/ResultEdit";
 
 const ResultPage = () => {
   // const data: ResultType[] = ResultData;
@@ -13,6 +14,7 @@ const ResultPage = () => {
 
   const limit = 12;
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [currentRecord, setCurrentRecord] = useState<ResultType | null>(null);
 
   const { data, isFetching } = useGetResultOfStudentQuery({
@@ -26,8 +28,14 @@ const ResultPage = () => {
     setIsViewModalVisible(true);
   };
 
+  const showEditModal = (record: ResultType) => {
+    setCurrentRecord(record);
+    setIsEditModalVisible(true);
+  };
+
   const handleCancel = () => {
     setIsViewModalVisible(false);
+    setIsEditModalVisible(false);
     setCurrentRecord(null);
   };
 
@@ -53,6 +61,7 @@ const ResultPage = () => {
           data={data?.data?.result}
           loading={isFetching}
           showViewModal={showViewUserModal}
+          showEditModal={showEditModal}
           setPage={setPage}
           page={page}
           total={data?.data?.meta?.total}
@@ -61,6 +70,11 @@ const ResultPage = () => {
       </div>
       <ResultView
         isViewModalVisible={isViewModalVisible}
+        handleCancel={handleCancel}
+        currentRecord={currentRecord}
+      />
+      <ResultEdit
+        isEditModalVisible={isEditModalVisible}
         handleCancel={handleCancel}
         currentRecord={currentRecord}
       />

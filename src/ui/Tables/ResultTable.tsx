@@ -11,6 +11,7 @@ interface ResultTableProps {
   data: ResultType[]; // Replace `unknown` with the actual type of your data array
   loading: boolean;
   showViewModal: (record: ResultType) => void; // Function to handle viewing a user
+  showEditModal: (record: ResultType) => void; // Function to handle editing a user
   setPage?: (page: number) => void; // Function to handle pagination
   page?: number;
   total?: number;
@@ -21,6 +22,7 @@ const ResultTable: React.FC<ResultTableProps> = ({
   data,
   loading,
   showViewModal,
+  showEditModal,
   setPage,
   page,
   total,
@@ -75,7 +77,7 @@ const ResultTable: React.FC<ResultTableProps> = ({
           <Tooltip placement="right" title="View Details">
             <button
               className="!p-0 !bg-transparent !border-none !text-secondary-color cursor-pointer"
-              onClick={() => showViewModal(record)}
+              onClick={() => showEditModal(record)}
             >
               <MdEdit style={{ fontSize: "24px" }} />
             </button>
