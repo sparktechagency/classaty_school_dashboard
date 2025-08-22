@@ -4,6 +4,7 @@ interface ITeacherData {
   phoneNumber: string;
   createdAt: string; // ISO date string
   schoolName: string;
+  userId?: string;
   schoolAddress: string;
   image: string;
   status: string;

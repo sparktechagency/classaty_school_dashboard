@@ -109,7 +109,7 @@ const AdminAllTeacher = () => {
   const handleDelete = async (data: ITeacherData) => {
     const res = await tryCatchWrapper(
       deleteTeacher,
-      { params: data?._id },
+      { params: data?.userId },
       "Deleting..."
     );
     if (res.statusCode === 200) {

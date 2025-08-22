@@ -2,7 +2,7 @@ import React from "react";
 import { Space, Tooltip } from "antd";
 import { GoEye } from "react-icons/go";
 import { CgUnblock } from "react-icons/cg";
-import { MdBlock } from "react-icons/md";
+import { MdBlock, MdEdit } from "react-icons/md";
 import ReuseTable from "../../utils/ReuseTable";
 import { IStudentData } from "../../types";
 
@@ -10,6 +10,7 @@ import { IStudentData } from "../../types";
 interface StudentTableProps {
   data: IStudentData[]; // Replace `unknown` with the actual type of your data array
   loading: boolean;
+  showEditModal: (record: IStudentData) => void; // Function to handle editing a user
   showViewModal: (record: IStudentData) => void; // Function to handle viewing a user
   showBlockModal: (record: IStudentData) => void; // Function to handle blocking a user
   showUnblockModal: (record: IStudentData) => void; // Function to handle unblocking a user
@@ -22,6 +23,7 @@ interface StudentTableProps {
 const StudentTable: React.FC<StudentTableProps> = ({
   data,
   loading,
+  showEditModal,
   showViewModal,
   showBlockModal,
   showUnblockModal,
@@ -82,6 +84,14 @@ const StudentTable: React.FC<StudentTableProps> = ({
       render: (_: unknown, record: IStudentData) => (
         <Space size="middle">
           {/* View Details Tooltip */}
+          <Tooltip placement="right" title="Edit">
+            <button
+              className="!p-0 !bg-transparent !border-none !text-secondary-color cursor-pointer"
+              onClick={() => showEditModal(record)}
+            >
+              <MdEdit style={{ fontSize: "24px" }} />
+            </button>
+          </Tooltip>
           <Tooltip placement="right" title="View Details">
             <button
               className="!p-0 !bg-transparent !border-none !text-secondary-color cursor-pointer"
