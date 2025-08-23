@@ -81,8 +81,8 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
       date: values.date,
       startTime: dayjs(values.startTime).format("HH:mm:ss"),
       classRoom: values.classRoom,
-      duration: Number(values.duration),
-      assignedTeacher: assignedTeacher?.name,
+      duration: values.duration,
+      teacherName: assignedTeacher?.name,
       teacherId: values.teacherId,
       termsId: activeKey?.[0],
       instruction: values.instruction,
@@ -90,11 +90,11 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
       subjectName: subjectName?.subjectName,
     };
 
-    const res = await tryCatchWrapper(
+    const res = (await tryCatchWrapper(
       createExam,
       { body: finalPayload },
       "Adding Exam..."
-    ) as any;
+    )) as any;
 
     if (res?.statusCode === 201) {
       form.resetFields();
@@ -225,7 +225,6 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
                 Typolevel={5}
                 label="Exam Duration"
                 name="duration"
-                type="number"
                 placeholder="Enter Exam Duration"
                 rules={[
                   { required: true, message: "Exam Duration is required" },

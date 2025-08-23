@@ -44,7 +44,7 @@ const studentApi = baseApi.injectEndpoints({
           url: `${student_url}/edit_student/${req?.params?.studentId}`,
           method: "PATCH",
           body: req?.body,
-        }
+        };
       },
       invalidatesTags: [tagTypes.student],
     }),

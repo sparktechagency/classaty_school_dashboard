@@ -2,7 +2,7 @@ import React from "react";
 import { Space, Tooltip } from "antd";
 import { GoEye } from "react-icons/go";
 import { CgUnblock } from "react-icons/cg";
-import { MdBlock } from "react-icons/md";
+import { MdBlock, MdEdit } from "react-icons/md";
 import ReuseTable from "../../utils/ReuseTable";
 import { ITeacherData } from "../../types";
 import { formetDateAndTime } from "../../utils/dateFormet";
@@ -11,6 +11,7 @@ import { formetDateAndTime } from "../../utils/dateFormet";
 interface AllTeacherTableProps {
   data: ITeacherData[]; // Replace `unknown` with the actual type of your data array
   loading: boolean;
+  showEditModal: (record: ITeacherData) => void; // Function to handle editing a user
   showViewModal: (record: ITeacherData) => void; // Function to handle viewing a user
   showBlockModal: (record: ITeacherData) => void; // Function to handle blocking a user
   showUnblockModal: (record: ITeacherData) => void; // Function to handle unblocking a user
@@ -23,6 +24,7 @@ interface AllTeacherTableProps {
 const AllTeacherTable: React.FC<AllTeacherTableProps> = ({
   data,
   loading,
+  showEditModal,
   showViewModal,
   showBlockModal,
   showUnblockModal,
@@ -71,6 +73,14 @@ const AllTeacherTable: React.FC<AllTeacherTableProps> = ({
       render: (_: unknown, record: ITeacherData) => (
         <Space size="middle">
           {/* View Details Tooltip */}
+          <Tooltip placement="right" title="Edit">
+            <button
+              className="!p-0 !bg-transparent !border-none !text-secondary-color cursor-pointer"
+              onClick={() => showEditModal(record)}
+            >
+              <MdEdit style={{ fontSize: "24px" }} />
+            </button>
+          </Tooltip>
           <Tooltip placement="right" title="View Details">
             <button
               className="!p-0 !bg-transparent !border-none !text-secondary-color cursor-pointer"
