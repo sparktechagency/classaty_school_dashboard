@@ -16,6 +16,10 @@ const ResultPage = () => {
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [currentRecord, setCurrentRecord] = useState<ResultType | null>(null);
+  const [editRecord, setEditRecord] = useState<ResultType | null>(null);
+
+  console.log("currentRecord", currentRecord);
+  console.log("editRecord", editRecord);
 
   const { data, isFetching } = useGetResultOfStudentQuery({
     page,
@@ -29,14 +33,18 @@ const ResultPage = () => {
   };
 
   const showEditModal = (record: ResultType) => {
-    setCurrentRecord(record);
+    setEditRecord(record);
     setIsEditModalVisible(true);
   };
 
   const handleCancel = () => {
     setIsViewModalVisible(false);
-    setIsEditModalVisible(false);
     setCurrentRecord(null);
+  };
+
+  const handleEditCancel = () => {
+    setIsEditModalVisible(false);
+    setEditRecord(null);
   };
 
   return (
@@ -61,7 +69,6 @@ const ResultPage = () => {
           data={data?.data?.result}
           loading={isFetching}
           showViewModal={showViewUserModal}
-          showEditModal={showEditModal}
           setPage={setPage}
           page={page}
           total={data?.data?.meta?.total}
@@ -71,12 +78,13 @@ const ResultPage = () => {
       <ResultView
         isViewModalVisible={isViewModalVisible}
         handleCancel={handleCancel}
+        showEditModal={showEditModal}
         currentRecord={currentRecord}
       />
       <ResultEdit
         isEditModalVisible={isEditModalVisible}
-        handleCancel={handleCancel}
-        currentRecord={currentRecord}
+        handleCancel={handleEditCancel}
+        currentRecord={editRecord}
       />
     </div>
   );

@@ -3,38 +3,20 @@ import React, { useEffect, useState } from "react";
 import { Modal, Table, Typography } from "antd";
 import { useGetResultBaseOnTermsAndStudentIdQuery } from "../../../redux/features/school/schoolApi";
 import { useGetAllTermsQuery } from "../../../redux/features/terms/termsApi";
+// import { MdEdit } from "react-icons/md";
 
 interface ResultViewProps {
   isViewModalVisible: boolean;
   handleCancel: () => void;
+  showEditModal: (record: any) => void;
   currentRecord: any; // your IParents type or appropriate type
 }
-
-const columns = [
-  {
-    title: "Subject Name",
-    dataIndex: "subjectName",
-    key: "subject",
-    render: (text: string) => <Typography.Text>{text}</Typography.Text>,
-  },
-  {
-    title: "Mark",
-    dataIndex: "mark",
-    key: "mark",
-    align: "center" as const,
-  },
-  {
-    title: "GPA",
-    dataIndex: "gpa",
-    key: "gpa",
-    align: "center" as const,
-  },
-];
 
 const ResultView: React.FC<ResultViewProps> = ({
   isViewModalVisible,
   handleCancel,
   currentRecord,
+  // showEditModal,
 }) => {
   const [termsId, setTermsId] = useState<string>("");
   const { data: terms } = useGetAllTermsQuery({});
@@ -55,6 +37,51 @@ const ResultView: React.FC<ResultViewProps> = ({
     setActiveTerm(terms?.data[0]?.termsName);
     setTermsId(terms?.data[0]?._id);
   }, [terms]);
+
+  const columns = [
+    {
+      title: "Subject Name",
+      dataIndex: "subjectName",
+      key: "subject",
+      render: (text: string) => <Typography.Text>{text}</Typography.Text>,
+    },
+    {
+      title: "Mark",
+      dataIndex: "mark",
+      key: "mark",
+      align: "center", // Use string literals directly without 'as const'
+    },
+    {
+      title: "GPA",
+      dataIndex: "gpa",
+      key: "gpa",
+      align: "center", // Use string literals directly without 'as const'
+    },
+    // {
+    //   title: "Action",
+    //   key: "action",
+    //   render: (_: unknown, record: any) => (
+    //     <Space size="middle">
+    //       <Tooltip placement="right" title="View Details">
+    //         <button
+    //           className="!p-0 !bg-transparent !border-none !text-secondary-color cursor-pointer"
+    //           onClick={() =>
+    //             showEditModal({
+    //               ...record,
+    //               termsId,
+    //               activeTerm,
+    //               studentName: currentRecord?.name,
+    //             })
+    //           }
+    //         >
+    //           <MdEdit style={{ fontSize: "24px" }} />
+    //         </button>
+    //       </Tooltip>
+    //     </Space>
+    //   ),
+    //   align: "center", // Use string literals directly without 'as const'
+    // },
+  ];
 
   const onTabChange = (key: any) => {
     setActiveTerm(key?.termsName);
@@ -94,7 +121,7 @@ const ResultView: React.FC<ResultViewProps> = ({
       </div>
       <Table
         dataSource={data?.data?.result}
-        columns={columns}
+        columns={columns as any}
         pagination={false}
         bordered
         summary={() => (
@@ -104,7 +131,7 @@ const ResultView: React.FC<ResultViewProps> = ({
               color: "#fff",
             }}
           >
-            <Table.Summary.Cell index={0} colSpan={2}>
+            <Table.Summary.Cell index={0} colSpan={3}>
               GPA :
             </Table.Summary.Cell>
             <Table.Summary.Cell index={2}>

@@ -1,17 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
-import { Space, Tooltip } from "antd";
 import ReuseTable from "../../utils/ReuseTable";
 import ReuseButton from "../Button/ReuseButton";
 import { ResultType } from "../../types/ResultType";
-import { MdEdit } from "react-icons/md";
 
 // Define the type for the props
 interface ResultTableProps {
   data: ResultType[]; // Replace `unknown` with the actual type of your data array
   loading: boolean;
   showViewModal: (record: ResultType) => void; // Function to handle viewing a user
-  showEditModal: (record: ResultType) => void; // Function to handle editing a user
   setPage?: (page: number) => void; // Function to handle pagination
   page?: number;
   total?: number;
@@ -22,7 +19,6 @@ const ResultTable: React.FC<ResultTableProps> = ({
   data,
   loading,
   showViewModal,
-  showEditModal,
   setPage,
   page,
   total,
@@ -67,26 +63,6 @@ const ResultTable: React.FC<ResultTableProps> = ({
           View
         </ReuseButton>
       ),
-    },
-    {
-      title: "Action",
-      key: "action",
-      render: (_: unknown, record: ResultType) => (
-        <Space size="middle">
-          {/* View Details Tooltip */}
-          <Tooltip placement="right" title="View Details">
-            <button
-              className="!p-0 !bg-transparent !border-none !text-secondary-color cursor-pointer"
-              onClick={() => showEditModal(record)}
-            >
-              <MdEdit style={{ fontSize: "24px" }} />
-            </button>
-          </Tooltip>
-
-          {/* Block User Tooltip */}
-        </Space>
-      ),
-      align: "center",
     },
   ];
 
