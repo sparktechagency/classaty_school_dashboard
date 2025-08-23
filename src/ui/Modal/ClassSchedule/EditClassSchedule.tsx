@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { DatePicker, Form, Modal, TimePicker, Typography } from "antd";
 import dayjs from "dayjs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useGetClassQuery } from "../../../redux/features/class/classAPi";
 import { useEditClassScheduleMutation } from "../../../redux/features/classSchedule/classScheduleApi";
 import { useGetSectionByClassIdQuery } from "../../../redux/features/section/sectionApi";
@@ -66,6 +66,25 @@ const EditClassSchedule: React.FC<AddClassScheduleProps> = ({
 
   const [editClassSchedule] = useEditClassScheduleMutation();
 
+  useEffect(() => {
+    if (isAddModalVisible && currentRecord) {
+      form.setFieldsValue({
+        classId: currentRecord.classId,
+        section: currentRecord.section,
+        subjectId: currentRecord.subjectId,
+        period: currentRecord.period,
+        description: currentRecord.description,
+        teacherId: currentRecord.teacherId,
+        selectTime: dayjs(currentRecord.selectTime, "HH:mm:ss"),
+        endTime: dayjs(currentRecord.endTime, "HH:mm:ss"),
+        days: currentRecord.days,
+        date: dayjs(currentRecord.date),
+        roomNo: currentRecord.roomNo,
+      });
+      setClassId(currentRecord.classId);
+    }
+  }, [isAddModalVisible, currentRecord, form]);
+
   const handleValuesChange = (changedValues: any) => {
     if (changedValues?.classId) {
       const selectedClass = changedValues.classId;
@@ -97,9 +116,8 @@ const EditClassSchedule: React.FC<AddClassScheduleProps> = ({
     }
   };
 
-    
-    console.log(currentRecord, "currentRecord");
-    
+  console.log(currentRecord, "currentRecord");
+
   return (
     <Modal
       open={isAddModalVisible}
