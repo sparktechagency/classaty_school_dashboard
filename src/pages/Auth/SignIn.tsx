@@ -81,7 +81,7 @@ const SignIn = () => {
                   <Form.Item
                     name="countryCode"
                     noStyle
-                    initialValue="965"
+                    initialValue="+965"
                     rules={[
                       { required: true, message: "Country code is required" },
                     ]}
