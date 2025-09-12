@@ -25,12 +25,12 @@ const PaymentSuccess = () => {
             Your payment was processed successfully. Thank you for your
             purchase!
           </p>
-          <button
+          {/* <button
             onClick={() => (window.location.href = "/")}
             className="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 transition duration-300"
           >
             Go to Homepage
-          </button>
+          </button> */}
         </div>
       </div>
     </div>
