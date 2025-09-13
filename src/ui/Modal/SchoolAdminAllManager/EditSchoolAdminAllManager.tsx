@@ -7,6 +7,7 @@ import ReuseInput from "../../Form/ReuseInput";
 import ReuseButton from "../../Button/ReuseButton";
 import { useUpdateManagerMutation } from "../../../redux/features/manager/managerApi";
 import tryCatchWrapper from "../../../utils/tryCatchWrapper";
+import { useEffect } from "react";
 
 interface EditSchoolAdminAllManagerProps {
   isEditModalVisible: boolean;
@@ -49,6 +50,16 @@ const EditSchoolAdminAllManager: React.FC<EditSchoolAdminAllManagerProps> = ({
   const [form] = Form.useForm();
 
   const [updateManager] = useUpdateManagerMutation();
+
+  useEffect(() => {
+    if (isEditModalVisible && currentRecord) {
+      form.setFieldsValue({
+        name: currentRecord.name,
+        phoneNumber: currentRecord.phoneNumber,
+        managerRole: currentRecord.managerRole,
+      });
+    }
+  }, [isEditModalVisible, currentRecord, form]);
 
   const handleFinish = async (values: any) => {
     const res = await tryCatchWrapper(

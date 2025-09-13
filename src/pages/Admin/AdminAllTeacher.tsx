@@ -15,6 +15,7 @@ import {
 } from "../../redux/features/teacher/teacherApi";
 import tryCatchWrapper from "../../utils/tryCatchWrapper";
 import { useBlockUserMutation } from "../../redux/features/parents/parentsApi";
+import EditTeacher from "../../ui/Modal/Teachers/EditTeacher";
 
 const AdminAllTeacher = () => {
   const [page, setPage] = useState(1);
@@ -33,6 +34,7 @@ const AdminAllTeacher = () => {
 
   const [userAction] = useBlockUserMutation();
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
   const [isBlockModalVisible, setIsBlockModalVisible] = useState(false);
   const [isUnblockModalVisible, setIsUnblockModalVisible] = useState(false);
@@ -41,6 +43,11 @@ const AdminAllTeacher = () => {
 
   const showAddModal = () => {
     setIsAddModalVisible(true);
+  };
+
+  const showEditModal = (record: ITeacherData) => {
+    setCurrentRecord(record);
+    setIsEditModalVisible(true);
   };
 
   const showViewUserModal = (record: ITeacherData) => {
@@ -64,6 +71,7 @@ const AdminAllTeacher = () => {
 
   const handleCancel = () => {
     setIsAddModalVisible(false);
+    setIsEditModalVisible(false);
     setIsViewModalVisible(false);
     setIsBlockModalVisible(false);
     setIsUnblockModalVisible(false);
@@ -109,7 +117,7 @@ const AdminAllTeacher = () => {
   const handleDelete = async (data: ITeacherData) => {
     const res = await tryCatchWrapper(
       deleteTeacher,
-      { params: data?._id },
+      { params: data?.userId },
       "Deleting..."
     );
     if (res.statusCode === 200) {
@@ -145,6 +153,7 @@ const AdminAllTeacher = () => {
         <AllTeacherTable
           data={teacherData}
           loading={isFetching}
+          showEditModal={showEditModal}
           showViewModal={showViewUserModal}
           showBlockModal={showBlockModal}
           showUnblockModal={showUnblockModal}
@@ -186,6 +195,11 @@ const AdminAllTeacher = () => {
         currentRecord={currentRecord}
         handleDelete={handleDelete}
         description=" Are You Sure You want to Delete This Teacher ?"
+      />
+      <EditTeacher
+        isEditModalVisible={isEditModalVisible}
+        handleCancel={handleCancel}
+        currentRecord={currentRecord}
       />
     </div>
   );

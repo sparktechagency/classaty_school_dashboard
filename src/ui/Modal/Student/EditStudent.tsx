@@ -7,17 +7,19 @@ import { FaDoorClosed, FaPhone } from "react-icons/fa6";
 import ReuseButton from "../../Button/ReuseButton";
 import ReuseSelect from "../../Form/ReuseSelect";
 import { useGetSchoolQuery } from "../../../redux/features/school/schoolApi";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IClass, ISchoolDetails } from "../../../types";
 import { useGetClassBySchoolIdQuery } from "../../../redux/features/class/classAPi";
 import { IoMaleFemale } from "react-icons/io5";
 import { MdOutlineClass } from "react-icons/md";
 import { useGetSectionByClassIdQuery } from "../../../redux/features/section/sectionApi";
 import tryCatchWrapper from "../../../utils/tryCatchWrapper";
-import { useAddStudentMutation } from "../../../redux/features/student/studentAPi";
-interface AddStudentProps {
-  isAddModalVisible: boolean;
+import { useEditStudentInfoMutation } from "../../../redux/features/student/studentAPi";
+
+interface EditStudentProps {
+  isEditModalVisible: boolean;
   handleCancel: () => void;
+  currentRecord: any;
 }
 
 const inputStructure = [
@@ -63,48 +65,38 @@ const inputStructure = [
   },
 ];
 
-const AddStudent: React.FC<AddStudentProps> = ({
-  isAddModalVisible,
+const EditStudent: React.FC<EditStudentProps> = ({
+  isEditModalVisible,
   handleCancel,
+  currentRecord,
 }) => {
   const [form] = Form.useForm();
   const [schoolId, setSchoolId] = useState<string | undefined>(undefined);
   const [classId, setClassId] = useState<string | undefined>(undefined);
 
-  const [addStudent] = useAddStudentMutation();
+  const [editStudent] = useEditStudentInfoMutation();
 
   const { data, isFetching } = useGetSchoolQuery(
-    {
-      page: 1,
-      limit: 999999,
-    },
+    { page: 1, limit: 999999 },
     {
       refetchOnMountOrArgChange: true,
-      skip: !isAddModalVisible,
+      skip: !isEditModalVisible,
     }
   );
   const { data: classData, isFetching: isClassFetching } =
     useGetClassBySchoolIdQuery(
-      {
-        page: 1,
-        limit: 999999,
-        schoolId: schoolId,
-      },
+      { page: 1, limit: 999999, schoolId: schoolId },
       {
         refetchOnMountOrArgChange: true,
-        skip: !isAddModalVisible || !schoolId,
+        skip: !isEditModalVisible || !schoolId,
       }
     );
   const { data: sectionData, isFetching: isSectionFetching } =
     useGetSectionByClassIdQuery(
-      {
-        page: 1,
-        limit: 999999,
-        classId: classId,
-      },
+      { page: 1, limit: 999999, classId: classId },
       {
         refetchOnMountOrArgChange: true,
-        skip: !isAddModalVisible || !schoolId || !classId,
+        skip: !isEditModalVisible || !schoolId || !classId,
       }
     );
 
@@ -112,18 +104,35 @@ const AddStudent: React.FC<AddStudentProps> = ({
   const allClass: IClass[] = classData?.data || [];
   const allSection: string[] = sectionData?.data || [];
 
+  // 🟢 Pre-fill form values when modal opens
+  useEffect(() => {
+    if (currentRecord && isEditModalVisible) {
+      setSchoolId(currentRecord?.student?.schoolId);
+      setClassId(currentRecord?.student?.classId);
+
+      form.setFieldsValue({
+        studentName: currentRecord?.name,
+        phoneNumber: currentRecord?.phoneNumber,
+        fatherPhoneNumber: currentRecord?.student?.fatherPhoneNumber,
+        motherPhoneNumber: currentRecord?.student?.motherPhoneNumber,
+        gender: currentRecord?.student?.gender, // only if exists
+        school: currentRecord?.student?.schoolId,
+        class: currentRecord?.student?.classId,
+        section: currentRecord?.student?.section,
+      });
+    }
+  }, [currentRecord, isEditModalVisible, form]);
+
   const handleValuesChange = (changedValues: any) => {
     if (changedValues?.school) {
       const selectedSchool = changedValues.school;
       setSchoolId(selectedSchool);
-      form.setFieldsValue({ class: undefined }); // reset subject field
-      form.setFieldsValue({ section: undefined });
+      form.setFieldsValue({ class: undefined, section: undefined });
     }
-
     if (changedValues?.class) {
       const selectedClass = changedValues.class;
       setClassId(selectedClass);
-      form.setFieldsValue({ section: undefined }); // reset subject field
+      form.setFieldsValue({ section: undefined });
     }
   };
 
@@ -131,16 +140,16 @@ const AddStudent: React.FC<AddStudentProps> = ({
     const selectedSchool = allSchool.find(
       (school) => school?.school?._id === values.school
     );
-
     const selectedClass = allClass.find((cls) => cls?._id === values.class);
 
     const payload = {
+      studentId: currentRecord?.student?._id, // ✅ include studentId for editing
       schoolId: schoolId,
       classId: classId,
       section: values.section,
       name: values.studentName,
-      gender: values.gender,
       phoneNumber: values.phoneNumber,
+      gender: values.gender,
       fatherPhoneNumber: values.fatherPhoneNumber,
       motherPhoneNumber: values.motherPhoneNumber,
       schoolName: selectedSchool?.school?.schoolName,
@@ -148,12 +157,12 @@ const AddStudent: React.FC<AddStudentProps> = ({
     };
 
     const res = await tryCatchWrapper(
-      addStudent,
-      { body: payload },
-      "Adding Student..."
+      editStudent,
+      { body: payload, params: { studentId: currentRecord?.student?._id } },
+      "Updating Student..."
     );
 
-    if (res?.statusCode === 201) {
+    if (res?.statusCode === 200) {
       form.resetFields();
       handleCancel();
     }
@@ -161,7 +170,7 @@ const AddStudent: React.FC<AddStudentProps> = ({
 
   return (
     <Modal
-      open={isAddModalVisible}
+      open={isEditModalVisible}
       onCancel={handleCancel}
       footer={null}
       centered
@@ -170,7 +179,7 @@ const AddStudent: React.FC<AddStudentProps> = ({
       <div className="py-5">
         <div className="text-base-color">
           <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-secondary-color text-center">
-            Add Student
+            Update Student
           </h3>
 
           <div className="mt-5">
@@ -193,6 +202,7 @@ const AddStudent: React.FC<AddStudentProps> = ({
                   rules={input.rules}
                 />
               ))}
+
               <ReuseSelect
                 name="gender"
                 Typolevel={5}
@@ -206,13 +216,9 @@ const AddStudent: React.FC<AddStudentProps> = ({
                   { value: "other", label: "Other" },
                 ]}
               />
+
               <ReuseSelect
                 showSearch={true}
-                filterOption={(input, option) =>
-                  (option?.children ?? "")
-                    .toLowerCase()
-                    .includes(input.toLowerCase())
-                }
                 optionFilterProp="children"
                 prefix={<RiSchoolFill className="mr-1 text-secondary-color" />}
                 name="school"
@@ -227,13 +233,9 @@ const AddStudent: React.FC<AddStudentProps> = ({
                   label: school.school?.schoolName,
                 }))}
               />
+
               <ReuseSelect
                 showSearch={true}
-                filterOption={(input, option) =>
-                  (option?.children ?? "")
-                    .toLowerCase()
-                    .includes(input.toLowerCase())
-                }
                 optionFilterProp="children"
                 prefix={
                   <MdOutlineClass className="mr-1 text-secondary-color" />
@@ -244,20 +246,16 @@ const AddStudent: React.FC<AddStudentProps> = ({
                 label="Class"
                 placeholder="Select Class"
                 labelClassName="!font-bold"
-                rules={[{ required: true, message: "School is required" }]}
+                rules={[{ required: true, message: "Class is required" }]}
                 options={allClass?.map((cls) => ({
                   value: cls?._id,
                   label: cls?.className,
                 }))}
                 disabled={!schoolId}
               />
+
               <ReuseSelect
                 showSearch={true}
-                filterOption={(input, option) =>
-                  (option?.children ?? "")
-                    .toLowerCase()
-                    .includes(input.toLowerCase())
-                }
                 optionFilterProp="children"
                 prefix={<FaDoorClosed className="mr-1 text-secondary-color" />}
                 name="section"
@@ -265,7 +263,7 @@ const AddStudent: React.FC<AddStudentProps> = ({
                 Typolevel={5}
                 label="Section"
                 labelClassName="!font-bold"
-                rules={[{ required: true, message: "School is required" }]}
+                rules={[{ required: true, message: "Section is required" }]}
                 options={allSection?.map((sec) => ({
                   value: sec,
                   label: sec,
@@ -278,7 +276,7 @@ const AddStudent: React.FC<AddStudentProps> = ({
                 variant="secondary"
                 className="w-full mt-4"
               >
-                Add Student
+                Update Student
               </ReuseButton>
             </ReusableForm>
           </div>
@@ -288,4 +286,4 @@ const AddStudent: React.FC<AddStudentProps> = ({
   );
 };
 
-export default AddStudent;
+export default EditStudent;

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Form, Modal } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaDoorClosed, FaPhone } from "react-icons/fa6";
 import { IoMaleFemale } from "react-icons/io5";
 import { MdOutlineClass } from "react-icons/md";
@@ -91,10 +91,24 @@ const EditSchoolAdminStudent: React.FC<EditSchoolAdminStudentProps> = ({
   const handleValuesChange = (changedValues: any) => {
     if (changedValues?.classId) {
       const selectedClass = changedValues.classId;
-      console.log(selectedClass, "selectedClass");
       setClassId(selectedClass);
+      form.setFieldsValue({ section: undefined });
     }
   };
+
+  useEffect(() => {
+    if (isEditModalVisible && currentRecord) {
+      form.setFieldsValue({
+        name: currentRecord.studentName,
+        phoneNumber: currentRecord.phoneNumber,
+        fatherPhoneNumber: currentRecord.fatherPhoneNumber,
+        motherPhoneNumber: currentRecord.motherPhoneNumber,
+        classId: currentRecord.classId,
+        section: currentRecord.section ? currentRecord.section : undefined,
+        className: currentRecord.className,
+      });
+    }
+  }, [isEditModalVisible, currentRecord, form]);
 
   const handleFinish = async (values: any) => {
     const selectedClass = allClass.find(
