@@ -34,7 +34,13 @@ const OTPVerify = () => {
         "Verifying..."
       );
 
-      const allowedRoles = ["supperAdmin", "school", "admin", "manager"];
+      const allowedRoles = [
+        "supperAdmin",
+        "school",
+        "admin",
+        "manager",
+        "schoolAdmin",
+      ];
       const userRole = res?.data?.user?.role;
 
       if (res?.statusCode === 200 && allowedRoles.includes(userRole)) {

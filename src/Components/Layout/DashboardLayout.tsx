@@ -78,10 +78,8 @@ const DashboardLayout = () => {
   const activeKeys = getActiveKeys(normalizedPath);
   const menuItems =
     userRole?.role === "supperAdmin"
-      ? //   ? sidebarItemsGenerator(adminPaths, "admin")
-        sidebarItemsGenerator(adminPaths, "admin")
+      ? sidebarItemsGenerator(adminPaths, "admin")
       : sidebarItemsGenerator(schoolAdminPaths, userRole?.role as string);
-  // : sidebarItemsGenerator(resturantOwnerPaths, userRole?.role);
 
   menuItems.push({
     key: "logout",
