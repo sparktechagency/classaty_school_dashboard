@@ -106,6 +106,7 @@ const ClassSchedulePage = () => {
           });
         }
         toastState.id = null;
+        window.location.reload();
       } else if (info.file.status === "error") {
         const errorMsg =
           info.file.response?.message ||
