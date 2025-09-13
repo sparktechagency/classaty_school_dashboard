@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Form, Upload } from "antd";
 import { useEffect, useState } from "react";
-import { FaImage } from "react-icons/fa6";
+import { FaImage, FaPhone } from "react-icons/fa6";
 import { IoCameraOutline, IoLocationSharp } from "react-icons/io5";
-import { RiSchoolFill } from "react-icons/ri";
+import { RiSchoolFill, RiShieldUserFill } from "react-icons/ri";
 import { toast } from "sonner";
 import { AllImages } from "../../../public/images/AllImages";
 import { getImageUrl } from "../../helpers/config/envConfig";
@@ -209,17 +209,15 @@ const SchoolAdmin = () => {
                 label="Address"
                 placeholder="Address"
                 inputClassName="!py-2 !w-full"
-                // rules={[{ required: true, message: "Address is required" }]}
                 prefix={
                   <IoLocationSharp className="mr-1 text-secondary-color" />
                 }
               />
-              {/* <ReuseInput
+              <ReuseInput
                 name="adminName"
                 label="Admin Name"
                 placeholder="Admin Name"
                 inputClassName="!py-2 !w-full"
-                // rules={[{ required: true, message: "Admin Name is required" }]}
                 prefix={
                   <RiShieldUserFill className="mr-1 text-secondary-color" />
                 }
@@ -229,9 +227,8 @@ const SchoolAdmin = () => {
                 label="Admin Phone"
                 placeholder="Admin Phone"
                 inputClassName="!py-2 !w-full"
-                // rules={[{ required: true, message: "Admin Phone is required" }]}
                 prefix={<FaPhone className="mr-1 text-secondary-color" />}
-              /> */}
+              />
             </div>
           </div>
           <div className="flex justify-end">
