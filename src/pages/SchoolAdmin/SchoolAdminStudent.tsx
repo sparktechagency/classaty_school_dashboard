@@ -9,7 +9,7 @@ import { MdDownload, MdFileUpload } from "react-icons/md";
 import { useGetAllStudentsQuery } from "../../redux/features/school/schoolApi";
 import {
   useDeleteStudentMutation,
-  useUserActionMutation
+  useUserActionMutation,
 } from "../../redux/features/student/studentAPi";
 import ReuseButton from "../../ui/Button/ReuseButton";
 import DeleteModal from "../../ui/Modal/DeleteModal";
@@ -19,8 +19,14 @@ import SendNotification from "../../ui/Modal/SchoolAdminStudent/SendNotification
 import ViewSchoolAdminStudent from "../../ui/Modal/SchoolAdminStudent/ViewSchoolAdminStudent";
 import SchoolAdminStudentTable from "../../ui/Tables/SchoolAdminStudentTable";
 import tryCatchWrapper from "../../utils/tryCatchWrapper";
+import { getBaseUrl } from "../../helpers/config/envConfig";
+import Cookies from "js-cookie";
+import { toast } from "sonner";
+import { Upload } from "antd";
 
 const SchoolAdminStudent = () => {
+  const token = Cookies.get("classaty_accessToken");
+
   const [page, setPage] = useState(1);
   const [searchText, setSearchText] = useState("");
   console.log(searchText);
@@ -134,6 +140,70 @@ const SchoolAdminStudent = () => {
     );
   };
 
+  const handleDownload = () => {
+    const link = document.createElement("a");
+    link.href = "../../file/Student.xlsx"; // Your file URL (can be relative or absolute)
+    link.download = "Student-Format.xlsx"; // Desired download filename
+    link.click();
+  };
+
+  // useEffect(() => {
+  //   if (xlFile && !hasSubmittedRef.current) {
+  //     hasSubmittedRef.current = true;
+  //     handleSubmitXm()
+  //       .catch(console.error)
+  //       .finally(() => {
+  //         hasSubmittedRef.current = false; // reset if you want to allow future submissions
+  //       });
+  //   }
+  // }, [xlFile]);
+
+  const toastState = {
+    id: null as any,
+  };
+
+  const props: UploadProps = {
+    name: "file",
+    action: `${getBaseUrl()}/student/create_student_using_xlsx`,
+    headers: {
+      authorization: `Bearer ${token}`,
+    },
+    onChange(info) {
+      console.log(info.file.status);
+
+      if (info.file.status === "uploading") {
+        if (!toastState.id) {
+          toastState.id = toast.loading("Uploading file...", {
+            duration: Infinity, // keep loading until updated
+          });
+        }
+      }
+
+      if (info.file.status === "done") {
+        if (toastState.id) {
+          toast.success(`${info.file.name} file uploaded successfully`, {
+            id: toastState.id,
+            duration: 2000,
+          });
+        }
+        toastState.id = null;
+      } else if (info.file.status === "error") {
+        const errorMsg =
+          info.file.response?.message ||
+          info.file.error?.message ||
+          `${info.file.name} file upload failed.`;
+
+        if (toastState.id) {
+          toast.error(errorMsg, {
+            id: toastState.id,
+            duration: 2000,
+          });
+        }
+        toastState.id = null;
+      }
+    },
+  };
+
   return (
     <div className=" bg-primary-color rounded-xl p-4 min-h-[90vh]">
       <div className="flex justify-between items-center mb-5">
@@ -141,10 +211,29 @@ const SchoolAdminStudent = () => {
           Student
         </p>
         <div className="h-fit flex items-center gap-2">
-          <ReuseButton variant="primary" className="!py-4.5">
-            <MdFileUpload className="!text-bas" /> Upload From Excel/CSV
+          <ReuseButton
+            // onClick={handleSubmitXm}
+            variant="primary"
+            className="!py-4.5"
+          >
+            <Upload
+              {...props}
+              maxCount={1}
+              accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+              className="text-start "
+              showUploadList={false}
+            >
+              <div className="!flex !items-center !gap-2 text-lg">
+                <MdFileUpload className="!text-bas" />{" "}
+                <span>Upload From Excel/CSV</span>
+              </div>
+            </Upload>
           </ReuseButton>
-          <ReuseButton variant="secondary" className="!py-4.5">
+          <ReuseButton
+            onClick={handleDownload}
+            variant="primary"
+            className="!py-4.5"
+          >
             <MdDownload className="!text-bas" /> Download Format
           </ReuseButton>
           <ReuseButton

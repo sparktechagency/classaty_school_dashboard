@@ -131,6 +131,26 @@ const schoolApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [tagTypes.school],
     }),
+
+    updateSchoolProfile: build.mutation({
+      query: (req) => ({
+        url: `${school_url}/update_school_profile`,
+        method: "PATCH",
+        body: req?.body,
+      }),
+      invalidatesTags: [tagTypes.school],
+    }),
+
+    getSchoolProfile: build.query({
+      query: () => {
+        return {
+          url: `${school_url}/school_profile`,
+          method: "GET",
+        };
+      },
+      providesTags: [tagTypes.school],
+    }),
+
   }),
 });
 
@@ -145,6 +165,8 @@ export const {
   useGetAllStudentsQuery,
   useGetTotalOfOverviewQuery,
   useDeleteSchoolMutation,
+  useUpdateSchoolProfileMutation,
+  useGetSchoolProfileQuery
 } = schoolApi;
 
 export default schoolApi;
