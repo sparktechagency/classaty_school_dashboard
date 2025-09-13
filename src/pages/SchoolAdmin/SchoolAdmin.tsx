@@ -2,22 +2,20 @@
 import { Form, Upload } from "antd";
 import { useEffect, useState } from "react";
 import { FaImage } from "react-icons/fa6";
-import { IoCameraOutline } from "react-icons/io5";
+import { IoCameraOutline, IoLocationSharp } from "react-icons/io5";
+import { RiSchoolFill } from "react-icons/ri";
+import { toast } from "sonner";
 import { AllImages } from "../../../public/images/AllImages";
-import ReusableForm from "../../ui/Form/ReuseForm";
-import ReuseInput from "../../ui/Form/ReuseInput";
-import ReuseButton from "../../ui/Button/ReuseButton";
-import { RiShieldUserFill, RiSchoolFill } from "react-icons/ri";
-import { FaPhone } from "react-icons/fa6";
-import { IoLocationSharp } from "react-icons/io5";
+import { getImageUrl } from "../../helpers/config/envConfig";
 import {
   useGetSchoolProfileQuery,
   useUpdateSchoolProfileMutation,
 } from "../../redux/features/school/schoolApi";
-import tryCatchWrapper from "../../utils/tryCatchWrapper";
-import { toast } from "sonner";
-import { getImageUrl } from "../../helpers/config/envConfig";
+import ReuseButton from "../../ui/Button/ReuseButton";
+import ReusableForm from "../../ui/Form/ReuseForm";
+import ReuseInput from "../../ui/Form/ReuseInput";
 import Loading from "../../ui/Loading";
+import tryCatchWrapper from "../../utils/tryCatchWrapper";
 
 const SchoolAdmin = () => {
   const [form] = Form.useForm();

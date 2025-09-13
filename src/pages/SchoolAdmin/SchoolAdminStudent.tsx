@@ -22,7 +22,7 @@ import tryCatchWrapper from "../../utils/tryCatchWrapper";
 import { getBaseUrl } from "../../helpers/config/envConfig";
 import Cookies from "js-cookie";
 import { toast } from "sonner";
-import { Upload } from "antd";
+import { Upload, UploadProps } from "antd";
 
 const SchoolAdminStudent = () => {
   const token = Cookies.get("classaty_accessToken");
@@ -168,7 +168,7 @@ const SchoolAdminStudent = () => {
     headers: {
       authorization: `Bearer ${token}`,
     },
-    onChange(info) {
+    onChange(info: any) {
       console.log(info.file.status);
 
       if (info.file.status === "uploading") {
