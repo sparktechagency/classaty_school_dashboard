@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { FiPlus } from "react-icons/fi";
-import { MdDownload, MdFileUpload } from "react-icons/md";
+// import { MdDownload, MdFileUpload } from "react-icons/md";
 import {
   useDeleteClassScheduleMutation,
   useGetAllClassScheduleQuery,
@@ -73,12 +73,12 @@ const ClassSchedulePage = () => {
         </p>
         <div className="h-fit">
           <div className="h-fit flex items-center gap-3">
-            <ReuseButton variant="primary" className="!py-4.5">
+            {/* <ReuseButton variant="primary" className="!py-4.5">
               <MdFileUpload className="!text-bas" /> Upload From Excel/CSV
             </ReuseButton>
             <ReuseButton variant="secondary" className="!py-4.5">
               <MdDownload className="!text-bas" /> Download Format
-            </ReuseButton>
+            </ReuseButton> */}
             <ReuseButton
               variant="secondary"
               className="!py-4.5"
