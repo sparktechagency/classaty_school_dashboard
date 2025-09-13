@@ -21,6 +21,7 @@ import ViewStudentModal from "../../ui/Modal/Student/ViewStudentModal";
 import UnblockModal from "../../ui/Modal/UnblockModal";
 import StudentTable from "../../ui/Tables/StudentTable";
 import tryCatchWrapper from "../../utils/tryCatchWrapper";
+import EditStudent from "../../ui/Modal/Student/EditStudent";
 
 const AdminAllStudent = () => {
   const token = Cookies.get("classaty_accessToken");
@@ -43,6 +44,7 @@ const AdminAllStudent = () => {
   const schoolPagination = data?.data?.meta;
 
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
   const [isBlockModalVisible, setIsBlockModalVisible] = useState(false);
   const [isUnblockModalVisible, setIsUnblockModalVisible] = useState(false);
@@ -51,6 +53,11 @@ const AdminAllStudent = () => {
 
   const showAddModal = () => {
     setIsAddModalVisible(true);
+  };
+
+  const showEditModal = (record: IStudentData) => {
+    setCurrentRecord(record);
+    setIsEditModalVisible(true);
   };
 
   const showViewUserModal = (record: IStudentData) => {
@@ -74,6 +81,7 @@ const AdminAllStudent = () => {
 
   const handleCancel = () => {
     setIsAddModalVisible(false);
+    setIsEditModalVisible(false);
     setIsViewModalVisible(false);
     setIsBlockModalVisible(false);
     setIsUnblockModalVisible(false);
@@ -256,6 +264,7 @@ const AdminAllStudent = () => {
         <StudentTable
           data={schoolData}
           loading={isFetching}
+          showEditModal={showEditModal}
           showViewModal={showViewUserModal}
           showBlockModal={showBlockModal}
           showUnblockModal={showUnblockModal}
@@ -270,7 +279,11 @@ const AdminAllStudent = () => {
         isAddModalVisible={isAddModalVisible}
         handleCancel={handleCancel}
       />
-
+      <EditStudent
+        isEditModalVisible={isEditModalVisible}
+        handleCancel={handleCancel}
+        currentRecord={currentRecord}
+      />
       <ViewStudentModal
         isViewModalVisible={isViewModalVisible}
         handleCancel={handleCancel}

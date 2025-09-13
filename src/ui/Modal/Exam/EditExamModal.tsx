@@ -10,6 +10,7 @@ import ReuseButton from "../../Button/ReuseButton";
 import ReusableForm from "../../Form/ReuseForm";
 import ReuseInput from "../../Form/ReuseInput";
 import ReuseSelect from "../../Form/ReuseSelect";
+import { useEffect } from "react";
 
 interface EditExamModalProps {
   isEditExamModalVisible: boolean;
@@ -56,6 +57,32 @@ const EditExamModal: React.FC<EditExamModalProps> = ({
 
   const [updateExam] = useUpdateExamMutation();
 
+  useEffect(() => {
+    if (isEditExamModalVisible && currentRecord) {
+      const assignedTeacher = teachers?.data?.result?.find((teacher: any) =>
+        console.log(teacher._id, currentRecord.teacherId)
+      );
+
+      console.log("assignedTeacher", currentRecord.teacherId);
+
+      form.setFieldsValue({
+        subjectId: currentRecord.subjectId,
+        details: currentRecord.details,
+        classId: currentRecord.classId,
+        totalMarks: currentRecord.totalMarks,
+        passGrade: currentRecord.passGrade,
+        date: dayjs(currentRecord.date),
+        startTime: dayjs(currentRecord.startTime, "HH:mm:ss"),
+        classRoom: currentRecord.classRoom,
+        duration: currentRecord.duration,
+        teacherId: assignedTeacher
+          ? assignedTeacher.name
+          : currentRecord.teacherName, // Set the teacher's name
+        instruction: currentRecord.instruction,
+      });
+    }
+  }, [isEditExamModalVisible, currentRecord, form, teachers]);
+
   const handleFinish = async (values: any) => {
     const subjectName = subject?.data?.result?.find(
       (subject: any) => subject._id === values.subjectId
@@ -81,8 +108,8 @@ const EditExamModal: React.FC<EditExamModalProps> = ({
       date: values.date,
       startTime: dayjs(values.startTime).format("HH:mm:ss"),
       classRoom: values.classRoom,
-      duration: Number(values.duration),
-      assignedTeacher: assignedTeacher?.name,
+      duration: values.duration,
+      teacherName: assignedTeacher?.name,
       teacherId: values.teacherId,
       instruction: values.instruction,
       totalMarks: values.totalMarks,
@@ -206,7 +233,6 @@ const EditExamModal: React.FC<EditExamModalProps> = ({
                 Typolevel={5}
                 label="Exam Duration"
                 name="duration"
-                type="number"
                 placeholder="Enter Exam Duration"
               />
               <ReuseSelect

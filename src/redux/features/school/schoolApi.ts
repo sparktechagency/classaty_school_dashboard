@@ -31,7 +31,6 @@ const schoolApi = baseApi.injectEndpoints({
 
     getAttendanceChartData: build.query({
       query: ({ year }) => {
-
         console.log(year, "year in redux");
         return {
           url: `/overview/student_attendance`,
@@ -48,7 +47,7 @@ const schoolApi = baseApi.injectEndpoints({
       query: () => {
         return {
           url: `/users/count_total`,
-          method: "GET"
+          method: "GET",
         };
       },
       providesTags: [tagTypes.school],
@@ -93,11 +92,20 @@ const schoolApi = baseApi.injectEndpoints({
             page,
             limit,
             searchTerm,
-            studentId
+            studentId,
           },
         };
       },
       providesTags: [tagTypes.student],
+    }),
+
+    updateResult: build.mutation({
+      query: (req) => ({
+        url: `/exam/update_result`,
+        method: "PATCH",
+        body: req?.body,
+      }),
+      invalidatesTags: [tagTypes.student],
     }),
 
     getNotification: build.query({
@@ -161,6 +169,7 @@ export const {
   useGetResultOfStudentQuery,
   useUpdateSchoolMutation,
   useGetResultBaseOnTermsAndStudentIdQuery,
+  useUpdateResultMutation,
   useGetNotificationQuery,
   useGetAllStudentsQuery,
   useGetTotalOfOverviewQuery,

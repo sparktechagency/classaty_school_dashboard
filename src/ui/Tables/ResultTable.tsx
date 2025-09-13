@@ -1,10 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
-import { Space, Tooltip } from "antd";
 import ReuseTable from "../../utils/ReuseTable";
 import ReuseButton from "../Button/ReuseButton";
 import { ResultType } from "../../types/ResultType";
-import { MdEdit } from "react-icons/md";
 
 // Define the type for the props
 interface ResultTableProps {
@@ -65,26 +63,6 @@ const ResultTable: React.FC<ResultTableProps> = ({
           View
         </ReuseButton>
       ),
-    },
-    {
-      title: "Action",
-      key: "action",
-      render: (_: unknown, record: ResultType) => (
-        <Space size="middle">
-          {/* View Details Tooltip */}
-          <Tooltip placement="right" title="View Details">
-            <button
-              className="!p-0 !bg-transparent !border-none !text-secondary-color cursor-pointer"
-              onClick={() => showViewModal(record)}
-            >
-              <MdEdit style={{ fontSize: "24px" }} />
-            </button>
-          </Tooltip>
-
-          {/* Block User Tooltip */}
-        </Space>
-      ),
-      align: "center",
     },
   ];
 

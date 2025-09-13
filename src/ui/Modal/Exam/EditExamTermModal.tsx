@@ -6,6 +6,7 @@ import ReuseButton from "../../Button/ReuseButton";
 import { GiClassicalKnowledge } from "react-icons/gi";
 import { useUpdateTermMutation } from "../../../redux/features/terms/termsApi";
 import tryCatchWrapper from "../../../utils/tryCatchWrapper";
+import { useEffect } from "react";
 
 interface EditExamTermModalProps {
   isEditModalVisible: boolean;
@@ -34,6 +35,15 @@ const EditExamTermModal: React.FC<EditExamTermModalProps> = ({
   const [form] = Form.useForm();
 
   const [updateTerm] = useUpdateTermMutation();
+
+  // Prefill form when modal opens
+  useEffect(() => {
+    if (isEditModalVisible && currentRecord) {
+      form.setFieldsValue({
+        termsName: currentRecord.termsName,
+      });
+    }
+  }, [isEditModalVisible, currentRecord, form]);
 
   const handleFinish = async (values: any) => {
     const res = await tryCatchWrapper(
