@@ -1,15 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Form, Upload } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaImage } from "react-icons/fa6";
-import { IoCameraOutline } from "react-icons/io5";
+import { IoCameraOutline, IoLocationSharp } from "react-icons/io5";
+import { RiSchoolFill } from "react-icons/ri";
+import { toast } from "sonner";
 import { AllImages } from "../../../public/images/AllImages";
+import { getImageUrl } from "../../helpers/config/envConfig";
+import {
+  useGetSchoolProfileQuery,
+  useUpdateSchoolProfileMutation,
+} from "../../redux/features/school/schoolApi";
+import ReuseButton from "../../ui/Button/ReuseButton";
 import ReusableForm from "../../ui/Form/ReuseForm";
 import ReuseInput from "../../ui/Form/ReuseInput";
-import ReuseButton from "../../ui/Button/ReuseButton";
-import { RiShieldUserFill, RiSchoolFill } from "react-icons/ri";
-import { FaPhone } from "react-icons/fa6";
-import { IoLocationSharp } from "react-icons/io5";
+import Loading from "../../ui/Loading";
+import tryCatchWrapper from "../../utils/tryCatchWrapper";
 
 const SchoolAdmin = () => {
   const [form] = Form.useForm();
@@ -45,9 +51,48 @@ const SchoolAdmin = () => {
     }
   };
 
-  const handleFinish = (values: Record<string, any>) => {
-    console.log(values);
+  const [updateSchoolProfile] = useUpdateSchoolProfileMutation();
+  const { data, isLoading } = useGetSchoolProfileQuery({});
+
+  const profile = data?.data;
+
+  console.log(profile);
+
+  useEffect(() => {
+    if (profile) {
+      form.setFieldsValue({
+        schoolName: profile?.schoolName,
+        schoolAddress: profile?.schoolAddress,
+        adminName: profile?.adminName,
+        adminPhone: profile?.adminPhone,
+      });
+    }
+  }, [profile, form]);
+
+  const handleFinish = async (values: Record<string, any>) => {
+    const formdata = new FormData();
+
+    console.log("School Image", values?.schoolImage?.file?.originFileObj);
+    console.log("Cover Image", values?.coverImage?.file?.originFileObj);
+    formdata.append("schoolImage", values?.schoolImage?.file?.originFileObj);
+    formdata.append("coverImage", values?.coverImage?.file?.originFileObj);
+
+    formdata.append("data", JSON.stringify(values));
+
+    const res = await tryCatchWrapper(
+      updateSchoolProfile,
+      { body: formdata },
+      "Updating Profile..."
+    );
+
+    if (res?.statusCode === 200) {
+      form.resetFields();
+      toast.success(res?.message);
+    }
   };
+
+  if (isLoading) return <Loading />;
+
   return (
     <div>
       <div className="mt-5 flex flex-col justify-center items-start gap-x-4">
@@ -55,12 +100,16 @@ const SchoolAdmin = () => {
           <div className=" relative">
             <img
               className="w-screen h-[500px] relative rounded-xl "
-              src={imageUrl}
+              src={
+                profile?.coverImage
+                  ? getImageUrl() + `/${profile?.coverImage}`
+                  : imageUrl
+              }
               alt=""
             />
             <div className="absolute right-3 bottom-3">
               {" "}
-              <Form.Item className="" name="image">
+              <Form.Item className="" name="coverImage">
                 <Upload
                   customRequest={(options) => {
                     setTimeout(() => {
@@ -102,10 +151,14 @@ const SchoolAdmin = () => {
               <div className=" relative ">
                 <img
                   className="h-40 w-40 mx-auto relative rounded-full border border-secondary-color object-contain "
-                  src={logoUrl}
+                  src={
+                    profile?.coverImage
+                      ? getImageUrl() + `/${profile?.schoolImage}`
+                      : logoUrl
+                  }
                   alt=""
                 />
-                <Form.Item name="image">
+                <Form.Item name="schoolImage">
                   <Upload
                     customRequest={(options) => {
                       setTimeout(() => {
@@ -139,35 +192,34 @@ const SchoolAdmin = () => {
                 </Form.Item>
               </div>
               <h2 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl text-center font-semibold text-secondary-color ">
-                International School of Kuwait
+                {profile?.schoolName}
               </h2>
             </div>
             <div className="lg:col-span-2">
               <ReuseInput
-                name="name"
-                label=" Name"
-                placeholder=" Name"
+                name="schoolName"
+                label="School Name"
                 inputClassName="!py-2 !w-full"
-                rules={[{ required: true, message: "Name is required" }]}
+                placeholder={profile?.schoolName}
                 prefix={<RiSchoolFill className="mr-1 text-secondary-color" />}
               />
               <ReuseInput
                 inputType="normal"
-                name="address"
+                name="schoolAddress"
                 label="Address"
                 placeholder="Address"
                 inputClassName="!py-2 !w-full"
-                rules={[{ required: true, message: "Address is required" }]}
+                // rules={[{ required: true, message: "Address is required" }]}
                 prefix={
                   <IoLocationSharp className="mr-1 text-secondary-color" />
                 }
               />
-              <ReuseInput
+              {/* <ReuseInput
                 name="adminName"
                 label="Admin Name"
                 placeholder="Admin Name"
                 inputClassName="!py-2 !w-full"
-                rules={[{ required: true, message: "Admin Name is required" }]}
+                // rules={[{ required: true, message: "Admin Name is required" }]}
                 prefix={
                   <RiShieldUserFill className="mr-1 text-secondary-color" />
                 }
@@ -177,9 +229,9 @@ const SchoolAdmin = () => {
                 label="Admin Phone"
                 placeholder="Admin Phone"
                 inputClassName="!py-2 !w-full"
-                rules={[{ required: true, message: "Admin Phone is required" }]}
+                // rules={[{ required: true, message: "Admin Phone is required" }]}
                 prefix={<FaPhone className="mr-1 text-secondary-color" />}
-              />
+              /> */}
             </div>
           </div>
           <div className="flex justify-end">

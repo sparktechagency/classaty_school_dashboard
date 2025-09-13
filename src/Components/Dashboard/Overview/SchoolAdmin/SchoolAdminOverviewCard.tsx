@@ -43,9 +43,13 @@ const SchoolAdminOverviewCard = () => {
           <img src={AllIcons.attendenceRate} className="w-6 h-6" alt="icon" />
         </div>
       ),
-      count: `${schoolTotalOverview?.data?.attendanceRate?.attendanceRate?.toFixed(
-        2
-      )}%`,
+      count: `${
+        schoolTotalOverview?.data?.attendanceRate?.attendanceRate
+          ? schoolTotalOverview?.data?.attendanceRate?.attendanceRate?.toFixed(
+              2
+            )
+          : 0
+      }%`,
     },
   ];
 
