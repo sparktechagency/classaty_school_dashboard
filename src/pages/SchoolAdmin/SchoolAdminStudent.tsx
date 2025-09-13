@@ -147,17 +147,6 @@ const SchoolAdminStudent = () => {
     link.click();
   };
 
-  // useEffect(() => {
-  //   if (xlFile && !hasSubmittedRef.current) {
-  //     hasSubmittedRef.current = true;
-  //     handleSubmitXm()
-  //       .catch(console.error)
-  //       .finally(() => {
-  //         hasSubmittedRef.current = false; // reset if you want to allow future submissions
-  //       });
-  //   }
-  // }, [xlFile]);
-
   const toastState = {
     id: null as any,
   };
@@ -225,7 +214,7 @@ const SchoolAdminStudent = () => {
             >
               <div className="!flex !items-center !gap-2 text-lg">
                 <MdFileUpload className="!text-bas" />{" "}
-                <span>Upload From Excel/CSV</span>
+                <span>Upload From Excel</span>
               </div>
             </Upload>
           </ReuseButton>

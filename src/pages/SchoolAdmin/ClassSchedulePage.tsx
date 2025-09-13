@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { FiPlus } from "react-icons/fi";
-// import { MdDownload, MdFileUpload } from "react-icons/md";
+import { MdDownload, MdFileUpload } from "react-icons/md";
 import {
   useDeleteClassScheduleMutation,
   useGetAllClassScheduleQuery,
@@ -13,10 +13,15 @@ import DeleteModal from "../../ui/Modal/DeleteModal";
 import ClassScheduleTable from "../../ui/Tables/ClassScheduleTable";
 import tryCatchWrapper from "../../utils/tryCatchWrapper";
 import EditClassSchedule from "../../ui/Modal/ClassSchedule/EditClassSchedule";
+import { getBaseUrl } from "../../helpers/config/envConfig";
+import Cookies from "js-cookie";
+import { Upload, UploadProps } from "antd";
+import { toast } from "sonner";
 
 const ClassSchedulePage = () => {
   const [page, setPage] = useState(1);
   const [searchText, setSearchText] = useState("");
+  const token = Cookies.get("classaty_accessToken");
 
   const limit = 12;
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
@@ -65,6 +70,59 @@ const ClassSchedulePage = () => {
     }
   };
 
+  const handleDownload = () => {
+    const link = document.createElement("a");
+    link.href = "../../file/class_schedule.xlsx";
+    link.download = "class_schedule.xlsx";
+    link.click();
+  };
+
+  const toastState = {
+    id: null as any,
+  };
+
+  const props: UploadProps = {
+    name: "file",
+    action: `${getBaseUrl()}/class_schedule/create_class_schedule_xlsx`,
+    headers: {
+      authorization: `Bearer ${token}`,
+    },
+    onChange(info: any) {
+      console.log(info.file.status);
+
+      if (info.file.status === "uploading") {
+        if (!toastState.id) {
+          toastState.id = toast.loading("Uploading file...", {
+            duration: Infinity, // keep loading until updated
+          });
+        }
+      }
+
+      if (info.file.status === "done") {
+        if (toastState.id) {
+          toast.success(`${info.file.name} file uploaded successfully`, {
+            id: toastState.id,
+            duration: 2000,
+          });
+        }
+        toastState.id = null;
+      } else if (info.file.status === "error") {
+        const errorMsg =
+          info.file.response?.message ||
+          info.file.error?.message ||
+          `${info.file.name} file upload failed.`;
+
+        if (toastState.id) {
+          toast.error(errorMsg, {
+            id: toastState.id,
+            duration: 2000,
+          });
+        }
+        toastState.id = null;
+      }
+    },
+  };
+
   return (
     <div className=" bg-primary-color rounded-xl p-4 min-h-[90vh]">
       <div className="flex justify-between items-center mb-5">
@@ -73,12 +131,27 @@ const ClassSchedulePage = () => {
         </p>
         <div className="h-fit">
           <div className="h-fit flex items-center gap-3">
-            {/* <ReuseButton variant="primary" className="!py-4.5">
-              <MdFileUpload className="!text-bas" /> Upload From Excel/CSV
+            <ReuseButton variant="primary" className="!py-4.5">
+              <Upload
+                {...props}
+                maxCount={1}
+                accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                className="text-start "
+                showUploadList={false}
+              >
+                <div className="!flex !items-center !gap-2 text-lg">
+                  <MdFileUpload className="!text-bas" />{" "}
+                  <span>Upload From Excel</span>
+                </div>
+              </Upload>
             </ReuseButton>
-            <ReuseButton variant="secondary" className="!py-4.5">
+            <ReuseButton
+              onClick={handleDownload}
+              variant="primary"
+              className="!py-4.5"
+            >
               <MdDownload className="!text-bas" /> Download Format
-            </ReuseButton> */}
+            </ReuseButton>
             <ReuseButton
               variant="secondary"
               className="!py-4.5"
