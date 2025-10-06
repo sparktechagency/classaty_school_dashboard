@@ -103,7 +103,7 @@ const ResultView: React.FC<ResultViewProps> = ({
       </h3>
       <div className="flex w-fit mt-5 bg-[#EFEFEF] p-2 rounded-2xl mb-5">
         {/* 1st Term Tab */}
-        {terms?.data?.map((term: any, index: number) => {
+        {terms?.data?.result?.map((term: any, index: number) => {
           return (
             <button
               key={index}
