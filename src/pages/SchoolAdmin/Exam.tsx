@@ -95,10 +95,10 @@ const ExamPage = () => {
   const { data: terms } = useGetAllTermsQuery({});
   const [deleteTerm] = useDeleteTermMutation();
   const [deleteExam] = useDeleteExamMutation();
-
+  console.log(terms, "terms ====++++++>");
   useEffect(() => {
-    if (terms?.data?.length) {
-      setActiveKey([terms.data[0]._id]);
+    if (terms?.data?.result?.length) {
+      setActiveKey([terms?.data?.result[0]?._id]);
     }
   }, [terms]);
 
@@ -282,7 +282,7 @@ const ExamPage = () => {
         expandIconPosition="right"
         style={{ backgroundColor: "#ffffff" }}
       >
-        {terms?.data?.map((term: ITerm) => (
+        {terms?.data?.result?.map((term: ITerm) => (
           <Panel
             key={term._id}
             header={
