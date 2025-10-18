@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { DatePicker, Form, Modal, TimePicker, Typography } from "antd";
+import dayjs from "dayjs";
+import { useGetClassBySchoolIdQuery } from "../../../redux/features/class/classAPi";
+import { useCreateExamMutation } from "../../../redux/features/exam/examApi";
+import { useGetSubjectBySchoolIdQuery } from "../../../redux/features/subject/subjectApi";
+import { useGetTeacherQuery } from "../../../redux/features/teacher/teacherApi";
+import tryCatchWrapper from "../../../utils/tryCatchWrapper";
+import ReuseButton from "../../Button/ReuseButton";
 import ReusableForm from "../../Form/ReuseForm";
 import ReuseInput from "../../Form/ReuseInput";
-import ReuseButton from "../../Button/ReuseButton";
 import ReuseSelect from "../../Form/ReuseSelect";
-import dayjs from "dayjs";
-import { useGetSubjectBySchoolIdQuery } from "../../../redux/features/subject/subjectApi";
-import { useGetClassBySchoolIdQuery } from "../../../redux/features/class/classAPi";
-import { useGetTeacherQuery } from "../../../redux/features/teacher/teacherApi";
-import { useCreateExamMutation } from "../../../redux/features/exam/examApi";
-import tryCatchWrapper from "../../../utils/tryCatchWrapper";
 
 interface AddExamModalProps {
   isAddExamModalVisible: boolean;
@@ -81,15 +81,14 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
       date: values.date,
       startTime: dayjs(values.startTime).format("HH:mm:ss"),
       classRoom: values.classRoom,
-      duration: values.duration,
-      teacherName: assignedTeacher?.name,
+      duration: Number(values.duration),
+      assignedTeacher: assignedTeacher?.name,
       teacherId: values.teacherId,
       termsId: activeKey?.[0],
       instruction: values.instruction,
       totalMarks: values.totalMarks,
       subjectName: subjectName?.subjectName,
     };
-
     const res = (await tryCatchWrapper(
       createExam,
       { body: finalPayload },
