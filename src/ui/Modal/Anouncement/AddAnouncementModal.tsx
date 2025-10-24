@@ -44,13 +44,17 @@ const AddAnouncementModal: React.FC<AddAnouncementModalProps> = ({
       description: content,
     };
 
+    console.log(finalPayload);
+
     const res = await tryCatchWrapper(
       createAnnouncement,
       { body: finalPayload },
       "Adding Announcement..."
     );
 
-    if (res?.statusCode === 201) {
+    console.log(res);
+
+    if (res?.statusCode === 200) {
       form.resetFields();
       handleCancel();
     }
@@ -127,7 +131,7 @@ const AddAnouncementModal: React.FC<AddAnouncementModalProps> = ({
                 variant="secondary"
                 className="w-full mt-4"
               >
-                Add Student
+                Add Announcement
               </ReuseButton>
             </ReusableForm>
           </div>

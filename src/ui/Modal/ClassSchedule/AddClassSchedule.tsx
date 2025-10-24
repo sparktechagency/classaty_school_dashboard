@@ -25,6 +25,8 @@ const AddClassSchedule: React.FC<AddClassScheduleProps> = ({
   const [form] = Form.useForm();
   const [classId, setClassId] = useState<string>("");
 
+  const [selectedTeacher, setSelectedTeacher] = useState<any>(null);
+
   const { data: classData, isFetching: classFetching } = useGetClassQuery(
     {},
     {
@@ -61,6 +63,8 @@ const AddClassSchedule: React.FC<AddClassScheduleProps> = ({
       skip: !classId || !isAddModalVisible,
     }
   );
+
+  console.log(teachers?.data?.result);
 
   const [createClassSchedule] = useCreateClassScheduleMutation();
 
@@ -143,17 +147,46 @@ const AddClassSchedule: React.FC<AddClassScheduleProps> = ({
               />
               <ReuseSelect
                 Typolevel={5}
+                label="Teacher"
+                name="teacherId"
+                labelClassName="!font-bold"
+                placeholder="Select Teacher"
+                onChange={(value) => {
+                  setSelectedTeacher(value);
+                  form.setFieldsValue({ subjectId: "" });
+                }}
+                options={teachers?.data?.result?.map((item: any) => ({
+                  value: item._id,
+                  label: item.name,
+                }))}
+                disabled={teacherFetching}
+                rules={[{ required: true, message: "Teacher is required" }]}
+              />
+              <ReuseSelect
+                Typolevel={5}
                 label="Subject"
                 name="subjectId"
                 labelClassName="!font-bold"
                 placeholder="Select Subject"
-                options={subjectData?.data?.result?.map((item: any) => ({
-                  value: item._id,
-                  label: item.subjectName,
-                }))}
-                disabled={subjectFetching}
+                options={
+                  subjectData?.data?.result
+                    ?.filter((subject: any) => {
+                      // Find the selected teacher object
+                      const teacher = teachers?.data?.result?.find(
+                        (t: any) => t._id === selectedTeacher
+                      );
+                      // Match the subject id of teacher with available subjects
+                      return teacher?.subjectId === subject._id;
+                    })
+                    ?.map((item: any) => ({
+                      value: item._id,
+                      label: item.subjectName,
+                    })) || []
+                }
+                disabled={subjectFetching || !selectedTeacher}
                 rules={[{ required: true, message: "Subject is required" }]}
               />
+
               <ReuseInput
                 Typolevel={5}
                 label="Period"
@@ -170,19 +203,7 @@ const AddClassSchedule: React.FC<AddClassScheduleProps> = ({
                 placeholder="Enter Description"
                 rules={[{ required: true, message: "Description is required" }]}
               />
-              <ReuseSelect
-                Typolevel={5}
-                label="Teacher"
-                name="teacherId"
-                labelClassName="!font-bold"
-                placeholder="Select Teacher"
-                options={teachers?.data?.result?.map((item: any) => ({
-                  value: item._id,
-                  label: item.name,
-                }))}
-                disabled={teacherFetching}
-                rules={[{ required: true, message: "Teacher is required" }]}
-              />
+
               <Typography.Title level={5} className="mb-1">
                 Start Time
               </Typography.Title>

@@ -159,11 +159,11 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
                 Typolevel={5}
                 label="Total Mark"
                 name="totalMarks"
-                placeholder="Enter Required Pass Grader"
+                placeholder="Enter Total Mark"
                 rules={[
                   {
                     required: true,
-                    message: "Required Pass Grader is required",
+                    message: "Total Mark is required",
                   },
                 ]}
               />
@@ -175,7 +175,7 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
                 Typolevel={5}
                 label="Required Pass Grade"
                 name="passGrade"
-                placeholder="Enter Required Pass Grader"
+                placeholder="Enter Required Pass Grade"
                 rules={[
                   {
                     required: true,
