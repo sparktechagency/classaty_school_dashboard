@@ -1,7 +1,7 @@
 import React from "react";
 import { Space, Tooltip } from "antd";
 import { GoEye } from "react-icons/go";
-import { MdDelete } from "react-icons/md";
+// import { MdDelete } from "react-icons/md";
 import ReuseTable from "../../utils/ReuseTable";
 import { IAnounceType } from "../../types";
 import dayjs from "dayjs";
@@ -22,7 +22,7 @@ const AnouncemantTable: React.FC<AnouncemantTableProps> = ({
   data,
   loading,
   showViewModal,
-  showDeleteModal,
+  // showDeleteModal,
   setPage,
   page,
   total,
@@ -81,14 +81,14 @@ const AnouncemantTable: React.FC<AnouncemantTableProps> = ({
 
           {/* Block User Tooltip */}
 
-          <Tooltip placement="left" title="Block">
+          {/* <Tooltip placement="left" title="Block">
             <button
               className="!p-0 !bg-transparent !border-none !text-error-color cursor-pointer"
               onClick={() => showDeleteModal(record)}
             >
               <MdDelete style={{ fontSize: "24px" }} />
             </button>
-          </Tooltip>
+          </Tooltip> */}
         </Space>
       ),
       align: "center",
