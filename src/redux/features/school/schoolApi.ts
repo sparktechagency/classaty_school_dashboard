@@ -120,7 +120,16 @@ const schoolApi = baseApi.injectEndpoints({
           },
         };
       },
-      providesTags: [tagTypes.school],
+      providesTags: [tagTypes.school, tagTypes.notification],
+    }),
+
+    sendNotification: build.mutation({
+      query: (req) => ({
+        url: `/notification/send_notification`,
+        method: "POST",
+        body: req.body,
+      }),
+      invalidatesTags: [tagTypes.school, tagTypes.notification],
     }),
 
     updateSchool: build.mutation({
@@ -158,7 +167,6 @@ const schoolApi = baseApi.injectEndpoints({
       },
       providesTags: [tagTypes.school],
     }),
-
   }),
 });
 
@@ -171,11 +179,12 @@ export const {
   useGetResultBaseOnTermsAndStudentIdQuery,
   useUpdateResultMutation,
   useGetNotificationQuery,
+  useSendNotificationMutation,
   useGetAllStudentsQuery,
   useGetTotalOfOverviewQuery,
   useDeleteSchoolMutation,
   useUpdateSchoolProfileMutation,
-  useGetSchoolProfileQuery
+  useGetSchoolProfileQuery,
 } = schoolApi;
 
 export default schoolApi;

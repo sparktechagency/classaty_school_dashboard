@@ -4,9 +4,12 @@ import ReusableForm from "../../Form/ReuseForm";
 import ReuseInput from "../../Form/ReuseInput";
 import ReuseButton from "../../Button/ReuseButton";
 import { MdMessage } from "react-icons/md";
+import { useSendNotificationMutation } from "../../../redux/features/school/schoolApi";
+import tryCatchWrapper from "../../../utils/tryCatchWrapper";
 
 interface SendNotificationProps {
   isSendModalVisible: boolean;
+  currentRecord: any;
   handleCancel: () => void;
 }
 
@@ -14,7 +17,7 @@ const inputStructure = [
   {
     name: "message",
     type: "text",
-    inputType: "normal",
+    inputType: "textarea",
     label: "Notification Message",
     placeholder: "Enter Notification Message",
     labelClassName: "!font-bold",
@@ -25,12 +28,29 @@ const inputStructure = [
 
 const SendNotification: React.FC<SendNotificationProps> = ({
   isSendModalVisible,
+  currentRecord,
   handleCancel,
 }) => {
   const [form] = Form.useForm();
-  const handleFinish = (values: any) => {
-    console.log(values);
-    handleCancel();
+  const [sendNotification] = useSendNotificationMutation();
+  const handleFinish = async (values: any) => {
+    const data = {
+      receiverId: currentRecord?._id,
+      message: values?.message,
+    };
+    console.log(data);
+    const res = await tryCatchWrapper(
+      sendNotification,
+      {
+        body: data,
+      },
+      "Sending Notification..."
+    );
+
+    if (res?.statusCode === 200) {
+      form.resetFields();
+      handleCancel();
+    }
   };
   return (
     <Modal

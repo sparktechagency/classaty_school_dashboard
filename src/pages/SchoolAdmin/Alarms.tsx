@@ -67,6 +67,8 @@ const AlarmsPage = () => {
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
 
+  console.log(newNotificationsByTime);
+
   if (isLoading) {
     return (
       <div className="w-full h-full flex items-center justify-center">
@@ -94,8 +96,14 @@ const AlarmsPage = () => {
             </div>
             <div>
               <p className="text-base-color text-base font-semibold">
-                At {dayjs(activity.createdAt).format("hh:mm A")} {", "}
+                At {dayjs(activity.createdAt).format("hh:mm A")}{" "}
                 {activity.message}
+                {activity?.senderName && (
+                  <span className="font-semibold text-red-600">
+                    {" "}
+                    - {activity?.senderName}
+                  </span>
+                )}
               </p>
 
               <p className="text-sm text-[#8A8D8E] mt-1">
