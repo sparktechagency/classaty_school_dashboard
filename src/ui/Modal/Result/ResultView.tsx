@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from "react";
-import { Modal, Table, Typography } from "antd";
+import { Modal, Space, Table, Tooltip, Typography } from "antd";
 import { useGetResultBaseOnTermsAndStudentIdQuery } from "../../../redux/features/school/schoolApi";
 import { useGetAllTermsQuery } from "../../../redux/features/terms/termsApi";
+import { MdEdit } from "react-icons/md";
 // import { MdEdit } from "react-icons/md";
 
 interface ResultViewProps {
@@ -16,11 +17,11 @@ const ResultView: React.FC<ResultViewProps> = ({
   isViewModalVisible,
   handleCancel,
   currentRecord,
-  // showEditModal,
+  showEditModal,
 }) => {
   const [termsId, setTermsId] = useState<string>("");
   const { data: terms } = useGetAllTermsQuery({});
-  const { data } = useGetResultBaseOnTermsAndStudentIdQuery(
+  const { data, isFetching } = useGetResultBaseOnTermsAndStudentIdQuery(
     {
       termsId: termsId,
       studentId: currentRecord?.studentId,
@@ -57,36 +58,42 @@ const ResultView: React.FC<ResultViewProps> = ({
       key: "gpa",
       align: "center", // Use string literals directly without 'as const'
     },
-    // {
-    //   title: "Action",
-    //   key: "action",
-    //   render: (_: unknown, record: any) => (
-    //     <Space size="middle">
-    //       <Tooltip placement="right" title="View Details">
-    //         <button
-    //           className="!p-0 !bg-transparent !border-none !text-secondary-color cursor-pointer"
-    //           onClick={() =>
-    //             showEditModal({
-    //               ...record,
-    //               termsId,
-    //               activeTerm,
-    //               studentName: currentRecord?.name,
-    //             })
-    //           }
-    //         >
-    //           <MdEdit style={{ fontSize: "24px" }} />
-    //         </button>
-    //       </Tooltip>
-    //     </Space>
-    //   ),
-    //   align: "center", // Use string literals directly without 'as const'
-    // },
+    {
+      title: "Action",
+      key: "action",
+      render: (_: unknown, record: any) => (
+        <Space size="middle">
+          <Tooltip placement="right" title="View Details">
+            <button
+              className="!p-0 !bg-transparent !border-none !text-secondary-color cursor-pointer"
+              onClick={() =>
+                showEditModal({
+                  ...record,
+                  termsId,
+                  activeTerm,
+                  studentName: currentRecord?.name,
+                })
+              }
+            >
+              <MdEdit style={{ fontSize: "24px" }} />
+            </button>
+          </Tooltip>
+        </Space>
+      ),
+      align: "center", // Use string literals directly without 'as const'
+    },
   ];
 
   const onTabChange = (key: any) => {
     setActiveTerm(key?.termsName);
     setTermsId(key?._id);
   };
+
+  useEffect(() => {
+    if (terms?.data?.result?.length > 0) {
+      onTabChange(terms?.data?.result?.[0]);
+    }
+  }, [terms]);
 
   console.log(data?.data, "data =============>");
 
@@ -120,6 +127,7 @@ const ResultView: React.FC<ResultViewProps> = ({
         })}
       </div>
       <Table
+        loading={isFetching}
         dataSource={data?.data?.result}
         columns={columns as any}
         pagination={false}

@@ -14,6 +14,7 @@ export interface INotification {
   updatedAt: string; // ISO date string
   isRead: boolean;
   linkId: string;
+  senderName: string;
   message: string;
   receiverId: string;
   role: "teacher" | "student" | "admin" | "parents" | "school" | "supperAdmin"; // extend based on actual roles

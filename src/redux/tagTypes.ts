@@ -1,5 +1,6 @@
 export const tagTypes = {
   auth: "Auth",
+  notification: "Notification",
   school: "School",
   student: "Student",
   teacher: "Teacher",
@@ -29,6 +30,7 @@ export const tagTypes = {
 
 export const tagTypesList = [
   tagTypes.auth,
+  tagTypes.notification,
   tagTypes.school,
   tagTypes.student,
   tagTypes.teacher,

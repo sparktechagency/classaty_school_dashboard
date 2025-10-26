@@ -270,6 +270,7 @@ const SchoolAdminStudent = () => {
       />
       <SendNotification
         isSendModalVisible={isSendModalVisible}
+        currentRecord={currentRecord}
         handleCancel={handleCancel}
       />
 

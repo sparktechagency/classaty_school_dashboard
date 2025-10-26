@@ -32,12 +32,22 @@ const ResultEdit: React.FC<ResultEditProps> = ({
   const handleFinish = async (values: any) => {
     const mark = Number(values.mark);
 
+    console.log({
+      data: {
+        termsId: currentRecord?.termsId,
+        resultId: currentRecord?._id,
+        studentId: currentRecord?.studentId,
+        mark: mark,
+      },
+    });
+
     const res = await tryCatchWrapper(
       updateResult,
       {
         body: {
           termsId: currentRecord?.termsId,
-          resultId: currentRecord?._id,
+          resultId: currentRecord?.resultId,
+          studentId: currentRecord?.studentId,
           mark: mark,
         },
       },
