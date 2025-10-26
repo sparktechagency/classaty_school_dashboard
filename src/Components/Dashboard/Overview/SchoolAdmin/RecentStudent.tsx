@@ -104,6 +104,7 @@ const RecentStudent = () => {
 
       <SendNotification
         isSendModalVisible={isSendModalVisible}
+        currentRecord={currentRecord}
         handleCancel={handleCancel}
       />
       <EditSchoolAdminStudent
