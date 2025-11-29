@@ -2,7 +2,7 @@
 import { useState } from "react";
 import DeleteModal from "../../ui/Modal/DeleteModal";
 import ReuseButton from "../../ui/Button/ReuseButton";
-import { Collapse as AntdCollapse, Table, Space, Tooltip } from "antd";
+import { Collapse as AntdCollapse, Dropdown, Space, Tooltip } from "antd";
 import { EditOutlined } from "@ant-design/icons";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { FiPlus } from "react-icons/fi";
@@ -21,6 +21,9 @@ import { IClass } from "../../types";
 import { FadeLoader } from "react-spinners";
 import tryCatchWrapper from "../../utils/tryCatchWrapper";
 import EditClassModal from "../../ui/Modal/Class/EditClassModal";
+import { HiOutlineDotsVertical } from "react-icons/hi";
+import ViewSectionModal from "../../ui/Modal/Class/ViewSectionModal";
+import SpinLoader from "../../ui/Spiner";
 
 const { Panel } = AntdCollapse;
 
@@ -77,8 +80,12 @@ const ClassPage = () => {
       }
     );
 
-  const allClass: IClass[] = classData?.data;
+  const allClass: IClass[] = [...(classData?.data || [])].sort(
+    (a: IClass, b: IClass) => Number(a.className) - Number(b.className)
+  );
 
+  const [isViewSectionModalVisible, setIsViewSectionModalVisible] =
+    useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [isAddClassModalVisible, setIsAddClassModalVisible] = useState(false);
@@ -100,6 +107,11 @@ const ClassPage = () => {
     setCurrentRecord(record);
   };
 
+  const showViewSectionModal = (record: any) => {
+    setIsViewSectionModalVisible(true);
+    setCurrentRecord(record);
+  };
+
   const showEditClassModal = (record: any) => {
     setIsEditClassModalVisible(true);
     setCurrentRecord(record);
@@ -116,6 +128,7 @@ const ClassPage = () => {
   };
 
   const handleCancel = () => {
+    setIsViewSectionModalVisible(false);
     setIsAddClassModalVisible(false);
     setIsAddModalVisible(false);
     setIsEditModalVisible(false);
@@ -146,48 +159,48 @@ const ClassPage = () => {
     }
   };
 
-  const columns = [
-    {
-      title: "#UID",
-      dataIndex: "_id",
-      render: (_: unknown, __: unknown, index: number) => index + 1,
-      align: "center" as const,
-      key: "_id",
-    },
-    {
-      title: "Class",
-      dataIndex: "className",
-      align: "center" as const,
-      key: "className",
-    },
-    {
-      title: "Section",
-      dataIndex: "section",
-      align: "center" as const,
-      key: "section",
-    },
-    {
-      title: "Action",
-      key: "action",
-      align: "center" as const,
-      render: (_: unknown, currentRecord: any) => (
-        <Space size="middle">
-          <Tooltip title="Delete">
-            <RiDeleteBin6Line
-              onClick={() => showDeleteClassModal(currentRecord)}
-              style={{ color: "red", cursor: "pointer" }}
-            />
-          </Tooltip>
-          <Tooltip title="Edit">
-            <EditOutlined
-              onClick={() => showEditClassModal(currentRecord)}
-              style={{ color: "#1890ff", cursor: "pointer" }}
-            />
-          </Tooltip>
-        </Space>
-      ),
-    },
-  ];
+  // const columns = [
+  //   {
+  //     title: "#UID",
+  //     dataIndex: "_id",
+  //     render: (_: unknown, __: unknown, index: number) => index + 1,
+  //     align: "center" as const,
+  //     key: "_id",
+  //   },
+  //   {
+  //     title: "Class",
+  //     dataIndex: "className",
+  //     align: "center" as const,
+  //     key: "className",
+  //   },
+  //   {
+  //     title: "Section",
+  //     dataIndex: "section",
+  //     align: "center" as const,
+  //     key: "section",
+  //   },
+  //   {
+  //     title: "Action",
+  //     key: "action",
+  //     align: "center" as const,
+  //     render: (_: unknown, currentRecord: any) => (
+  //       <Space size="middle">
+  //         <Tooltip title="Delete">
+  //           <RiDeleteBin6Line
+  //             onClick={() => showDeleteClassModal(currentRecord)}
+  //             style={{ color: "red", cursor: "pointer" }}
+  //           />
+  //         </Tooltip>
+  //         <Tooltip title="Edit">
+  //           <EditOutlined
+  //             onClick={() => showEditClassModal(currentRecord)}
+  //             style={{ color: "#1890ff", cursor: "pointer" }}
+  //           />
+  //         </Tooltip>
+  //       </Space>
+  //     ),
+  //   },
+  // ];
 
   if (isFetching) {
     return (
@@ -243,6 +256,13 @@ const ClassPage = () => {
         handleCancel={handleCancel}
         currentRecord={currentRecord}
       />
+
+      <ViewSectionModal
+        isViewSectionModalVisible={isViewSectionModalVisible}
+        handleCancel={handleCancel}
+        currentRecord={currentRecord}
+      />
+
       <div className="!mt-5">
         <AntdCollapse
           accordion
@@ -270,14 +290,68 @@ const ClassPage = () => {
                 />
               }
             >
-              <Table
-                dataSource={allClass}
-                columns={columns}
-                pagination={false}
-                loading={isFetchingClass}
-                size="small"
-                rowKey="_id"
-              />
+              <div className="flex items-center gap-5 flex-wrap">
+                {isFetchingClass ? (
+                  <div className="flex justify-center items-center w-full py-20">
+                    <SpinLoader />
+                  </div>
+                ) : (
+                  allClass?.map((cl: any) => (
+                    <div
+                      className="px-2 py-3 bg-secondary-color rounded-lg"
+                      key={cl._id}
+                    >
+                      <div className="flex justify-end">
+                        <Dropdown
+                          menu={{
+                            items: [
+                              {
+                                key: "1",
+                                label: (
+                                  <Tooltip title="View">
+                                    <p onClick={() => showViewSectionModal(cl)}>
+                                      View Section
+                                    </p>
+                                  </Tooltip>
+                                ),
+                              },
+                              {
+                                key: "2",
+                                label: (
+                                  <Tooltip title="Edit">
+                                    <p onClick={() => showEditClassModal(cl)}>
+                                      Edit Class
+                                    </p>
+                                  </Tooltip>
+                                ),
+                              },
+                              {
+                                key: "3",
+                                label: (
+                                  <Tooltip title="Delete">
+                                    <p onClick={() => showDeleteClassModal(cl)}>
+                                      Delete Class
+                                    </p>
+                                  </Tooltip>
+                                ),
+                              },
+                            ],
+                          }}
+                          trigger={["hover"]}
+                          placement="bottomRight"
+                        >
+                          <HiOutlineDotsVertical className="size-5 text-primary-color cursor-pointer" />
+                        </Dropdown>
+                      </div>
+
+                      <div className="py-4 px-10 text-primary-color text-2xl">
+                        Class {cl.className}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
               <ReuseButton
                 onClick={showAddClassModal}
                 variant="outline"

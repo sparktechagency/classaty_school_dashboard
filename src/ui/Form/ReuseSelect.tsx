@@ -24,6 +24,7 @@ type TSelectProps = {
   wrapperClassName?: string;
   labelClassName?: string;
   selectClassName?: string;
+  fromItemClass?: string;
   defaultValue?: any;
   prefix?: React.ReactNode | null;
   optionFilterProp?: string;
@@ -47,6 +48,7 @@ const ReuseSelect = ({
   wrapperClassName,
   labelClassName,
   selectClassName,
+  fromItemClass = "",
   defaultValue = "",
   prefix,
   optionFilterProp,
@@ -61,7 +63,7 @@ const ReuseSelect = ({
           {label}
         </Typography.Title>
       )}
-      <Form.Item name={name} rules={rules}>
+      <Form.Item name={name} className={cn(fromItemClass)} rules={rules}>
         <Select
           showSearch={showSearch}
           filterOption={filterOption}

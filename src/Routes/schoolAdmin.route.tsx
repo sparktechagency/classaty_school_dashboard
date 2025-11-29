@@ -2,7 +2,6 @@
 import dashboardLogo from "../../public/images/dashboard-logo/dashboard.svg";
 import settingLogo from "../../public/images/dashboard-logo/setting.svg";
 import classLogo from "../../public/images/dashboard-logo/class.svg";
-import scheduleLogo from "../../public/images/dashboard-logo/schedule.svg";
 import subjectLogo from "../../public/images/dashboard-logo/subject.svg";
 import schoolLogo from "../../public/images/dashboard-logo/school.svg";
 import teacherLogo from "../../public/images/dashboard-logo/teacher.svg";
@@ -28,7 +27,6 @@ import AssignmentPage from "../pages/SchoolAdmin/AssignmentPage";
 import SchoolAdminTeachers from "../pages/SchoolAdmin/SchoolAdminTeachers";
 import SchoolAdminStudent from "../pages/SchoolAdmin/SchoolAdminStudent";
 import SubjectPage from "../pages/SchoolAdmin/Subject";
-import ClassSchedulePage from "../pages/SchoolAdmin/ClassSchedulePage";
 import ClassPage from "../pages/SchoolAdmin/Class";
 import SchoolAdminOVerview from "../pages/SchoolAdmin/SchoolAdminOVerview";
 import ExamPage from "../pages/SchoolAdmin/Exam";
@@ -36,6 +34,7 @@ import Profile from "../pages/Common/settings/Profile";
 import SchoolAdminAllManager from "../pages/SchoolAdmin/SchoolAdminAllManager";
 import GradeSystem from "../pages/SchoolAdmin/GradeSystem";
 import ConversationPage from "../pages/Common/ConversationPage";
+import ClassSchedulePage from "../pages/SchoolAdmin/ClassSchedulePage";
 
 export const schoolAdminPaths = [
   {
@@ -58,11 +57,9 @@ export const schoolAdminPaths = [
     icon: classLogo,
   },
   {
-    path: "schedule",
+    path: "class/:classId/:classname/:section",
     element: <ClassSchedulePage />,
-    key: "schedule",
-    name: "Schedule",
-    icon: scheduleLogo,
+    key: "class",
   },
   {
     path: "subject",

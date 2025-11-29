@@ -1,206 +1,120 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
-import { FiPlus } from "react-icons/fi";
-import { MdDownload, MdFileUpload } from "react-icons/md";
+import { useParams } from "react-router-dom";
+import ClassRoutineTable from "../../ui/Modal/ClassSchedule/ClassRoutineTable";
 import {
-  useDeleteClassScheduleMutation,
-  useGetAllClassScheduleQuery,
-} from "../../redux/features/classSchedule/classScheduleApi";
-import ReuseButton from "../../ui/Button/ReuseButton";
-import ReuseSearchInput from "../../ui/Form/ReuseSearchInput";
-import AddClassSchedule from "../../ui/Modal/ClassSchedule/AddClassSchedule";
-import DeleteModal from "../../ui/Modal/DeleteModal";
-import ClassScheduleTable from "../../ui/Tables/ClassScheduleTable";
-import tryCatchWrapper from "../../utils/tryCatchWrapper";
-import EditClassSchedule from "../../ui/Modal/ClassSchedule/EditClassSchedule";
-import { getBaseUrl } from "../../helpers/config/envConfig";
-import Cookies from "js-cookie";
-import { Upload, UploadProps } from "antd";
-import { toast } from "sonner";
+  useGetAllSujectAndTeacherQuery,
+  useGetClassRoutineQuery,
+  useSpecificStudentsQuery,
+} from "../../redux/features/classRoutine/classRoutineApi";
+import { FadeLoader } from "react-spinners";
+import ClassStudentTable from "../../ui/Tables/ClassStudentTable";
+import { useState } from "react";
+import ViewStudentMessageModal from "../../ui/Modal/ClassSchedule/ViewStudentMessageModal";
+import SupervisorSection from "../../ui/Modal/ClassSchedule/SupervisorSection";
+
+interface User {
+  _id: string;
+  name: string;
+  phoneNumber: string;
+  role: string;
+}
+
+interface Teacher {
+  _id: string;
+  userId: User;
+  subjectId: string;
+  subjectName: string;
+}
+
+export interface ISubjectTeacher {
+  subjectId: string;
+  subjectName: string;
+  schoolId: string;
+  schoolName: string;
+  teachers: Teacher[];
+}
 
 const ClassSchedulePage = () => {
-  const [page, setPage] = useState(1);
-  const [searchText, setSearchText] = useState("");
-  const token = Cookies.get("classaty_accessToken");
-
-  const limit = 12;
-  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
-  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
-  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
-  const [currentRecord, setCurrentRecord] = useState<any | null>(null);
-  const [deleteClassSchedule] = useDeleteClassScheduleMutation();
-
-  const { data, isFetching } = useGetAllClassScheduleQuery({
-    page,
-    limit,
-    searchTerm: searchText,
-  });
-
-  const classScheduleData = data?.data;
-
-  const showAddModal = () => {
-    setIsAddModalVisible(true);
+  const [isViewModal, setIsViewModal] = useState(false);
+  const [currentRecord, setCurrentRecord] = useState(null);
+  const setViewModal = (data: any) => {
+    setIsViewModal(true);
+    setCurrentRecord(data);
   };
 
-  const showEditModal = (record: any) => {
-    setIsEditModalVisible(true);
-    setCurrentRecord(record);
-  };
-
-  const showDeleteModal = (record: any) => {
-    setCurrentRecord(record);
-    setIsDeleteModalVisible(true);
-  };
-
-  const handleCancel = () => {
-    setIsAddModalVisible(false);
-    setIsEditModalVisible(false);
-    setIsDeleteModalVisible(false);
+  const handleCloseModal = () => {
+    setIsViewModal(false);
     setCurrentRecord(null);
   };
 
-  const handleDelete = async (record: any) => {
-    const res = await tryCatchWrapper(
-      deleteClassSchedule,
-      { params: record?._id },
-      "Deleting..."
+  const { classId, classname, section } = useParams<{
+    classId: string;
+    section: string;
+    classname: string;
+  }>();
+
+  const { data: classRoutine, isFetching: isClassRoutineFetching } =
+    useGetClassRoutineQuery(
+      { classId, section },
+      {
+        skip: !classId || !section,
+      }
     );
-    if (res.statusCode === 200) {
-      handleCancel();
-    }
-  };
 
-  const handleDownload = () => {
-    const link = document.createElement("a");
-    link.href = "../../file/class_schedule.xlsx";
-    link.download = "class_schedule.xlsx";
-    link.click();
-  };
+  const routine = classRoutine?.data?.routine;
 
-  const toastState = {
-    id: null as any,
-  };
+  const supervisor = classRoutine?.data?.supervisor;
 
-  const props: UploadProps = {
-    name: "file",
-    action: `${getBaseUrl()}/class_schedule/create_class_schedule_xlsx`,
-    headers: {
-      authorization: `Bearer ${token}`,
-    },
-    onChange(info: any) {
-      console.log(info.file.status);
-
-      if (info.file.status === "uploading") {
-        if (!toastState.id) {
-          toastState.id = toast.loading("Uploading file...", {
-            duration: Infinity, // keep loading until updated
-          });
-        }
+  const { data: subjects, isFetching: isSubjectFetching } =
+    useGetAllSujectAndTeacherQuery(
+      {},
+      {
+        skip: !routine,
       }
+    );
 
-      if (info.file.status === "done") {
-        if (toastState.id) {
-          toast.success(`${info.file.name} file uploaded successfully`, {
-            id: toastState.id,
-            duration: 2000,
-          });
-        }
-        toastState.id = null;
-        window.location.reload();
-      } else if (info.file.status === "error") {
-        const errorMsg =
-          info.file.response?.message ||
-          info.file.error?.message ||
-          `${info.file.name} file upload failed.`;
+  const allSubjectAndTeacher: ISubjectTeacher[] = subjects?.data;
 
-        if (toastState.id) {
-          toast.error(errorMsg, {
-            id: toastState.id,
-            duration: 2000,
-          });
-        }
-        toastState.id = null;
-      }
-    },
-  };
+  const { data: students, isFetching: isStudentFetching } =
+    useSpecificStudentsQuery({ classId, section });
 
+  const allStudent = students?.data;
+
+  if (isClassRoutineFetching || isSubjectFetching) {
+    return (
+      <div className="flex justify-center items-center h-[90vh]">
+        <FadeLoader color="#28314E" />
+      </div>
+    );
+  }
   return (
-    <div className=" bg-primary-color rounded-xl p-4 min-h-[90vh]">
-      <div className="flex justify-between items-center mb-5">
-        <p className="text-xl sm:text-2xl lg:text-3xl text-secondary-color font-bold">
-          Class Schedule
-        </p>
-        <div className="h-fit">
-          <div className="h-fit flex items-center gap-3">
-            <ReuseButton variant="primary" className="!py-4.5">
-              <Upload
-                {...props}
-                maxCount={1}
-                accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                className="text-start "
-                showUploadList={false}
-              >
-                <div className="!flex !items-center !gap-2 text-lg">
-                  <MdFileUpload className="!text-bas" />{" "}
-                  <span>Upload From Excel</span>
-                </div>
-              </Upload>
-            </ReuseButton>
-            <ReuseButton
-              onClick={handleDownload}
-              variant="primary"
-              className="!py-4.5"
-            >
-              <MdDownload className="!text-bas" /> Download Format
-            </ReuseButton>
-            <ReuseButton
-              variant="secondary"
-              className="!py-4.5"
-              onClick={showAddModal}
-            >
-              <FiPlus className="!text-bas" /> Add New Schedule
-            </ReuseButton>
-          </div>
-        </div>
-      </div>
-      <div className="h-fit flex justify-end">
-        <div className="h-fit">
-          <ReuseSearchInput
-            placeholder="Search Schedule ..."
-            setSearch={setSearchText}
-            setPage={setPage}
-          />
-        </div>
-      </div>
-      <AddClassSchedule
-        isAddModalVisible={isAddModalVisible}
-        handleCancel={handleCancel}
+    <div className="min-h-[90vh] mt-10">
+      <ClassRoutineTable
+        initialData={routine}
+        allSubjectAndTeacher={allSubjectAndTeacher}
+        classId={classId as string}
+        section={section as string}
+        className={classname as string}
       />
-      <div className="border-2 border-[#e1e1e1] rounded-xl rounded-tr-xl">
-        <ClassScheduleTable
-          data={classScheduleData?.result}
-          loading={isFetching}
-          showDeleteModal={showDeleteModal}
-          ShowAddModal={showAddModal}
-          showEditModal={showEditModal}
-          setPage={setPage}
-          page={page}
-          total={classScheduleData?.meta?.total}
-          limit={limit}
-        />
-      </div>
-
-      <EditClassSchedule
-        isAddModalVisible={isEditModalVisible}
-        handleCancel={handleCancel}
-        currentRecord={currentRecord}
+      <SupervisorSection
+        supervisor={supervisor}
+        classId={classId as string}
+        classname={classname as string}
+        section={section as string}
       />
-      <DeleteModal
-        isDeleteModalVisible={isDeleteModalVisible}
-        handleCancel={handleCancel}
+      <h3 className="text-3xl font-bold text-secondary-color mb-5 mt-10">
+        Students
+      </h3>
+      <ClassStudentTable
+        data={allStudent}
+        loading={isStudentFetching}
+        showViewModal={setViewModal}
+        limit={allStudent?.length}
+      />
+      <ViewStudentMessageModal
+        isViewModalVisible={isViewModal}
+        handleCancel={handleCloseModal}
         currentRecord={currentRecord}
-        handleDelete={handleDelete}
-        description=" Are You Sure You want to Delete This ?"
       />
     </div>
   );
