@@ -11,6 +11,9 @@ const getActiveKeys = (normalizedPath: string): string[] => {
   if (normalizedPath.includes("/terms-and-condition")) {
     return ["terms-and-condition"];
   }
+  if (normalizedPath.includes("/class")) {
+    return ["class"];
+  }
 
   return [normalizedPath.split("/").pop() || ""]; // Default fallback, ensuring a non-null value is returned
 };

@@ -64,8 +64,9 @@ const EditClassModal: React.FC<EditClassModalProps> = ({
 
       const payload = {
         className: values.className.trim(),
-        section: values.sections.map((s: string) => s.trim()),
+        section: values.sections,
       };
+      console.log(payload);
       const res = await tryCatchWrapper(
         updateClass,
         { body: payload, params: currentRecord?._id },
