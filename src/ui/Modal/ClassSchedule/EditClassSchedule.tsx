@@ -74,7 +74,7 @@ const EditClassSchedule: React.FC<AddClassScheduleProps> = ({
         subjectId: currentRecord.subjectId,
         period: currentRecord.period,
         description: currentRecord.description,
-        teacherId: currentRecord.teacherId,
+        teacherId: currentRecord?.teacherId,
         selectTime: dayjs(currentRecord.selectTime, "HH:mm:ss"),
         endTime: dayjs(currentRecord.endTime, "HH:mm:ss"),
         days: currentRecord.days,

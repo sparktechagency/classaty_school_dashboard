@@ -60,10 +60,10 @@ const EditExamModal: React.FC<EditExamModalProps> = ({
   useEffect(() => {
     if (isEditExamModalVisible && currentRecord) {
       const assignedTeacher = teachers?.data?.result?.find((teacher: any) =>
-        console.log(teacher._id, currentRecord.teacherId)
+        console.log(teacher._id, currentRecord?.teacherId)
       );
 
-      console.log("assignedTeacher", currentRecord.teacherId);
+      console.log("assignedTeacher", currentRecord?.teacherId);
 
       form.setFieldsValue({
         subjectId: currentRecord.subjectId,

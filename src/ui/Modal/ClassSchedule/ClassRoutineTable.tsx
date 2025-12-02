@@ -160,8 +160,8 @@ export default function ClassRoutineTable({
             values[fieldName] = p.subjectId;
 
             // include teacherId if available
-            if (p.teacherId) {
-              values[fieldName + "_teacher"] = p.teacherId;
+            if (p?.teacherId) {
+              values[fieldName + "_teacher"] = p?.teacherId;
             }
           }
         });
@@ -203,7 +203,7 @@ export default function ClassRoutineTable({
         const teacherName =
           allSubjectAndTeacher
             .find((s) => s.subjectId === subjectId)
-            ?.teachers.find((t) => t.userId._id === teacherId)?.userId.name ||
+            ?.teachers.find((t) => t?.userId?._id === teacherId)?.userId.name ||
           "";
         teacherMap[subjectId] = { teacherId, teacherName };
       }
@@ -537,8 +537,8 @@ export default function ClassRoutineTable({
                       ...prev,
                       [subject.value]: teacher
                         ? {
-                            teacherId: teacher.value,
-                            teacherName: teacher.label,
+                            teacherId: teacher?.value,
+                            teacherName: teacher?.label,
                           }
                         : null,
                     }));

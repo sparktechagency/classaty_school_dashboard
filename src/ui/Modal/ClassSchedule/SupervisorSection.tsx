@@ -45,7 +45,7 @@ const SupervisorSection = ({
 
   useEffect(() => {
     form.setFieldsValue({
-      supervisor: supervisor.teacherId,
+      supervisor: supervisor?.teacherId,
     });
   }, [form, supervisor]);
   const handleSubmit = (values: any) => {
@@ -56,7 +56,7 @@ const SupervisorSection = ({
           classId: classId,
           className: classname,
           section: section,
-          teacherId: values.supervisor,
+          teacherId: values?.supervisor,
           teacherName: allTeacher?.find(
             (t: any) => t?._id === values.supervisor
           )?.userId?.name,

@@ -66,7 +66,7 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
     );
 
     const assignedTeacher = teachers?.data?.result?.find(
-      (teacher: any) => teacher._id === values.teacherId
+      (teacher: any) => teacher._id === values?.teacherId
     );
 
     const isoDate = dayjs(values.date).toISOString();
@@ -83,7 +83,7 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
       classRoom: values.classRoom,
       duration: Number(values.duration),
       assignedTeacher: assignedTeacher?.name,
-      teacherId: values.teacherId,
+      teacherId: values?.teacherId,
       termsId: activeKey?.[0],
       instruction: values.instruction,
       totalMarks: values.totalMarks,
