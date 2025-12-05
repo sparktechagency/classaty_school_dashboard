@@ -243,7 +243,7 @@ export default function ClassRoutineTable({
   // === Modal state for Add Period ===
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newPeriodData, setNewPeriodData] = useState({
-    name: "",
+    name: "__",
     startTime: "08:00",
     endTime: "08:40",
     isBreak: false,
@@ -264,16 +264,22 @@ export default function ClassRoutineTable({
     if (!newPeriodData.isBreak) {
       // sequential normal periods
       periodNumber = periods.filter((p) => !p.isBreak).length + 1;
+      newPeriodData.name = newPeriodData.name
+        ? newPeriodData.name
+        : `Period ${periodNumber}`;
     } else {
       // break periods: 00, 000, 0000 ...
       const breakCount = periods.filter((p) => p.isBreak).length;
       periodNumber = parseInt("0".repeat(breakCount + 2));
+      newPeriodData.name = `Break ${breakCount + 1}`;
     }
 
     const newPeriod: Period = {
       periodNumber,
       ...newPeriodData,
     };
+
+    console.log(newPeriod);
 
     setPeriods((prev) => [...prev, newPeriod]);
     setIsModalOpen(false);
@@ -315,6 +321,7 @@ export default function ClassRoutineTable({
   // Save handler (same as before)
   const handleSave = () => {
     const values = form.getFieldsValue();
+    console.log(values);
 
     const changedSubjects: Record<string, string> = {};
     Object.keys(values).forEach((key) => {
@@ -348,36 +355,50 @@ export default function ClassRoutineTable({
     });
 
     const routinePayload = DAYS_ORDER.flatMap((day) => {
-      const routineForDay: any[] = [];
-      periods.forEach((p) => {
-        const fieldName = `${day}_period_${p.periodNumber}`;
-        const subjectId = values[fieldName];
-        if (!subjectId) return;
+      const dayRoutine = initialData.routines.find(
+        (r) => r.day.toLowerCase() === day
+      )?.periods;
 
-        const initialTeacher =
-          initialTeacherMapRef.current[subjectId]?.teacherId;
-        const currentTeacher = subjectTeacherMap[subjectId]?.teacherId;
+      return periods
+        .map((p) => {
+          const fieldName = `${day}_period_${p.periodNumber}`;
+          const subjectId = values[fieldName];
 
-        if (initialTeacher !== currentTeacher) {
-          const subjectName =
-            allSubjectAndTeacher.find((s) => s.subjectId === subjectId)
-              ?.subjectName || null;
+          // skip if subject is not selected
+          if (!subjectId) return null;
 
-          routineForDay.push({
+          const teacherId = values[`${subjectId}_teacher`] || null;
+          const teacherName = subjectTeacherMap[subjectId]?.teacherName;
+
+          // skip if teacherName is missing
+          if (!teacherName) return null;
+
+          const initialPeriod = dayRoutine?.find(
+            (ip) => ip.periodNumber === p.periodNumber
+          );
+
+          // skip if nothing changed
+          if (
+            initialPeriod &&
+            initialPeriod.subjectId === subjectId &&
+            initialPeriod.teacherId === teacherId
+          ) {
+            return null;
+          }
+
+          return {
             day,
             periodNumber: p.periodNumber,
             subjectId,
-            subjectName,
-            teacherId: currentTeacher || null,
-            teacherName: subjectTeacherMap[subjectId]?.teacherName || null,
-            startTime: p.startTime,
-            endTime: p.endTime,
-            isBreak: p.isBreak,
-          });
-        }
-      });
-      return routineForDay;
+            subjectName: teacherName, // assign teacherName as subjectName if needed
+            teacherId,
+            teacherName,
+          };
+        })
+        .filter(Boolean);
     });
+
+    console.log(routinePayload);
 
     const payload = {
       schoolId: user?.schoolId,
@@ -569,7 +590,7 @@ export default function ClassRoutineTable({
         onOk={handleAddPeriod}
       >
         <Form layout="vertical">
-          <Form.Item label="Period Name">
+          <Form.Item label="Period Name" rules={[{ required: true }]}>
             <Input
               value={newPeriodData.name}
               onChange={(e) =>
