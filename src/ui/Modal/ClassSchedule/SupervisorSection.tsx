@@ -36,14 +36,15 @@ const SupervisorSection = ({
   const allTeacher = teachers?.data;
 
   const teacherOptions = allTeacher?.map((t: any) => ({
-    value: t?._id,
-    label: t?.userId?.name,
+    value: t?.userId,
+    label: t?.name,
   }));
 
-  console.log(teachers?.data);
+  console.log(allTeacher);
   const [form] = Form.useForm();
 
   useEffect(() => {
+    if (!supervisor) return;
     form.setFieldsValue({
       supervisor: supervisor.teacherId,
     });
@@ -58,8 +59,8 @@ const SupervisorSection = ({
           section: section,
           teacherId: values.supervisor,
           teacherName: allTeacher?.find(
-            (t: any) => t?._id === values.supervisor
-          )?.userId?.name,
+            (t: any) => t?.userId === values.supervisor
+          )?.name,
         },
       },
       "Adding Supervisor..."

@@ -42,14 +42,16 @@ const ClassStudentTable: React.FC<ClassStudentTableProps> = ({
       key: "action",
       render: (_: unknown, record: any) => (
         <Space size="middle">
-          <Tooltip placement="right" title="View Details">
-            <button
-              className="!p-0 !bg-transparent !border-none !text-secondary-color cursor-pointer"
-              onClick={() => showViewModal(record)}
-            >
-              <GoEye style={{ fontSize: "24px" }} />
-            </button>
-          </Tooltip>
+          {record?.parentsMessage && (
+            <Tooltip placement="right" title="View Details">
+              <button
+                className="!p-0 !bg-transparent !border-none !text-secondary-color cursor-pointer"
+                onClick={() => showViewModal(record)}
+              >
+                <GoEye style={{ fontSize: "24px" }} />
+              </button>
+            </Tooltip>
+          )}
         </Space>
       ),
       align: "center",
