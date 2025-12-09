@@ -9,7 +9,10 @@ import { ISchoolDetails } from "../../../../types";
 import {
   useDeleteSchoolMutation,
   useGetSchoolQuery,
+  useSchoolBlockUnblockMutation,
 } from "../../../../redux/features/school/schoolApi";
+import BlockModal from "../../../../ui/Modal/BlockModal";
+import UnblockModal from "../../../../ui/Modal/UnblockModal";
 
 const RecentSchool = () => {
   const { data, isFetching } = useGetSchoolQuery({
@@ -17,6 +20,8 @@ const RecentSchool = () => {
     limit: 6,
     searchTerm: "",
   });
+  const [schoolBlockUnblock] = useSchoolBlockUnblockMutation();
+
   const [deleteSchool] = useDeleteSchoolMutation();
   const schoolData: ISchoolDetails[] = data?.data?.result;
   const schoolPagination = data?.data?.meta;
@@ -24,7 +29,17 @@ const RecentSchool = () => {
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [isBlockModalVisible, setIsBlockModalVisible] = useState(false);
+  const [isUnblockModalVisible, setIsUnblockModalVisible] = useState(false);
+  const showBlockModal = (record: ISchoolDetails) => {
+    setCurrentRecord(record);
+    setIsBlockModalVisible(true);
+  };
 
+  const showUnblockModal = (record: ISchoolDetails) => {
+    setCurrentRecord(record);
+    setIsUnblockModalVisible(true);
+  };
   const [currentRecord, setCurrentRecord] = useState<any | null>(null);
 
   const showViewUserModal = (record: any) => {
@@ -63,6 +78,28 @@ const RecentSchool = () => {
       handleCancel();
     }
   };
+  const handleBlock = async (data: ISchoolDetails) => {
+    const res = await tryCatchWrapper(
+      schoolBlockUnblock,
+      { params: data?.school?._id },
+      "Blocking..."
+    );
+    if (res.statusCode === 200) {
+      handleCancel();
+    }
+  };
+
+  const handleUnblock = async (data: ISchoolDetails) => {
+    const res = await tryCatchWrapper(
+      schoolBlockUnblock,
+      { params: data?.school?._id },
+      "Unblocking..."
+    );
+    if (res.statusCode === 200) {
+      handleCancel();
+    }
+  };
+
   return (
     <div className="mt-10 rounded-xl">
       <div className="flex justify-between items-center py-2">
@@ -76,32 +113,45 @@ const RecentSchool = () => {
           loading={isFetching}
           showViewModal={showViewUserModal}
           showEditModal={showEditModal}
-          setPage={undefined}
+          showBlockModal={showBlockModal}
+          showUnblockModal={showUnblockModal}
+          setPage={() => {}}
           page={1}
           total={schoolPagination?.total}
           limit={6}
         />
       </div>
-
       <EditSchoolModal
         isEditModalVisible={isEditModalVisible}
         handleCancel={handleCancel}
         currentRecord={currentRecord}
       />
-
       <SchoolModal
         isViewModalVisible={isViewModalVisible}
         handleCancel={handleCancel}
         currentRecord={currentRecord}
         showDeleteModal={showDeleteModal}
       />
-
       <DeleteModal
         isDeleteModalVisible={isDeleteModalVisible}
         handleCancel={handleDeleteCancel}
         currentRecord={currentRecord}
         handleDelete={handleDelete}
         description=" Are You Sure You want to Delete This School ?"
+      />{" "}
+      <BlockModal
+        isBlockModalVisible={isBlockModalVisible}
+        handleCancel={handleCancel}
+        currentRecord={currentRecord}
+        handleBlock={handleBlock}
+        description=" Are You Sure You want to Block This School ?"
+      />
+      <UnblockModal
+        isUnblockModalVisible={isUnblockModalVisible}
+        handleCancel={handleCancel}
+        currentRecord={currentRecord}
+        handleUnblock={handleUnblock}
+        description=" Are You Sure You want to Unblock This School ?"
       />
     </div>
   );
