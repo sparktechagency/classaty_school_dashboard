@@ -59,9 +59,9 @@ const EditExamModal: React.FC<EditExamModalProps> = ({
 
   useEffect(() => {
     if (isEditExamModalVisible && currentRecord) {
-      const assignedTeacher = teachers?.data?.result?.find((teacher: any) =>
-        console.log(teacher._id, currentRecord?.teacherId)
-      );
+      // const assignedTeacher = teachers?.data?.result?.find((teacher: any) =>
+      //   console.log(teacher._id, currentRecord?.teacherId)
+      // );
 
       console.log("assignedTeacher", currentRecord?.teacherId);
 
@@ -75,15 +75,17 @@ const EditExamModal: React.FC<EditExamModalProps> = ({
         startTime: dayjs(currentRecord.startTime, "HH:mm:ss"),
         classRoom: currentRecord.classRoom,
         duration: currentRecord.duration,
-        teacherId: assignedTeacher
-          ? assignedTeacher.name
-          : currentRecord.teacherName, // Set the teacher's name
+        // teacherId: assignedTeacher
+        //   ? assignedTeacher.name
+        //   : currentRecord.teacherName, // Set the teacher's name
+        teacherId: currentRecord.teacherId,
         instruction: currentRecord.instruction,
       });
     }
   }, [isEditExamModalVisible, currentRecord, form, teachers]);
 
   const handleFinish = async (values: any) => {
+    console.log(values);
     const subjectName = subject?.data?.result?.find(
       (subject: any) => subject._id === values.subjectId
     );
@@ -127,6 +129,12 @@ const EditExamModal: React.FC<EditExamModalProps> = ({
       handleCancel();
     }
   };
+  console.log(
+    teachers?.data?.result?.map((teacher: any) => ({
+      value: teacher?._id,
+      label: teacher?.name,
+    }))
+  );
   return (
     <Modal
       open={isEditExamModalVisible}
@@ -230,6 +238,7 @@ const EditExamModal: React.FC<EditExamModalProps> = ({
                 placeholder="Enter Class Room"
               />
               <ReuseInput
+                type="number"
                 Typolevel={5}
                 label="Exam Duration"
                 name="duration"
@@ -242,8 +251,8 @@ const EditExamModal: React.FC<EditExamModalProps> = ({
                 labelClassName="!font-bold"
                 placeholder="Select Teacher"
                 options={teachers?.data?.result?.map((teacher: any) => ({
-                  value: teacher._id,
-                  label: teacher.name,
+                  value: teacher?._id,
+                  label: teacher?.name,
                 }))}
               />
 

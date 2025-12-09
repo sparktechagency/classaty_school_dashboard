@@ -82,6 +82,9 @@ const MyPanelHeader = ({
 );
 
 const ExamPage = () => {
+  const [page, setPage] = useState(1);
+  const limit = 10;
+
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isEditExamModalVisible, setIsEditExamModalVisible] = useState(false);
   const [isAddTermModalVisible, setIsAddTermModalVisible] = useState(false);
@@ -95,7 +98,7 @@ const ExamPage = () => {
   const { data: terms } = useGetAllTermsQuery({});
   const [deleteTerm] = useDeleteTermMutation();
   const [deleteExam] = useDeleteExamMutation();
-  console.log(terms, "terms ====++++++>");
+
   useEffect(() => {
     if (terms?.data?.result?.length) {
       setActiveKey([terms?.data?.result[0]?._id]);
@@ -105,8 +108,8 @@ const ExamPage = () => {
   const { data: exams, isFetching } = useGetAllExamsQuery(
     {
       termsId: activeKey?.[0],
-      page: 1,
-      limit: 1000,
+      page,
+      limit,
     },
     {
       skip: !activeKey?.length,
@@ -141,6 +144,7 @@ const ExamPage = () => {
     setIsAddTermModalVisible(false);
     setIsAddExamModalVisible(false);
     setIsDeleteModalVisible(false);
+    setIsDeleteExamModalVisible(false);
     setIsEditExamModalVisible(false);
     setCurrentRecord(null);
   };
@@ -298,12 +302,17 @@ const ExamPage = () => {
                 <Table
                   columns={columns}
                   dataSource={exams?.data?.result}
-                  pagination={false}
                   loading={isFetching}
                   rowKey="_id"
                   scroll={{ x: "max-content" }}
                   bordered
                   size="middle"
+                  pagination={{
+                    current: page,
+                    pageSize: limit,
+                    total: exams?.data?.meta?.total,
+                    onChange: (page: number) => setPage(page),
+                  }}
                 />
                 <ReuseButton
                   onClick={showAddExamModal}

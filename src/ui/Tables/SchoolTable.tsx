@@ -2,8 +2,9 @@
 import React from "react";
 import { Space, Tooltip } from "antd";
 import { GoEye } from "react-icons/go";
-import { MdModeEditOutline } from "react-icons/md";
+import { MdBlock, MdModeEditOutline } from "react-icons/md";
 import ReuseTable from "../../utils/ReuseTable";
+import { CgUnblock } from "react-icons/cg";
 
 // Define the type for the props
 interface AllSchoolTableProps {
@@ -12,6 +13,8 @@ interface AllSchoolTableProps {
   showEditModal: (record: any) => void;
   showViewModal: (record: any) => void; // Function to handle viewing a user
   setPage?: (page: number) => void; // Function to handle pagination
+  showUnblockModal: (record: any) => void;
+  showBlockModal: (record: any) => void;
   page: number;
   total: number;
   limit: number;
@@ -22,6 +25,8 @@ const AllSchoolTable: React.FC<AllSchoolTableProps> = ({
   loading,
   showEditModal,
   showViewModal,
+  showBlockModal,
+  showUnblockModal,
   setPage,
   page,
   total,
@@ -72,6 +77,25 @@ const AllSchoolTable: React.FC<AllSchoolTableProps> = ({
               <MdModeEditOutline style={{ fontSize: "24px" }} />
             </button>
           </Tooltip>
+          {record?.school?.isBlocked ? (
+            <Tooltip placement="left" title="Unblock">
+              <button
+                className="!p-0 !bg-transparent !border-none !text-secondary-color cursor-pointer"
+                onClick={() => showUnblockModal(record)}
+              >
+                <CgUnblock style={{ fontSize: "24px" }} />
+              </button>
+            </Tooltip>
+          ) : (
+            <Tooltip placement="left" title="Block">
+              <button
+                className="!p-0 !bg-transparent !border-none !text-error-color cursor-pointer"
+                onClick={() => showBlockModal(record)}
+              >
+                <MdBlock style={{ fontSize: "24px" }} />
+              </button>
+            </Tooltip>
+          )}
           <Tooltip placement="right" title="View Details">
             <button
               className="!p-0 !bg-transparent !border-none !text-secondary-color cursor-pointer"
