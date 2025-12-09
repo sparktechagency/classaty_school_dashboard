@@ -62,7 +62,7 @@ const classRoutineApi = baseApi.injectEndpoints({
     }),
     addSupervisor: build.mutation({
       query: (req) => ({
-        url: `/class_section_supervisor/add`,
+        url: `/class_section_supervisor/add-many`,
         method: "POST",
         body: req.body,
       }),
