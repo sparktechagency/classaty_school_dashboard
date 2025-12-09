@@ -60,6 +60,9 @@ const RecentSchool = () => {
   const handleCancel = () => {
     setIsViewModalVisible(false);
     setIsDeleteModalVisible(false);
+    setIsEditModalVisible(false);
+    setIsBlockModalVisible(false);
+    setIsUnblockModalVisible(false);
     setCurrentRecord(null);
   };
 
