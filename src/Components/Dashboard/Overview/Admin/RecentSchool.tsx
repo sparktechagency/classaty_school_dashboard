@@ -20,6 +20,7 @@ const RecentSchool = () => {
     limit: 6,
     searchTerm: "",
   });
+
   const [schoolBlockUnblock] = useSchoolBlockUnblockMutation();
 
   const [deleteSchool] = useDeleteSchoolMutation();
