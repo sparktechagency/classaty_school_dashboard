@@ -63,7 +63,7 @@ const ClassSchedulePage = () => {
 
   const routine = classRoutine?.data?.routine;
 
-  const supervisor = classRoutine?.data?.supervisor;
+  const supervisor = classRoutine?.data?.supervisors;
 
   const { data: subjects, isFetching: isSubjectFetching } =
     useGetAllSujectAndTeacherQuery(

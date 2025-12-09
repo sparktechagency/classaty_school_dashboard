@@ -71,7 +71,7 @@ const ReuseSelect = ({
           loading={loading}
           mode={mode}
           className={cn(
-            "!h-12 !text-secondary-color !bg-[#EFEFEF] !ring-0 rounded-md ",
+            "!min-h-fit !text-secondary-color !bg-[#EFEFEF] !ring-0 rounded-md ",
             selectClassName
           )}
           value={value}
