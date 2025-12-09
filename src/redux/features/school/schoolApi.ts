@@ -167,6 +167,14 @@ const schoolApi = baseApi.injectEndpoints({
       },
       providesTags: [tagTypes.school],
     }),
+    schoolBlockUnblock: build.mutation({
+      query: (req) => ({
+        url: `${school_url}/update_school_block_status/${req?.params}`,
+        method: "PATCH",
+        body: req.body,
+      }),
+      invalidatesTags: [tagTypes.school],
+    }),
   }),
 });
 
@@ -185,6 +193,7 @@ export const {
   useDeleteSchoolMutation,
   useUpdateSchoolProfileMutation,
   useGetSchoolProfileQuery,
+  useSchoolBlockUnblockMutation,
 } = schoolApi;
 
 export default schoolApi;

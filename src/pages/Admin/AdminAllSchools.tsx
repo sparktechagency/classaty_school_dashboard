@@ -10,9 +10,12 @@ import EditSchoolModal from "../../ui/Modal/User/EditSchoolModal";
 import {
   useDeleteSchoolMutation,
   useGetSchoolQuery,
+  useSchoolBlockUnblockMutation,
 } from "../../redux/features/school/schoolApi";
 import { ISchoolDetails } from "../../types";
 import tryCatchWrapper from "../../utils/tryCatchWrapper";
+import BlockModal from "../../ui/Modal/BlockModal";
+import UnblockModal from "../../ui/Modal/UnblockModal";
 
 const AdminAllSchools = () => {
   const [page, setPage] = useState(1);
@@ -26,6 +29,7 @@ const AdminAllSchools = () => {
     searchTerm: searchText,
   });
   const [deleteSchool] = useDeleteSchoolMutation();
+  const [schoolBlockUnblock] = useSchoolBlockUnblockMutation();
   const schoolData: ISchoolDetails[] = data?.data?.result;
   const schoolPagination = data?.data?.meta;
 
@@ -33,6 +37,8 @@ const AdminAllSchools = () => {
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [isBlockModalVisible, setIsBlockModalVisible] = useState(false);
+  const [isUnblockModalVisible, setIsUnblockModalVisible] = useState(false);
   const [currentRecord, setCurrentRecord] = useState<ISchoolDetails | null>(
     null
   );
@@ -56,11 +62,23 @@ const AdminAllSchools = () => {
     setIsDeleteModalVisible(true);
   };
 
+  const showBlockModal = (record: ISchoolDetails) => {
+    setCurrentRecord(record);
+    setIsBlockModalVisible(true);
+  };
+
+  const showUnblockModal = (record: ISchoolDetails) => {
+    setCurrentRecord(record);
+    setIsUnblockModalVisible(true);
+  };
+
   const handleCancel = () => {
     setIsAddModalVisible(false);
     setIsEditModalVisible(false);
     setIsViewModalVisible(false);
     setIsDeleteModalVisible(false);
+    setIsBlockModalVisible(false);
+    setIsUnblockModalVisible(false);
     setCurrentRecord(null);
   };
 
@@ -79,6 +97,29 @@ const AdminAllSchools = () => {
       handleCancel();
     }
   };
+
+  const handleBlock = async (data: ISchoolDetails) => {
+    const res = await tryCatchWrapper(
+      schoolBlockUnblock,
+      { params: data?.school?._id },
+      "Blocking..."
+    );
+    if (res.statusCode === 200) {
+      handleCancel();
+    }
+  };
+
+  const handleUnblock = async (data: ISchoolDetails) => {
+    const res = await tryCatchWrapper(
+      schoolBlockUnblock,
+      { params: data?.school?._id },
+      "Unblocking..."
+    );
+    if (res.statusCode === 200) {
+      handleCancel();
+    }
+  };
+
   return (
     <div className=" bg-primary-color rounded-xl p-4 min-h-[90vh]">
       <div className="flex justify-between items-center mb-5">
@@ -110,6 +151,8 @@ const AdminAllSchools = () => {
           loading={isFetching}
           showViewModal={showViewUserModal}
           showEditModal={showEditModal}
+          showBlockModal={showBlockModal}
+          showUnblockModal={showUnblockModal}
           setPage={setPage}
           page={page}
           total={schoolPagination?.total}
@@ -132,6 +175,21 @@ const AdminAllSchools = () => {
         handleCancel={handleCancel}
         currentRecord={currentRecord}
         showDeleteModal={showDeleteModal}
+      />
+      <BlockModal
+        isBlockModalVisible={isBlockModalVisible}
+        handleCancel={handleCancel}
+        currentRecord={currentRecord}
+        handleBlock={handleBlock}
+        description=" Are You Sure You want to Block This School ?"
+      />
+
+      <UnblockModal
+        isUnblockModalVisible={isUnblockModalVisible}
+        handleCancel={handleCancel}
+        currentRecord={currentRecord}
+        handleUnblock={handleUnblock}
+        description=" Are You Sure You want to Unblock This School ?"
       />
 
       <DeleteModal

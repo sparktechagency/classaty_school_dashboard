@@ -221,6 +221,7 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
                 rules={[{ required: true, message: "Class Room is required" }]}
               />
               <ReuseInput
+                type="number"
                 Typolevel={5}
                 label="Exam Duration"
                 name="duration"
