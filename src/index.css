@@ -43,10 +43,6 @@ th {
   text-wrap: nowrap;
 }
 
-/* .font-special {
-  font-family: var(--font-bagatelleVF);
-} */
-
 ::-webkit-scrollbar {
   width: 7px;
 }
