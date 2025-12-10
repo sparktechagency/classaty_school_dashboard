@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Upload, UploadProps } from "antd";
+import { Upload } from "antd";
 import Cookies from "js-cookie";
 import { useState } from "react";
 import { FiPlus } from "react-icons/fi";
@@ -22,6 +22,7 @@ import UnblockModal from "../../ui/Modal/UnblockModal";
 import StudentTable from "../../ui/Tables/StudentTable";
 import tryCatchWrapper from "../../utils/tryCatchWrapper";
 import EditStudent from "../../ui/Modal/Student/EditStudent";
+import * as XLSX from "xlsx";
 
 const AdminAllStudent = () => {
   const token = Cookies.get("classaty_accessToken");
@@ -154,50 +155,143 @@ const AdminAllStudent = () => {
   //   }
   // }, [xlFile]);
 
-  const toastState = {
-    id: null as any,
-  };
+  // const props: UploadProps = {
+  //   name: "file",
 
-  const props: UploadProps = {
-    name: "file",
-    action: `${getBaseUrl()}/student/create_student_using_xlsx`,
-    headers: {
-      authorization: `Bearer ${token}`,
-    },
-    onChange(info) {
-      console.log(info.file.status);
+  //   beforeUpload: async (file) => {
+  //     const requiredKeys = [
+  //       "name",
+  //       "phoneNumber",
+  //       "fatherPhoneNumber",
+  //       "motherPhoneNumber",
+  //       "className",
+  //       "schoolName",
+  //       "section",
+  //     ];
 
-      if (info.file.status === "uploading") {
-        if (!toastState.id) {
-          toastState.id = toast.loading("Uploading file...", {
-            duration: Infinity, // keep loading until updated
-          });
-        }
+  //     return new Promise((resolve, reject) => {
+  //       const reader = new FileReader();
+
+  //       reader.onload = async (e) => {
+  //         const data = new Uint8Array(e.target?.result as ArrayBuffer);
+  //         const workbook = XLSX.read(data, { type: "array" });
+  //         const sheet = workbook.Sheets[workbook.SheetNames[0]];
+  //         let rows: any[] = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+
+  //         // Remove empty rows
+  //         rows = rows.filter((row) =>
+  //           Object.values(row).some((v) => v && v.toString().trim() !== "")
+  //         );
+
+  //         // Validate fields
+  //         for (let i = 0; i < rows.length; i++) {
+  //           const row = rows[i];
+
+  //           for (const key of requiredKeys) {
+  //             if (!row[key] || row[key].toString().trim() === "") {
+  //               toast.error(`Row ${i + 2}: Missing required "${key}" 😭`);
+  //               reject();
+  //               return;
+  //             }
+  //           }
+  //         }
+
+  //         resolve(file); // Validation passed → allow upload
+  //       };
+
+  //       reader.onerror = () => {
+  //         toast.error("Could not read file 😓");
+  //         reject();
+  //       };
+
+  //       reader.readAsArrayBuffer(file);
+  //     });
+  //   },
+
+  //   action: `${getBaseUrl()}/student/create_student_using_xlsx`,
+  //   headers: {
+  //     authorization: `Bearer ${token}`,
+  //   },
+
+  //   onChange(info) {
+  //     if (info.file.status === "uploading") {
+  //       if (!toastState.id) {
+  //         toastState.id = toast.loading("Uploading file...", {
+  //           duration: Infinity,
+  //         });
+  //       }
+  //     }
+
+  //     if (info.file.status === "done") {
+  //       toast.success("File uploaded successfully! 🎉", {
+  //         id: toastState.id,
+  //       });
+  //       toastState.id = null;
+  //     }
+
+  //     if (info.file.status === "error") {
+  //       toast.error("Upload failed 😭", { id: toastState.id });
+  //       toastState.id = null;
+  //     }
+  //   },
+
+  //   showUploadList: false,
+  // };
+
+  const handleExcelUpload = async (file: File) => {
+    const toastId = toast.loading("Uploading file...", { duration: Infinity });
+    const workbook = XLSX.read(await file.arrayBuffer(), { type: "array" });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+
+    // Convert sheet to JSON
+    let rows: any[] = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+
+    // Remove empty rows
+    rows = rows.filter((row) =>
+      Object.values(row).some((v) => v && v.toString().trim() !== "")
+    );
+
+    // Convert back to XLSX in memory
+    const newSheet = XLSX.utils.json_to_sheet(rows);
+    const newWorkbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(newWorkbook, newSheet, "Sheet1");
+
+    const wbout = XLSX.write(newWorkbook, { bookType: "xlsx", type: "array" });
+    const blob = new Blob([wbout], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+
+    // Create a new File object
+    const cleanedFile = new File([blob], file.name, { type: file.type });
+
+    // Upload using FormData
+    const formData = new FormData();
+    formData.append("file", cleanedFile);
+
+    const res = await fetch(
+      `${getBaseUrl()}/student/create_student_using_xlsx`,
+      {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
       }
+    );
 
-      if (info.file.status === "done") {
-        if (toastState.id) {
-          toast.success(`${info.file.name} file uploaded successfully`, {
-            id: toastState.id,
-            duration: 2000,
-          });
-        }
-        toastState.id = null;
-      } else if (info.file.status === "error") {
-        const errorMsg =
-          info.file.response?.message ||
-          info.file.error?.message ||
-          `${info.file.name} file upload failed.`;
+    const json = await res.json();
+    console.log(json);
 
-        if (toastState.id) {
-          toast.error(errorMsg, {
-            id: toastState.id,
-            duration: 2000,
-          });
-        }
-        toastState.id = null;
-      }
-    },
+    if (!res.ok) {
+      console.log(res);
+      toast.error(json?.message, {
+        id: toastId,
+        duration: 2000,
+      });
+      throw new Error("Failed to upload file");
+    }
+    toast.success("File uploaded successfully! 🎉", {
+      id: toastId,
+      duration: 2000,
+    });
   };
 
   return (
@@ -214,15 +308,10 @@ const AdminAllStudent = () => {
               className="!py-4.5"
             >
               <Upload
-                {...props}
-                // customRequest={(options) => {
-                //   setTimeout(() => {
-                //     if (options.onSuccess) {
-                //       options.onSuccess("ok");
-                //     }
-                //   }, 1000);
-                // }}
-                // onChange={(e) => setXlFile(e)}
+                beforeUpload={(file) => {
+                  handleExcelUpload(file);
+                  return false; // ❗STOP auto upload
+                }}
                 maxCount={1}
                 accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 className="text-start "
