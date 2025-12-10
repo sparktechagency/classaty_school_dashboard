@@ -51,6 +51,7 @@
     "@types/react": "^19.1.1",
     "@types/react-dom": "^19.1.2",
     "@types/react-redux": "^7.1.34",
+    "@types/xlsx": "^0.0.35",
     "@vitejs/plugin-react": "^4.3.4",
     "eslint": "^9.21.0",
     "eslint-plugin-react-hooks": "^5.1.0",
