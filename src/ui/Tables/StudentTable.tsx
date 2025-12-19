@@ -35,10 +35,10 @@ const StudentTable: React.FC<StudentTableProps> = ({
   const columns = [
     {
       title: "#UID",
-      dataIndex: "_id",
-      render: (_: unknown, __: unknown, index: number) =>
-        page * limit - limit + index + 1,
-      key: "_id",
+      dataIndex: "uid",
+      // render: (_: unknown, __: unknown, index: number) =>
+      //   page * limit - limit + index + 1,
+      key: "uid",
     },
     {
       title: "Student Name",

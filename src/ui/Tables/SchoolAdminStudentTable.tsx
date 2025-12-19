@@ -42,9 +42,9 @@ const SchoolAdminStudentTable: React.FC<SchoolAdminStudentTableProps> = ({
     {
       title: "ID",
       dataIndex: "uid",
-      render: (_: unknown, record: any) => {
-        return <p>{record.uid ? record.uid : "-"}</p>;
-      },
+      // render: (_: unknown, record: any) => {
+      //   return <p>{record.uid ? record.uid : "-"}</p>;
+      // },
       align: "center",
       key: "uid",
     },
