@@ -43,21 +43,19 @@ const inputStructure = [
     name: "fatherPhoneNumber",
     type: "number",
     inputType: "number",
-    label: "Father Contact No ",
+    label: "Father Contact No ( Optional )",
     placeholder: "Enter Father Contact No",
     labelClassName: "!font-bold",
     prefix: <FaPhone className="mr-1 text-secondary-color" />,
-    rules: [{ required: true }],
   },
   {
     name: "motherPhoneNumber",
     type: "number",
     inputType: "number",
-    label: "Mother Contact No ",
+    label: "Mother Contact No ( Optional )",
     placeholder: "Enter Mother Contact No",
     labelClassName: "!font-bold",
     prefix: <FaPhone className="mr-1 text-secondary-color" />,
-    rules: [{ required: true }],
   },
 ];
 
