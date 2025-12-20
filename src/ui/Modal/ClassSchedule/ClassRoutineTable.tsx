@@ -27,7 +27,6 @@ import {
 import ReuseButton from "../../Button/ReuseButton";
 
 const DAYS_ORDER = [
-  "saturday",
   "sunday",
   "monday",
   "tuesday",
